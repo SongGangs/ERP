@@ -118,7 +118,7 @@
         </a-card>
       </a-col>
     </a-row>
-    <a-row :gutter="24">
+    <a-row :gutter="24" :hidden="true">
       <a-col :sm="24" :md="24" :xl="24" :style="{ paddingRight: '0px',marginBottom: '6px' }">
         <a-card :bordered="false" :body-style="{padding: '5'}" data-step="7" data-title="服务和版权"
                 data-intro="展示服务到期时间（快到期时会出现续费链接，请注意及时续费）、
@@ -131,9 +131,9 @@
               <div slot="content">
                 <img src="/static/weixin.jpg" style="width:258px" />
               </div>
-              <a-button type="link" v-if="showWeixinSpan()">管伊佳ERP微信小程序</a-button>
+              <a-button type="link" v-if="showWeixinSpan()">木里ERP微信小程序</a-button>
             </a-popover>
-            &copy; 2015-2030 {{systemTitle}} V3.5
+            &copy; 2025-2025 {{systemTitle}} V3.5
           </div>
           <a-tag v-if="tenant.type==0" color="blue">试用到期：{{tenant.expireTime}}</a-tag>
           <a-tag v-if="tenant.type==0" color="blue">试用用户：{{tenant.userCurrentNum}}/{{tenant.userNumLimit}}</a-tag>

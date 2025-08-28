@@ -40,10 +40,10 @@
         </div>
       </div>
       <p>
-        <span v-if="this.isShowRight">管伊佳科技</span>
-        © 2015-2030 {{systemTitle}} - All Right Reserved 版权所有
-        <a style="color:#00458a; padding-right: 10px" :href="systemUrl" target="_blank">官方网站</a>
-        <span v-if="this.isShowRight"><a href="http://beian.miit.gov.cn/" target="_blank">苏ICP备2021042833号</a></span>
+        <span v-if="this.isShowRight">木里科技</span>
+        © 2025-2025 {{systemTitle}} - All Right Reserved 版权所有
+<!--        <a style="color:#00458a; padding-right: 10px" :href="systemUrl" target="_blank">官方网站</a>-->
+<!--        <span v-if="this.isShowRight"><a href="http://beian.miit.gov.cn/" target="_blank">苏ICP备2021042833号</a></span>-->
       </p>
     </div>
     <a-modal v-model="isAndroidShow" title="微信扫一扫下载安卓版" width="200" centered>
