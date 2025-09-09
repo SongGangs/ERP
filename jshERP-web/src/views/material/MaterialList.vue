@@ -288,7 +288,7 @@
         columns:[],
         // 默认索引
         defDataIndex:['action','mBarCode','name','standard','model','color','categoryName','unit', 'stock',
-          'purchaseDecimal','commodityDecimal','wholesaleDecimal','lowDecimal','enabled'],
+          'purchaseDecimal','enabled'],
         // 默认列
         defColumns: [
           {

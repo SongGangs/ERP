@@ -226,9 +226,9 @@
                 @deleted="onDeleted">
                 <template #buttonAfter>
                   <a-button @click="batchSetPrice('purchase')">采购价-批量</a-button>
-                  <a-button style="margin-left: 8px" @click="batchSetPrice('commodity')">零售价-批量</a-button>
-                  <a-button style="margin-left: 8px" @click="batchSetPrice('wholesale')">销售价-批量</a-button>
-                  <a-button style="margin-left: 8px" @click="batchSetPrice('low')">最低售价-批量</a-button>
+<!--                  <a-button style="margin-left: 8px" @click="batchSetPrice('commodity')">零售价-批量</a-button>-->
+<!--                  <a-button style="margin-left: 8px" @click="batchSetPrice('wholesale')">销售价-批量</a-button>-->
+<!--                  <a-button style="margin-left: 8px" @click="batchSetPrice('low')">最低售价-批量</a-button>-->
                 </template>
               </j-editable-table>
               <!-- 表单区域 -->
@@ -381,15 +381,15 @@
             {
               title: '采购价', key: 'purchaseDecimal', width: '9%', type: FormTypes.inputNumber, defaultValue: '', placeholder: '请输入${title}'
             },
-            {
-              title: '零售价', key: 'commodityDecimal', width: '9%', type: FormTypes.inputNumber, defaultValue: '', placeholder: '请输入${title}'
-            },
-            {
-              title: '销售价', key: 'wholesaleDecimal', width: '9%', type: FormTypes.inputNumber, defaultValue: '', placeholder: '请输入${title}'
-            },
-            {
-              title: '最低售价', key: 'lowDecimal', width: '9%', type: FormTypes.inputNumber, defaultValue: '', placeholder: '请输入${title}'
-            }
+            // {
+            //   title: '零售价', key: 'commodityDecimal', width: '9%', type: FormTypes.inputNumber, defaultValue: '', placeholder: '请输入${title}'
+            // },
+            // {
+            //   title: '销售价', key: 'wholesaleDecimal', width: '9%', type: FormTypes.inputNumber, defaultValue: '', placeholder: '请输入${title}'
+            // },
+            // {
+            //   title: '最低售价', key: 'lowDecimal', width: '9%', type: FormTypes.inputNumber, defaultValue: '', placeholder: '请输入${title}'
+            // }
           ]
         },
         depotTable: {
