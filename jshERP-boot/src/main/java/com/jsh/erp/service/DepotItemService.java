@@ -12,10 +12,12 @@ import com.jsh.erp.datasource.vo.DepotItemVoBatchNumberList;
 import com.jsh.erp.datasource.vo.InOutPriceVo;
 import com.jsh.erp.exception.BusinessRunTimeException;
 import com.jsh.erp.exception.JshException;
+import com.jsh.erp.utils.DateUtils;
 import com.jsh.erp.utils.StringUtil;
 import com.jsh.erp.utils.Tools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,6 +65,8 @@ public class DepotItemService {
     private MaterialCurrentStockMapperEx materialCurrentStockMapperEx;
     @Resource
     private LogService logService;
+    @Autowired
+    private RoleService roleService;
 
     public DepotItem getDepotItem(long id)throws Exception {
         DepotItem result=null;
@@ -381,7 +385,7 @@ public class DepotItemService {
     }
 
     @Transactional(value = "transactionManager", rollbackFor = Exception.class)
-    public void saveDetials(String rows, Long headerId, String actionType, HttpServletRequest request) throws Exception{
+    public void saveDetials(String rows, Long headerId, String actionType, boolean priceLimit, HttpServletRequest request) throws Exception {
         //查询单据主表信息
         DepotHead depotHead =depotHeadMapper.selectByPrimaryKey(headerId);
         //删除序列号和回收序列号
@@ -389,6 +393,7 @@ public class DepotItemService {
         //删除单据的明细
         deleteDepotItemHeadId(headerId);
         JSONArray rowArr = JSONArray.parseArray(rows);
+        Date currentDate = DateUtils.getDayBeginTime(new Date());
         if (null != rowArr && rowArr.size()>0) {
             //针对组装单、拆卸单校验是否存在组合件和普通子件
             checkAssembleWithMaterialType(rowArr, depotHead.getSubType());
@@ -464,30 +469,39 @@ public class DepotItemService {
                         }
                     }
                 }
-                if (StringUtil.isExist(rowObj.get("batchNumber"))) {
-                    depotItem.setBatchNumber(rowObj.getString("batchNumber"));
-                } else {
-                    //入库或出库
-                    if(BusinessConstants.DEPOTHEAD_TYPE_IN.equals(depotHead.getType()) ||
-                            BusinessConstants.DEPOTHEAD_TYPE_OUT.equals(depotHead.getType())) {
-                        //批号不能为空
-                        if (BusinessConstants.ENABLE_BATCH_NUMBER_ENABLED.equals(material.getEnableBatchNumber())) {
-                            //如果开启出入库管理，并且类型等于采购、采购退货、销售、销售退货，则跳过
-                            if(systemConfigService.getInOutManageFlag() &&
-                                    (BusinessConstants.SUB_TYPE_PURCHASE.equals(depotHead.getSubType())
-                                            ||BusinessConstants.SUB_TYPE_PURCHASE_RETURN.equals(depotHead.getSubType())
-                                            ||BusinessConstants.SUB_TYPE_SALES.equals(depotHead.getSubType())
-                                            ||BusinessConstants.SUB_TYPE_SALES_RETURN.equals(depotHead.getSubType()))) {
-                                //跳过
-                            } else {
-                                throw new BusinessRunTimeException(ExceptionConstants.DEPOT_HEAD_BATCH_NUMBERE_EMPTY_CODE,
-                                        String.format(ExceptionConstants.DEPOT_HEAD_BATCH_NUMBERE_EMPTY_MSG, barCode));
-                            }
-                        }
+                depotItem.setBatchNumber(rowObj.getString("batchNumber"));
+                depotItem.setProductionDate(rowObj.getDate("productionDate"));
+                depotItem.setExpirationDate(rowObj.getDate("expirationDate"));
+                // 批号、生产日期、有效期不能为空
+                if (BusinessConstants.ENABLE_BATCH_NUMBER_ENABLED.equals(material.getEnableBatchNumber()) &&
+                        (BusinessConstants.DEPOTHEAD_TYPE_IN.equals(depotHead.getType()) ||
+                                BusinessConstants.DEPOTHEAD_TYPE_OUT.equals(depotHead.getType()))) {
+                    //如果开启出入库管理，并且类型等于采购、采购退货、销售、销售退货，则跳过
+                    if (systemConfigService.getInOutManageFlag() &&
+                            (BusinessConstants.SUB_TYPE_PURCHASE.equals(depotHead.getSubType())
+                                    || BusinessConstants.SUB_TYPE_PURCHASE_RETURN.equals(depotHead.getSubType())
+                                    || BusinessConstants.SUB_TYPE_SALES.equals(depotHead.getSubType())
+                                    || BusinessConstants.SUB_TYPE_SALES_RETURN.equals(depotHead.getSubType()))) {
+                        //跳过
+                    } else if (StringUtil.isEmpty(depotItem.getBatchNumber())) {
+                        throw new BusinessRunTimeException(ExceptionConstants.DEPOT_HEAD_BATCH_NUMBERE_EMPTY_CODE,
+                                String.format(ExceptionConstants.DEPOT_HEAD_BATCH_NUMBERE_EMPTY_MSG, barCode));
+                    } else if (Objects.isNull(depotItem.getProductionDate())) {
+                        throw new BusinessRunTimeException(ExceptionConstants.DEPOT_HEAD_BATCH_NUMBERE_EMPTY_CODE,
+                                String.format(ExceptionConstants.DEPOT_HEAD_BATCH_COMMON_MSG, barCode, "生产日期不能为空"));
+                    } else if (Objects.isNull(depotItem.getExpirationDate())) {
+                        throw new BusinessRunTimeException(ExceptionConstants.DEPOT_HEAD_BATCH_NUMBERE_EMPTY_CODE,
+                                String.format(ExceptionConstants.DEPOT_HEAD_BATCH_COMMON_MSG, barCode, "有效期不能为空"));
+                    } else if (depotItem.getProductionDate().after(currentDate)) {
+                        throw new BusinessRunTimeException(ExceptionConstants.DEPOT_HEAD_BATCH_NUMBERE_EMPTY_CODE,
+                                String.format(ExceptionConstants.DEPOT_HEAD_BATCH_COMMON_MSG, barCode, "生产日期需早于今天"));
+                    } else if (depotItem.getExpirationDate().before(currentDate)) {
+                        throw new BusinessRunTimeException(ExceptionConstants.DEPOT_HEAD_BATCH_NUMBERE_EMPTY_CODE,
+                                String.format(ExceptionConstants.DEPOT_HEAD_BATCH_COMMON_MSG, barCode, "有效期需晚于今天"));
+                    } else if (depotItem.getProductionDate().after(depotItem.getExpirationDate())) {
+                        throw new BusinessRunTimeException(ExceptionConstants.DEPOT_HEAD_BATCH_NUMBERE_EMPTY_CODE,
+                                String.format(ExceptionConstants.DEPOT_HEAD_BATCH_COMMON_MSG, barCode, "有效期需晚于生产日期"));
                     }
-                }
-                if (StringUtil.isExist(rowObj.get("expirationDate"))) {
-                    depotItem.setExpirationDate(rowObj.getDate("expirationDate"));
                 }
                 if (StringUtil.isExist(rowObj.get("sku"))) {
                     depotItem.setSku(rowObj.getString("sku"));
@@ -556,6 +570,7 @@ public class DepotItemService {
                         }
                     }
                 }
+                // Todo childs 更新问题
                 if (StringUtil.isExist(rowObj.get("unitPrice"))) {
                     BigDecimal unitPrice = rowObj.getBigDecimal("unitPrice");
                     depotItem.setUnitPrice(unitPrice);

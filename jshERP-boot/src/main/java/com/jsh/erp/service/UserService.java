@@ -376,18 +376,19 @@ public class UserService {
                 pwdSimple = true;
             }
             user.setPassword(null);
-            if(BusinessConstants.DEFAULT_MANAGER.equals(user.getLoginName())) {
-                //如果是管理员，则发送订阅消息
-                //1-获取token
-                String accessToken = platformConfigService.getAccessToken();
-                //2-发送订阅消息
-                String templateId = platformConfigService.getPlatformConfigByKey("login_temp_id").getPlatformValue();
-                String weixinUrl = platformConfigService.getPlatformConfigByKey("weixinUrl").getPlatformValue();
-                String platformName = platformConfigService.getPlatformConfigByKey("platform_name").getPlatformValue();
-                if(StringUtil.isNotEmpty(accessToken) && StringUtil.isNotEmpty(user.getWeixinOpenId()) && StringUtil.isNotEmpty(templateId)) {
-                    platformConfigService.sendSubscribeMessage(accessToken, weixinUrl, platformName, templateId, null, user.getWeixinOpenId());
-                }
-            }
+            // Todo childs 注释 不发微信订阅消息
+//            if(BusinessConstants.DEFAULT_MANAGER.equals(user.getLoginName())) {
+//                //如果是管理员，则发送订阅消息
+//                //1-获取token
+//                String accessToken = platformConfigService.getAccessToken();
+//                //2-发送订阅消息
+//                String templateId = platformConfigService.getPlatformConfigByKey("login_temp_id").getPlatformValue();
+//                String weixinUrl = platformConfigService.getPlatformConfigByKey("weixinUrl").getPlatformValue();
+//                String platformName = platformConfigService.getPlatformConfigByKey("platform_name").getPlatformValue();
+//                if(StringUtil.isNotEmpty(accessToken) && StringUtil.isNotEmpty(user.getWeixinOpenId()) && StringUtil.isNotEmpty(templateId)) {
+//                    platformConfigService.sendSubscribeMessage(accessToken, weixinUrl, platformName, templateId, null, user.getWeixinOpenId());
+//                }
+//            }
             redisService.storageObjectBySession(token,"clientIp", Tools.getLocalIp(request));
             logService.insertLogWithUserId(user.getId(), user.getTenantId(), "用户",
                     new StringBuffer(BusinessConstants.LOG_OPERATION_TYPE_LOGIN).append(user.getLoginName()).toString(),
@@ -954,5 +955,11 @@ public class UserService {
             }
         }
         return 0;
+    }
+
+    public List<User> getUserMapByTenantId(Long tenantId) {
+        UserExample example = new UserExample();
+        example.createCriteria().andTenantIdEqualTo(tenantId).andDeleteFlagNotEqualTo(BusinessConstants.DELETE_FLAG_DELETED);
+        return userMapper.selectByExample(example);
     }
 }

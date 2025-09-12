@@ -276,8 +276,11 @@ public class StringUtil {
         List<Long> idList=new ArrayList<Long>();
         String[] d=strArr.split(",");
         for (int i = 0, size = d.length; i < size; i++) {
-            if(d[i]!=null) {
-                idList.add(Long.parseLong(d[i]));
+            try {
+                if (d[i] != null) {
+                    idList.add(Long.parseLong(d[i]));
+                }
+            } catch (Exception e) {
             }
         }
         return idList;

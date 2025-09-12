@@ -299,6 +299,29 @@ public class RoleService {
         return price;
     }
 
+    /**
+     * 是否价格限制
+     *
+     * @param request
+     * @return
+     */
+    public boolean isPriceLimit(String billCategory, HttpServletRequest request) throws Exception {
+        String priceLimit = getCurrentPriceLimit(request);
+        if (StringUtil.isEmpty(priceLimit)) {
+            return false;
+        }
+        if ("buy".equals(billCategory) && priceLimit.contains("4")) {
+            return true;
+        }
+        if ("retail".equals(billCategory) && priceLimit.contains("5")) {
+            return true;
+        }
+        if ("sale".equals(billCategory) && priceLimit.contains("6")) {
+            return true;
+        }
+        return false;
+    }
+
     public String getCurrentPriceLimit(HttpServletRequest request) throws Exception {
         Long userId = userService.getUserId(request);
         return userService.getRoleTypeByUserId(userId).getPriceLimit();

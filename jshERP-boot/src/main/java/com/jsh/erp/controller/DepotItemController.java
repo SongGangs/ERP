@@ -244,6 +244,7 @@ public class DepotItemController {
                     item.put("unit", diEx.getMaterialUnit());
                     item.put("snList", diEx.getSnList());
                     item.put("batchNumber", diEx.getBatchNumber());
+                    item.put("productionDate", Tools.parseDateToStr(diEx.getProductionDate()));
                     item.put("expirationDate", Tools.parseDateToStr(diEx.getExpirationDate()));
                     item.put("sku", diEx.getSku());
                     item.put("enableSerialNumber", diEx.getEnableSerialNumber());

@@ -198,6 +198,7 @@ CREATE TABLE `jsh_depot_item` (
   `material_type` varchar(20) DEFAULT NULL COMMENT '商品类型',
   `sn_list` varchar(2000) DEFAULT NULL COMMENT '序列号列表',
   `batch_number` varchar(100) DEFAULT NULL COMMENT '批号',
+  `production_date` datetime DEFAULT NULL COMMENT '生产日期',
   `expiration_date` datetime DEFAULT NULL COMMENT '有效日期',
   `link_id` bigint(20) DEFAULT NULL COMMENT '关联明细id',
   `tenant_id` bigint(20) DEFAULT NULL COMMENT '租户id',

@@ -403,6 +403,7 @@ public class ExceptionConstants {
     //单据录入-商品的批号不能为空
     public static final int DEPOT_HEAD_BATCH_NUMBERE_EMPTY_CODE = 8500015;
     public static final String DEPOT_HEAD_BATCH_NUMBERE_EMPTY_MSG = "抱歉，商品条码:%s的批号不能为空";
+    public static final String DEPOT_HEAD_BATCH_COMMON_MSG = "抱歉，商品条码:%s.%s";
     //单据录入-会员预付款余额不足
     public static final int DEPOT_HEAD_MEMBER_PAY_LACK_CODE = 8500016;
     public static final String DEPOT_HEAD_MEMBER_PAY_LACK_MSG = "抱歉，会员预付款余额不足";

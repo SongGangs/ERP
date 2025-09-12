@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -209,6 +210,13 @@ public class DepotHeadService {
                         dh.setOrganName("****");
                         dh.setTotalPrice(null);
                         dh.setDiscountLastMoney(null);
+                    }
+                    if ("采购".equals(subType) && StringUtil.isNotEmpty(dh.getLinkNumber())
+                            && StringUtil.isNotEmpty(dh.getSalesMan()) && !dh.getUserName().equals(dh.getSalesMan())) {
+                        dh.setUserName(dh.getSalesMan());
+                    } else if ("采购订单".equals(subType) && StringUtil.isNotEmpty(dh.getLinkApply())
+                            && StringUtil.isNotEmpty(dh.getSalesMan()) && !dh.getUserName().equals(dh.getSalesMan())) {
+                        dh.setUserName(dh.getSalesMan());
                     }
                 }
             }
@@ -1112,6 +1120,7 @@ public class DepotHeadService {
                                       HttpServletRequest request) throws Exception {
         /**处理单据主表数据*/
         DepotHead depotHead = JSONObject.parseObject(beanJson, DepotHead.class);
+        boolean priceLimit = handleDeportHeadPriceLimit(depotHead, request);
         //判断用户是否已经登录过，登录过不再处理
         User userInfo=userService.getCurrentUser();
         //通过redis去校验重复
@@ -1141,7 +1150,27 @@ public class DepotHeadService {
                         String.format(ExceptionConstants.DEPOT_HEAD_ACCOUNT_FAILED_MSG));
             }
         }
-        depotHead.setCreator(userInfo==null?null:userInfo.getId());
+        Long creator = userInfo.getId();
+        // 采购订单转采购入库，创建人使用请购单人员
+        if ("采购".equals(subType) && StringUtil.isNotEmpty(depotHead.getLinkNumber())) {
+            DepotHead cgddDepotHead = getDepotHead(depotHead.getLinkNumber());
+            if (Objects.nonNull(cgddDepotHead) && StringUtil.isNotEmpty(cgddDepotHead.getLinkApply())) {
+                DepotHead qgdDepotHead = getDepotHead(cgddDepotHead.getLinkApply());
+                creator = Objects.nonNull(qgdDepotHead) ? qgdDepotHead.getCreator() : creator;
+                if (!Objects.equals(creator, userInfo.getId())) {
+                    // 实际操作人入库
+                    depotHead.setSalesMan(userInfo.getUsername());
+                }
+            }
+        } else if ("采购订单".equals(subType) && StringUtil.isNotEmpty(depotHead.getLinkApply())) {
+            DepotHead qgdDepotHead = getDepotHead(depotHead.getLinkApply());
+            creator = Objects.nonNull(qgdDepotHead) ? qgdDepotHead.getCreator() : creator;
+            if (!Objects.equals(creator, userInfo.getId())) {
+                // 实际操作人入库
+                depotHead.setSalesMan(userInfo.getUsername());
+            }
+        }
+        depotHead.setCreator(creator);
         depotHead.setCreateTime(new Timestamp(System.currentTimeMillis()));
         if(StringUtil.isEmpty(depotHead.getStatus())) {
             depotHead.setStatus(BusinessConstants.BILLS_STATUS_UN_AUDIT);
@@ -1204,7 +1233,7 @@ public class DepotHeadService {
         if(list!=null) {
             Long headId = list.get(0).getId();
             /**入库和出库处理单据子表信息*/
-            depotItemService.saveDetials(rows,headId, "add",request);
+            depotItemService.saveDetials(rows, headId, "add", priceLimit, request);
         }
         logService.insertLog("单据",
                 new StringBuffer(BusinessConstants.LOG_OPERATION_TYPE_ADD).append(depotHead.getNumber()).toString(),
@@ -1222,6 +1251,7 @@ public class DepotHeadService {
     public void updateDepotHeadAndDetail(String beanJson, String rows,HttpServletRequest request)throws Exception {
         /**更新单据主表信息*/
         DepotHead depotHead = JSONObject.parseObject(beanJson, DepotHead.class);
+        boolean priceLimit = handleDeportHeadPriceLimit(depotHead, request);
         //校验单号是否重复
         if(checkIsBillNumberExist(depotHead.getId(), depotHead.getNumber())>0) {
             throw new BusinessRunTimeException(ExceptionConstants.DEPOT_HEAD_BILL_NUMBER_EXIST_CODE,
@@ -1305,7 +1335,7 @@ public class DepotHeadService {
             }
         }
         /**入库和出库处理单据子表信息*/
-        depotItemService.saveDetials(rows,depotHead.getId(), "update",request);
+        depotItemService.saveDetials(rows, depotHead.getId(), "update", priceLimit, request);
         logService.insertLog("单据",
                 new StringBuffer(BusinessConstants.LOG_OPERATION_TYPE_EDIT).append(depotHead.getNumber()).toString(),
                 ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest());
@@ -1419,6 +1449,16 @@ public class DepotHeadService {
             JshException.readFail(logger, e);
         }
         return depotHead;
+    }
+
+    public Map<String, DepotHead> getDepotHeadMap(List<String> numbers) {
+        if (CollectionUtils.isEmpty(numbers)) {
+            return Collections.emptyMap();
+        }
+        DepotHeadExample example = new DepotHeadExample();
+        example.createCriteria().andNumberIn(numbers).andDeleteFlagNotEqualTo(BusinessConstants.DELETE_FLAG_DELETED);
+        List<DepotHead> depotHeads = depotHeadMapper.selectByExample(example);
+        return depotHeads.stream().collect(Collectors.toMap(DepotHead::getNumber, t -> t));
     }
 
     public List<DepotHeadVo4List> debtList(Long organId, String materialParam, String number, String beginTime, String endTime,
@@ -1750,6 +1790,7 @@ public class DepotHeadService {
         List<DepotHead> dhList = getDepotHeadListByIds(ids);
         StringBuilder sb = new StringBuilder();
         User userInfo=userService.getCurrentUser();
+        boolean priceLimit = roleService.isPriceLimit(getBillCategory(BusinessConstants.SUB_TYPE_OTHER), request);
         for(DepotHead depotHead : dhList) {
             String prefixNo = BusinessConstants.DEPOTHEAD_TYPE_IN.equals(depotHead.getType())?"QTRK":"QTCK";
             //关联单据单号
@@ -1816,11 +1857,47 @@ public class DepotHeadService {
             if(list!=null) {
                 Long headId = list.get(0).getId();
                 /**入库和出库处理单据子表信息*/
-                depotItemService.saveDetials(rows, headId, "add", request);
+                depotItemService.saveDetials(rows, headId, "add", priceLimit, request);
             }
         }
         logService.insertLog("单据",
                 new StringBuffer(BusinessConstants.LOG_OPERATION_TYPE_BATCH_ADD).append(sb).toString(),
                 ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest());
+    }
+
+    /**
+     * 价格限制不处理任何价格信息
+     */
+    private boolean handleDeportHeadPriceLimit(DepotHead depotHead, HttpServletRequest request) throws Exception {
+        // 价格限制不更新价格
+        String subType = depotHead.getSubType();
+        String billCategory = getBillCategory(subType);
+        boolean priceLimit = roleService.isPriceLimit(billCategory, request);
+        if (!priceLimit) {
+            return false;
+        }
+        depotHead.setChangeAmount(null);
+        depotHead.setBackAmount(null);
+        depotHead.setTotalPrice(null);
+        depotHead.setDiscount(null);
+        depotHead.setDiscountMoney(null);
+        depotHead.setDiscountLastMoney(null);
+        depotHead.setOtherMoney(null);
+        depotHead.setDeposit(null);
+        // 采购订单转采购入库，创建人使用请购单人员
+        if ("采购".equals(subType) && StringUtil.isNotEmpty(depotHead.getLinkNumber())) {
+            DepotHead cgddDepotHead = getDepotHead(depotHead.getLinkNumber());
+            if (Objects.nonNull(cgddDepotHead)) {
+                depotHead.setChangeAmount(cgddDepotHead.getChangeAmount());
+                depotHead.setBackAmount(cgddDepotHead.getBackAmount());
+                depotHead.setTotalPrice(cgddDepotHead.getTotalPrice());
+                depotHead.setDiscount(cgddDepotHead.getDiscount());
+                depotHead.setDiscountMoney(cgddDepotHead.getDiscountMoney());
+                depotHead.setDiscountLastMoney(cgddDepotHead.getDiscountLastMoney());
+                depotHead.setOtherMoney(cgddDepotHead.getOtherMoney());
+                depotHead.setDeposit(cgddDepotHead.getDeposit());
+            }
+        }
+        return priceLimit;
     }
 }
