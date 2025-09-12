@@ -73,7 +73,7 @@
                 <a-col :md="6" :sm="24">
                   <a-form-item label="单据状态" :labelCol="labelCol" :wrapperCol="wrapperCol">
                     <a-select placeholder="请选择单据状态" allow-clear v-model="queryParam.status">
-                      <a-select-option value="0">未审核</a-select-option>
+                      <a-select-option value="0" v-if="btnEnableList.indexOf(1)>-1">未审核</a-select-option>
                       <a-select-option value="9" v-if="!checkFlag">审核中</a-select-option>
                       <a-select-option value="1">已审核</a-select-option>
                       <a-select-option value="3">部分采购</a-select-option>
@@ -94,7 +94,7 @@
         <div class="table-operator"  style="margin-top: 5px">
           <a-button v-if="btnEnableList.indexOf(1)>-1" @click="myHandleAdd" type="primary" icon="plus">新增</a-button>
           <a-button v-if="btnEnableList.indexOf(1)>-1" icon="delete" @click="batchDel">删除</a-button>
-          <a-button v-if="quickBtn.purchaseIn.indexOf(1)>-1 && btnEnableList.indexOf(1)>-1" icon="share-alt" @click="transferBill('转采购入库', quickBtn.purchaseIn)">转采购入库</a-button>
+          <a-button v-if="quickBtn.purchaseIn.indexOf(1)>-1" icon="share-alt" @click="transferBill('转采购入库', quickBtn.purchaseIn)">转采购入库</a-button>
           <a-tooltip title="可将状态是部分采购的单据强制完成">
             <a-button v-if="btnEnableList.indexOf(1)>-1" icon="issues-close" @click="batchForceClose">强制结单</a-button>
           </a-tooltip>
@@ -302,6 +302,8 @@
       this.initUser()
       this.initQuickBtn()
       this.getDepotByCurrentUser()
+      // Todo Childs
+      // this.queryParam.status = '1,2,3'
     },
     computed: {
     },

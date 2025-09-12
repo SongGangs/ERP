@@ -161,7 +161,7 @@ export const BillModalMixin = {
                   columns[i].type = FormTypes.input //显示
                 }
               }
-            } else if(key === 'expirationDate') {
+            } else if(key === 'expirationDate' || key === 'productionDate') {
               if(this.prefixNo === 'LSTH' || this.prefixNo === 'CGRK' || this.prefixNo === 'XSTH' || this.prefixNo === 'QTRK') {
                 columns[i].type = FormTypes.date //显示
               } else {
@@ -560,7 +560,8 @@ export const BillModalMixin = {
                   allPrice = (unitPrice*operNumber).toFixed(2)-0
                   taxMoney =((taxRate*0.01)*allPrice).toFixed(2)-0
                   taxLastMoney = (allPrice + taxMoney).toFixed(2)-0
-                  target.setValues([{rowKey: row.id, values: {expirationDate: info.expirationDateStr, operNumber: operNumber,
+                  target.setValues([{rowKey: row.id, values: {expirationDate: info.expirationDateStr,
+                      productionDate: info.productionDateStr, operNumber: operNumber,
                       allPrice: allPrice, taxMoney: taxMoney, taxLastMoney: taxLastMoney}}])
                   target.recalcAllStatisticsColumns()
                   that.autoChangePrice(target)
@@ -707,6 +708,7 @@ export const BillModalMixin = {
           //跳过
         } else {
           this.changeFormTypes(this.materialTable.columns, 'batchNumber', 1)
+          this.changeFormTypes(this.materialTable.columns, 'productionDate', 1)
           this.changeFormTypes(this.materialTable.columns, 'expirationDate', 1)
         }
       }

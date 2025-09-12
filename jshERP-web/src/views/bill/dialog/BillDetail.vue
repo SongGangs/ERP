@@ -1352,6 +1352,7 @@
           { title: '单位', dataIndex: 'unit'},
           { title: '序列号', dataIndex: 'snList', width:300},
           { title: '批号', dataIndex: 'batchNumber'},
+          { title: '生产日期', dataIndex: 'productionDate'},
           { title: '有效期', dataIndex: 'expirationDate'},
           { title: '多属性', dataIndex: 'sku'},
           { title: '数量', dataIndex: 'operNumber'},
@@ -1381,6 +1382,7 @@
           { title: '单位', dataIndex: 'unit'},
           { title: '序列号', dataIndex: 'snList', width:300},
           { title: '批号', dataIndex: 'batchNumber'},
+          { title: '生产日期', dataIndex: 'productionDate'},
           { title: '有效期', dataIndex: 'expirationDate'},
           { title: '多属性', dataIndex: 'sku'},
           { title: '数量', dataIndex: 'operNumber'},
@@ -1491,6 +1493,7 @@
           { title: '单位', dataIndex: 'unit'},
           { title: '序列号', dataIndex: 'snList', width:300},
           { title: '批号', dataIndex: 'batchNumber'},
+          { title: '生产日期', dataIndex: 'productionDate'},
           { title: '有效期', dataIndex: 'expirationDate'},
           { title: '多属性', dataIndex: 'sku'},
           { title: '数量', dataIndex: 'operNumber'},
@@ -1516,6 +1519,7 @@
           { title: '单位', dataIndex: 'unit'},
           { title: '序列号', dataIndex: 'snList', width:300},
           { title: '批号', dataIndex: 'batchNumber'},
+          { title: '生产日期', dataIndex: 'productionDate'},
           { title: '有效期', dataIndex: 'expirationDate'},
           { title: '多属性', dataIndex: 'sku'},
           { title: '数量', dataIndex: 'operNumber'},
@@ -1665,6 +1669,9 @@
           if(ds[i].batchNumber) {
             needAddkeywords.push('batchNumber')
           }
+          if(ds[i].productionDate) {
+            needAddkeywords.push('productionDate')
+          }
           if(ds[i].expirationDate) {
             needAddkeywords.push('expirationDate')
           }
@@ -1715,7 +1722,7 @@
         }]
         for(let i=0; i<this.defColumns.length; i++){
           //移除列
-          let needRemoveKeywords = ['finishNumber','snList','batchNumber','expirationDate','sku','weight','position',
+          let needRemoveKeywords = ['finishNumber','snList','batchNumber','productionDate','expirationDate','sku','weight','position',
             'brand','mfrs','otherField1','otherField2','otherField3','taxRate','remark']
           if(needRemoveKeywords.indexOf(this.defColumns[i].dataIndex)===-1) {
             let info = {}
@@ -2025,7 +2032,7 @@
           let item = []
           let ds = this.dataSource[i]
           item.push(ds.depotName, ds.barCode, ds.name, ds.standard, ds.model, ds.color, ds.otherField1, ds.otherField2, ds.otherField3, ds.stock, ds.unit,
-            ds.snList, ds.batchNumber, ds.expirationDate, ds.sku, ds.operNumber, ds.unitPrice, ds.allPrice, ds.taxRate, ds.taxMoney, ds.taxLastMoney, ds.weight, ds.remark)
+            ds.snList, ds.batchNumber, ds.productionDate, ds.expirationDate, ds.sku, ds.operNumber, ds.unitPrice, ds.allPrice, ds.taxRate, ds.taxMoney, ds.taxLastMoney, ds.weight, ds.remark)
           list.push(item)
         }
         let organName = this.model.organName? this.model.organName: ''
@@ -2048,7 +2055,7 @@
           let item = []
           let ds = this.dataSource[i]
           item.push(ds.depotName, ds.barCode, ds.name, ds.standard, ds.model, ds.color, ds.otherField1, ds.otherField2, ds.otherField3, ds.stock, ds.unit,
-            ds.snList, ds.batchNumber, ds.expirationDate, ds.sku, ds.operNumber, ds.unitPrice, ds.allPrice, ds.remark)
+            ds.snList, ds.batchNumber, ds.productionDate, ds.expirationDate, ds.sku, ds.operNumber, ds.unitPrice, ds.allPrice, ds.remark)
           list.push(item)
         }
         let organName = this.model.organName? this.model.organName: ''

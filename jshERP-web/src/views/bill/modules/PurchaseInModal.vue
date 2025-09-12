@@ -276,34 +276,35 @@
             { title: '仓库名称', key: 'depotId', width: '8%', type: FormTypes.select, placeholder: '请选择${title}', options: [],
               allowSearch:true, validateRules: [{ required: true, message: '${title}不能为空' }]
             },
-            { title: '条码', key: 'barCode', width: '12%', type: FormTypes.popupJsh, kind: 'material', multi: true,
+            { title: '条码', key: 'barCode', width: '10%', type: FormTypes.popupJsh, kind: 'material', multi: true,
               validateRules: [{ required: true, message: '${title}不能为空' }]
             },
             { title: '名称', key: 'name', width: '10%', type: FormTypes.normal },
-            { title: '规格', key: 'standard', width: '9%', type: FormTypes.normal },
-            { title: '型号', key: 'model', width: '9%', type: FormTypes.normal },
+            { title: '规格', key: 'standard', width: '8%', type: FormTypes.normal },
+            { title: '型号', key: 'model', width: '8%', type: FormTypes.normal },
             { title: '颜色', key: 'color', width: '5%', type: FormTypes.normal },
             { title: '品牌', key: 'brand', width: '6%', type: FormTypes.normal },
             { title: '制造商', key: 'mfrs', width: '6%', type: FormTypes.normal },
             { title: '扩展1', key: 'otherField1', width: '4%', type: FormTypes.normal },
             { title: '扩展2', key: 'otherField2', width: '4%', type: FormTypes.normal },
             { title: '扩展3', key: 'otherField3', width: '4%', type: FormTypes.normal },
-            { title: '库存', key: 'stock', width: '5%', type: FormTypes.normal },
+            { title: '库存', key: 'stock', width: '4%', type: FormTypes.normal },
             { title: '单位', key: 'unit', width: '4%', type: FormTypes.normal },
-            { title: '序列号', key: 'snList', width: '12%', type: FormTypes.popupJsh, kind: 'snAdd', multi: true },
-            { title: '批号', key: 'batchNumber', width: '7%', type: FormTypes.input },
-            { title: '有效期', key: 'expirationDate',width: '7%', type: FormTypes.date },
+            { title: '序列号', key: 'snList', width: '10%', type: FormTypes.popupJsh, kind: 'snAdd', multi: true },
+            { title: '批号', key: 'batchNumber', width: '8%', type: FormTypes.input },
+            { title: '生产日期', key: 'productionDate',width: '8%', type: FormTypes.date },
+            { title: '有效期', key: 'expirationDate',width: '8%', type: FormTypes.date },
             { title: '多属性', key: 'sku', width: '9%', type: FormTypes.normal },
-            { title: '原数量', key: 'preNumber', width: '4%', type: FormTypes.normal },
-            { title: '已入库', key: 'finishNumber', width: '4%', type: FormTypes.normal },
-            { title: '数量', key: 'operNumber', width: '4%', type: FormTypes.inputNumber, statistics: true,
+            { title: '原数量', key: 'preNumber', width: '3%', type: FormTypes.normal },
+            { title: '已入库', key: 'finishNumber', width: '3%', type: FormTypes.normal },
+            { title: '数量', key: 'operNumber', width: '3%', type: FormTypes.inputNumber, statistics: true,
               validateRules: [{ required: true, message: '${title}不能为空' }]
             },
-            { title: '单价', key: 'unitPrice', width: '4%', type: FormTypes.inputNumber},
-            { title: '金额', key: 'allPrice', width: '5%', type: FormTypes.inputNumber, statistics: true },
-            { title: '税率', key: 'taxRate', width: '4%', type: FormTypes.inputNumber,placeholder: '%'},
-            { title: '税额', key: 'taxMoney', width: '5%', type: FormTypes.inputNumber, readonly: true, statistics: true },
-            { title: '价税合计', key: 'taxLastMoney', width: '7%', type: FormTypes.inputNumber, statistics: true },
+            { title: '单价', key: 'unitPrice', width: '3%', type: FormTypes.inputNumber},
+            { title: '金额', key: 'allPrice', width: '4%', type: FormTypes.inputNumber, statistics: true },
+            { title: '税率', key: 'taxRate', width: '3%', type: FormTypes.inputNumber,placeholder: '%'},
+            { title: '税额', key: 'taxMoney', width: '3%', type: FormTypes.inputNumber, readonly: true, statistics: true },
+            { title: '价税合计', key: 'taxLastMoney', width: '5%', type: FormTypes.inputNumber, statistics: true },
             { title: '备注', key: 'remark', width: '6%', type: FormTypes.input },
             { title: '关联id', key: 'linkId', width: '5%', type: FormTypes.hidden },
           ]
@@ -356,6 +357,7 @@
         this.changeColumnHide()
         this.changeFormTypes(this.materialTable.columns, 'snList', 0)
         this.changeFormTypes(this.materialTable.columns, 'batchNumber', 0)
+        this.changeFormTypes(this.materialTable.columns, 'productionDate', 0)
         this.changeFormTypes(this.materialTable.columns, 'expirationDate', 0)
         this.changeFormTypes(this.materialTable.columns, 'preNumber', 0)
         this.changeFormTypes(this.materialTable.columns, 'finishNumber', 0)
