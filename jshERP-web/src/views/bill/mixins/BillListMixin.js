@@ -20,6 +20,7 @@ export const BillListMixin = {
       dateFormat: 'YYYY-MM-DD',
       billExcelUrl: '',
       defaultDepotId: '',
+      priceLimit: false,
       supList: [],
       cusList: [],
       retailList: [],
@@ -142,6 +143,7 @@ export const BillListMixin = {
         { title: '单位', dataIndex: 'unit'},
         { title: '序列号', dataIndex: 'snList', width:300},
         { title: '批号', dataIndex: 'batchNumber'},
+        { title: '生产日期', dataIndex: 'productionDate'},
         { title: '有效期', dataIndex: 'expirationDate'},
         { title: '多属性', dataIndex: 'sku'},
         { title: '数量', dataIndex: 'operNumber'},
@@ -171,6 +173,7 @@ export const BillListMixin = {
         { title: '单位', dataIndex: 'unit'},
         { title: '序列号', dataIndex: 'snList', width:300},
         { title: '批号', dataIndex: 'batchNumber'},
+        { title: '生产日期', dataIndex: 'productionDate'},
         { title: '有效期', dataIndex: 'expirationDate'},
         { title: '多属性', dataIndex: 'sku'},
         { title: '数量', dataIndex: 'operNumber'},
@@ -456,6 +459,7 @@ export const BillListMixin = {
     },
     myHandleAdd() {
       this.$refs.modalForm.action = "add";
+      this.$refs.modalForm.priceLimit = this.priceLimit
       if(this.btnEnableList.indexOf(2)===-1) {
         this.$refs.modalForm.isCanCheck = false
       }
@@ -463,6 +467,7 @@ export const BillListMixin = {
     },
     myHandleCopyAdd(record) {
       this.$refs.modalForm.action = "copyAdd";
+      this.$refs.modalForm.priceLimit = this.priceLimit
       if(this.btnEnableList.indexOf(2)===-1) {
         this.$refs.modalForm.isCanCheck = false
       }
@@ -488,6 +493,7 @@ export const BillListMixin = {
         findBillDetailByNumber({ number: record.number }).then((res) => {
           if (res && res.code === 200) {
             let item = res.data
+            item['priceLimit'] = this.priceLimit
             this.handleEdit(item)
           }
         })
@@ -506,7 +512,7 @@ export const BillListMixin = {
       if(this.btnEnableList.indexOf(7)===-1) {
         this.$refs.modalDetail.isCanBackCheck = false
       }
-      this.handleDetail(record, type, prefixNo);
+      this.handleDetail(record, type, prefixNo, this.priceLimit);
     },
     batchForceClose: function () {
       if(!this.url.forceCloseBatch){
@@ -677,27 +683,39 @@ export const BillListMixin = {
         }
       })
     },
+    async getCurrentPriceLimit(prefixNo) {
+      if (prefixNo === 'CGRK' || prefixNo == 'CGDD' || prefixNo == 'CGTH') {
+        await getAction('/user/getCurrentPriceLimit', {}).then(res => {
+          if (res && res.code === 200) {
+            this.priceLimit = res.data.priceLimit && res.data.priceLimit.includes(4)
+          }
+        })
+      }
+    },
     //加载初始化列
-    initColumnsSetting(){
+    async initColumnsSetting() {
+      await this.getCurrentPriceLimit(this.prefixNo)
       let columnsStr = Vue.ls.get(this.prefixNo)
       if(columnsStr && columnsStr.indexOf(',')>-1) {
         this.settingDataIndex = columnsStr.split(',')
       } else {
         this.settingDataIndex = this.defDataIndex
       }
+      let needRemoveColumns = this.priceLimit ? ['totalPrice', 'totalTaxLastMoney', 'discount', 'discountMoney', 'otherMoney', 'needInMoney', 'changeAmount', 'debt', 'needBackMoney']
+        : []
       this.columns = this.defColumns.filter(item => {
         if(this.purchaseBySaleFlag) {
           //以销定购-开启
-          return this.settingDataIndex.includes(item.dataIndex)
+          return this.settingDataIndex.includes(item.dataIndex) && !needRemoveColumns.includes(item.dataIndex)
         } else {
           //以销定购-关闭
           if(this.prefixNo === 'CGDD') {
             //采购订单只显示除了关联订单之外的列
             if(item.dataIndex!=='linkNumber') {
-              return this.settingDataIndex.includes(item.dataIndex)
+              return this.settingDataIndex.includes(item.dataIndex) && !needRemoveColumns.includes(item.dataIndex)
             }
           } else {
-            return this.settingDataIndex.includes(item.dataIndex)
+            return this.settingDataIndex.includes(item.dataIndex) && !needRemoveColumns.includes(item.dataIndex)
           }
         }
       })
@@ -771,6 +789,7 @@ export const BillListMixin = {
                 this.$refs.transferPurchaseModalForm.defaultDepotId = this.defaultDepotId
                 this.$refs.transferPurchaseModalForm.add()
                 this.$refs.transferPurchaseModalForm.title = type
+                this.$refs.transferPurchaseModalForm.priceLimit = this.priceLimit
                 if(quickBtnStr.indexOf(2)===-1) {
                   this.$refs.transferPurchaseModalForm.isCanCheck = false
                 }
@@ -780,6 +799,7 @@ export const BillListMixin = {
                 this.$refs.transferModalForm.defaultDepotId = this.defaultDepotId
                 this.$refs.transferModalForm.add()
                 this.$refs.transferModalForm.title = type
+                this.$refs.transferModalForm.priceLimit = this.priceLimit
                 if(quickBtnStr.indexOf(2)===-1) {
                   this.$refs.transferModalForm.isCanCheck = false
                 }
@@ -885,7 +905,7 @@ export const BillListMixin = {
       }
       //动态替换扩展字段
       this.handleChangeOtherField()
-      //判断序列号、批号、有效期、多属性、重量、仓位货架、扩展、备注等是否有值
+      //判断序列号、批号、生产日期、有效期、多属性、重量、仓位货架、扩展、备注等是否有值
       let needAddkeywords = []
       for (let i = 0; i < ds.length; i++) {
         if(ds[i].snList) {
@@ -893,6 +913,9 @@ export const BillListMixin = {
         }
         if(ds[i].batchNumber) {
           needAddkeywords.push('batchNumber')
+        }
+        if(ds[i].productionDate) {
+          needAddkeywords.push('productionDate')
         }
         if(ds[i].expirationDate) {
           needAddkeywords.push('expirationDate')
@@ -954,10 +977,13 @@ export const BillListMixin = {
         }
         this.detailColumns = currentCol
       } else {
+        //移除列
+        let needRemoveKeywords = ['finishNumber', 'snList', 'batchNumber', 'productionDate', 'expirationDate', 'sku', 'weight', 'position',
+          'brand', 'mfrs', 'otherField1', 'otherField2', 'otherField3', 'taxRate', 'remark']
+        if (this.priceLimit) {
+          needRemoveKeywords.push('unitPrice', 'allPrice', 'taxRate', 'taxMoney', 'taxLastMoney')
+        }
         for(let i=0; i<this.defDetailColumns.length; i++){
-          //移除列
-          let needRemoveKeywords = ['finishNumber','snList','batchNumber','expirationDate','sku','weight','position',
-            'brand','mfrs','otherField1','otherField2','otherField3','taxRate','remark']
           if(needRemoveKeywords.indexOf(this.defDetailColumns[i].dataIndex)===-1) {
             let info = {}
             info.title = this.defDetailColumns[i].title

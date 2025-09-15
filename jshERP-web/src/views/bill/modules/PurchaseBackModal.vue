@@ -100,7 +100,7 @@
             </a-form-item>
           </a-col>
         </a-row>
-        <a-row class="form-row" :gutter="24">
+        <a-row class="form-row" :gutter="24" :hidden="priceLimit">
           <a-col :lg="6" :md="12" :sm="24">
             <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="优惠率">
               <a-input style="width:80%;" placeholder="请输入优惠率" v-decorator.trim="[ 'discount' ]" suffix="%" @change="onChangeDiscount"/>
@@ -122,7 +122,7 @@
             </a-form-item>
           </a-col>
         </a-row>
-        <a-row class="form-row" :gutter="24">
+        <a-row class="form-row" :gutter="24" :hidden="priceLimit">
           <a-col :lg="6" :md="12" :sm="24">
             <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="结算账户">
               <a-select style="width:80%;" placeholder="请选择结算账户" v-decorator="[ 'accountId', validatorRules.accountId ]"
@@ -227,6 +227,7 @@
         prefixNo: 'CGTH',
         fileList:[],
         rowCanEdit: true,
+        priceLimit: false,
         model: {},
         labelCol: {
           xs: { span: 24 },
@@ -261,6 +262,7 @@
             { title: '单位', key: 'unit', width: '4%', type: FormTypes.normal },
             { title: '序列号', key: 'snList', width: '12%', type: FormTypes.popupJsh, kind: 'sn', multi: true },
             { title: '批号', key: 'batchNumber', width: '7%', type: FormTypes.popupJsh, kind: 'batch', multi: false },
+            { title: '生产日期', key: 'productionDate',width: '7%', type: FormTypes.input, readonly: true },
             { title: '有效期', key: 'expirationDate',width: '7%', type: FormTypes.input, readonly: true },
             { title: '多属性', key: 'sku', width: '9%', type: FormTypes.normal },
             { title: '原数量', key: 'preNumber', width: '5%', type: FormTypes.normal },
@@ -312,7 +314,10 @@
     },
     methods: {
       //调用完edit()方法之后会自动调用此方法
-      editAfter() {
+      editAfter(record) {
+        if (record){
+          this.priceLimit = record.priceLimit
+        }
         this.billStatus = '0'
         this.currentSelectDepotId = ''
         this.rowCanEdit = true
@@ -320,11 +325,13 @@
         this.changeColumnHide()
         this.changeFormTypes(this.materialTable.columns, 'snList', 0)
         this.changeFormTypes(this.materialTable.columns, 'batchNumber', 0)
+        this.changeFormTypes(this.materialTable.columns, 'productionDate', 0)
         this.changeFormTypes(this.materialTable.columns, 'expirationDate', 0)
         this.changeFormTypes(this.materialTable.columns, 'preNumber', 0)
         this.changeFormTypes(this.materialTable.columns, 'finishNumber', 0)
         if (this.action === 'add') {
           this.addInit(this.prefixNo)
+          this.hiddenPriceColumns()
           this.fileList = []
           this.$nextTick(() => {
             if(this.transferParam && this.transferParam.number) {
@@ -406,7 +413,7 @@
         }
       },
       onSearchLinkNumber() {
-        this.$refs.linkBillList.show('入库', '采购', '供应商', "1,2,3")
+        this.$refs.linkBillList.show('入库', '采购', '供应商', "1,2,3", this.priceLimit)
         this.$refs.linkBillList.title = "请选择采购入库"
       },
       linkBillListOk(selectBillDetailRows, linkNumber, organId, discountMoney, deposit, remark, depotId, accountId) {

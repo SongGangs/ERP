@@ -287,7 +287,7 @@
             </a-col>
             <a-col :span="6" v-if="model.linkApply">
               <a-form-item :labelCol="{xs: { span: 24 },sm: { span: 6 }}" :wrapperCol="wrapperCol" label="关联请购单">
-                <a @click="myHandleDetail(model.linkApply)">{{model.linkApply}}</a>
+                <a @click="myHandleDetail(model.linkApply,priceLimit)">{{model.linkApply}}</a>
               </a-form-item>
             </a-col>
             <a-col :span="6" v-if="model.linkNumber">
@@ -322,7 +322,7 @@
               </a-form-item>
             </a-col>
           </a-row>
-          <a-row class="form-row" :gutter="24">
+          <a-row class="form-row" :gutter="24" v-if="!priceLimit">
             <a-col :span="6">
               <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="优惠率">
                 {{model.discount}}%
@@ -346,7 +346,7 @@
                 {{model.accountName}}
               </a-form-item>
             </a-col>
-            <a-col :span="6">
+            <a-col :span="6" v-if="!priceLimit">
               <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="支付订金">
                 {{model.changeAmount}}
               </a-form-item>
@@ -378,7 +378,7 @@
             </a-col>
             <a-col :span="6">
               <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="关联订单">
-                <a @click="myHandleDetail(model.linkNumber)">{{model.linkNumber}}</a>
+                <a @click="myHandleDetail(model.linkNumber, priceLimit)">{{model.linkNumber}}</a>
               </a-form-item>
             </a-col>
           </a-row>
@@ -408,7 +408,7 @@
               </a-form-item>
             </a-col>
           </a-row>
-          <a-row class="form-row" :gutter="24">
+          <a-row class="form-row" :gutter="24" v-if="!priceLimit">
             <a-col :span="6">
               <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="优惠率">
                 {{model.discount}}%
@@ -436,17 +436,17 @@
                 {{model.accountName}}
               </a-form-item>
             </a-col>
-            <a-col v-if="model.deposit" :span="6">
+            <a-col v-if="!priceLimit && model.deposit" :span="6">
               <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="扣除订金">
                 {{model.deposit}}
               </a-form-item>
             </a-col>
-            <a-col :span="6">
+            <a-col :span="6" v-if="!priceLimit">
               <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="本次付款">
                 {{model.changeAmount}}
               </a-form-item>
             </a-col>
-            <a-col :span="6">
+            <a-col :span="6" v-if="!priceLimit">
               <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="本次欠款">
                 {{model.debt}}
               </a-form-item>
@@ -454,7 +454,7 @@
             <a-col v-if="model.hasBackFlag" :span="6">
               <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="退货单号">
                 <template v-for="(item, index) in linkNumberList">
-                  <a @click="myHandleDetail(item.number)">{{item.number}}</a><br/>
+                  <a @click="myHandleDetail(item.number, priceLimit)">{{item.number}}</a><br/>
                 </template>
               </a-form-item>
             </a-col>
@@ -492,7 +492,7 @@
             </a-col>
             <a-col :span="6">
               <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="关联单据">
-                <a @click="myHandleDetail(model.linkNumber)">{{model.linkNumber}}</a>
+                <a @click="myHandleDetail(model.linkNumber, priceLimit)">{{model.linkNumber}}</a>
               </a-form-item>
             </a-col>
           </a-row>
@@ -522,7 +522,7 @@
               </a-form-item>
             </a-col>
           </a-row>
-          <a-row class="form-row" :gutter="24">
+          <a-row class="form-row" :gutter="24"  v-if="!priceLimit">
             <a-col :span="6">
               <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="优惠率">
                 {{model.discount}}%
@@ -550,12 +550,12 @@
                 {{model.accountName}}
               </a-form-item>
             </a-col>
-            <a-col :span="6">
+            <a-col :span="6"  v-if="!priceLimit">
               <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="本次退款">
                 {{model.changeAmount}}
               </a-form-item>
             </a-col>
-            <a-col :span="6">
+            <a-col :span="6"  v-if="!priceLimit">
               <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="本次欠款">
                 {{model.debt}}
               </a-form-item>
@@ -1215,6 +1215,7 @@
         purchaseBySaleFlag: false,
         linkNumberList: [],
         financialBillNoList: [],
+        priceLimit: false,
         /* 原始反审核是否开启 */
         checkFlag: true,
         /* 是否显示打印按钮 */
@@ -1720,10 +1721,13 @@
             }
           }
         }]
+        //移除列
+        let needRemoveKeywords = ['finishNumber','snList','batchNumber','productionDate','expirationDate','sku','weight','position',
+          'brand','mfrs','otherField1','otherField2','otherField3','taxRate','remark']
+        if (this.priceLimit) {
+          needRemoveKeywords.push('unitPrice', 'allPrice', 'taxRate', 'taxMoney', 'taxLastMoney')
+        }
         for(let i=0; i<this.defColumns.length; i++){
-          //移除列
-          let needRemoveKeywords = ['finishNumber','snList','batchNumber','productionDate','expirationDate','sku','weight','position',
-            'brand','mfrs','otherField1','otherField2','otherField3','taxRate','remark']
           if(needRemoveKeywords.indexOf(this.defColumns[i].dataIndex)===-1) {
             let info = {}
             info.title = this.defColumns[i].title
@@ -1822,7 +1826,8 @@
           }
         })
       },
-      show(record, type, prefixNo) {
+      show(record, type, prefixNo, priceLimit) {
+        this.priceLimit = priceLimit
         //查询单条单据信息
         findBillDetailByNumber({ number: record.number }).then((res) => {
           if (res && res.code === 200) {
@@ -1915,11 +1920,11 @@
         this.visible = false
         this.modalStyle = ''
       },
-      myHandleDetail(billNumber) {
+      myHandleDetail(billNumber, priceLimit) {
         findBillDetailByNumber({ number: billNumber }).then((res) => {
           if (res && res.code === 200) {
             let type = res.data.type === "其它"? "":res.data.type
-            this.show(res.data, res.data.subType + type);
+            this.show(res.data, res.data.subType + type, null, priceLimit)
             this.title = res.data.subType + type + "-详情";
           }
         })

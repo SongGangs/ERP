@@ -670,6 +670,7 @@ export const BillModalMixin = {
     },
     //使得sku、序列号、批号、到期日等为显示
     changeColumnShow(info) {
+      this.hiddenPriceColumns()
       if(info.model) {
         this.changeFormTypes(this.materialTable.columns, 'model', 1)
       }
@@ -726,6 +727,17 @@ export const BillModalMixin = {
           target.recalcAllStatisticsColumns()
         }
       })
+    },
+    hiddenPriceColumns() {
+      let prefixNo = this.prefixNo
+      if (prefixNo === 'CGRK' || prefixNo == 'CGDD' || prefixNo == 'CGTH') {
+        if (this.priceLimit) {
+          let priceColumns = ['unitPrice', 'allPrice', 'taxRate', 'taxMoney', 'taxLastMoney']
+          priceColumns.forEach(item => {
+            this.changeFormTypes(this.materialTable.columns, item, 0)
+          })
+        }
+      }
     },
     //改变优惠、本次付款、欠款的值
     autoChangePrice(target) {

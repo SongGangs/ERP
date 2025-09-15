@@ -286,8 +286,8 @@ export const JeecgListMixin = {
       // 关闭页面时，重载列表
       this.loadData()
     },
-    handleDetail:function(record, type, prefixNo){
-      this.$refs.modalDetail.show(record, type, prefixNo);
+    handleDetail:function(record, type, prefixNo, priceLimit){
+      this.$refs.modalDetail.show(record, type, prefixNo, priceLimit);
       this.$refs.modalDetail.title=type+"-详情";
     },
     //加载初始化列

@@ -112,7 +112,7 @@
             </a-form-item>
           </a-col>
         </a-row>
-        <a-row class="form-row" :gutter="24">
+        <a-row class="form-row" :gutter="24" :hidden="priceLimit">
           <a-col :lg="6" :md="12" :sm="24">
             <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="优惠率" data-step="5" data-title="优惠率"
                          data-intro="针对单据明细中商品总金额进行优惠的比例">
@@ -133,7 +133,7 @@
           </a-col>
           <a-col :lg="6" :md="12" :sm="24"></a-col>
         </a-row>
-        <a-row class="form-row" :gutter="24">
+        <a-row class="form-row" :gutter="24" :hidden="priceLimit">
           <a-col :lg="6" :md="12" :sm="24">
             <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="结算账户" data-step="8" data-title="结算账户"
                          data-intro="如果在下拉框中选择多账户，则可以通过多个结算账户进行结算">
@@ -238,6 +238,7 @@
         prefixNo: 'CGDD',
         fileList:[],
         rowCanEdit: true,
+        priceLimit: false,
         //以销定购的场景开关
         purchaseBySaleFlag: false,
         model: {},
@@ -316,7 +317,10 @@
     },
     methods: {
       //调用完edit()方法之后会自动调用此方法
-      editAfter() {
+      editAfter(record) {
+        if (record){
+          this.priceLimit = record.priceLimit
+        }
         this.billStatus = '0'
         this.currentSelectDepotId = ''
         this.rowCanEdit = true
@@ -326,6 +330,7 @@
         this.changeFormTypes(this.materialTable.columns, 'finishNumber', 0)
         if (this.action === 'add') {
           this.addInit(this.prefixNo)
+          this.hiddenPriceColumns()
           this.fileList = []
           this.$nextTick(() => {
             handleIntroJs(this.prefixNo, 1)
@@ -410,15 +415,15 @@
       },
       handleHistoryBillList() {
         let organId = this.form.getFieldValue('organId')
-        this.$refs.historyBillListModalForm.show('其它', '采购订单', '供应商', organId);
+        this.$refs.historyBillListModalForm.show('其它', '采购订单', '供应商', organId, this.priceLimit)
         this.$refs.historyBillListModalForm.disableSubmit = false;
       },
       onSearchLinkNumber() {
-        this.$refs.linkBillList.purchaseShow('其它', '销售订单', '客户', "1,3","0,3")
+        this.$refs.linkBillList.purchaseShow('其它', '销售订单', '客户', "1,3","0,3", this.priceLimit)
         this.$refs.linkBillList.title = "请选择销售订单"
       },
       onSearchLinkApply() {
-        this.$refs.linkBillList.purchaseShow('其它', '请购单', '客户', "1,3")
+        this.$refs.linkBillList.purchaseShow('其它', '请购单', '客户', "1,3", this.priceLimit)
         this.$refs.linkBillList.title = "请选择请购单"
       },
       linkBillListOk(selectBillDetailRows, linkNumber, organId) {

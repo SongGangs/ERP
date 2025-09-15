@@ -134,6 +134,7 @@
         selectedDetailRowKeys: [],
         selectBillRows: [],
         selectBillDetailRows: [],
+        priceLimit: false,
         showType: 'basic',
         selectType: 'list',
         oldTitle: '',
@@ -219,7 +220,8 @@
     created() {
     },
     methods: {
-      show(type, subType, organType, status) {
+      show(type, subType, organType, status, priceLimit) {
+        this.priceLimit = priceLimit
         this.selectType = 'list'
         this.showType = 'basic'
         this.queryParam.type = type
@@ -228,10 +230,11 @@
         this.model = Object.assign({}, {});
         this.visible = true;
         this.selectedDetailRowKeys = []
-        this.initColumns(subType, organType)
+        this.initColumns(subType, organType, priceLimit)
         this.loadData(1)
       },
-      purchaseShow(type, subType, organType, status, purchaseStatus) {
+      purchaseShow(type, subType, organType, status, purchaseStatus, priceLimit) {
+        this.priceLimit = priceLimit
         this.selectType = 'list'
         this.showType = 'purchase'
         this.queryParam.type = type
@@ -241,13 +244,18 @@
         this.model = Object.assign({}, {});
         this.visible = true;
         this.selectedDetailRowKeys = []
-        this.initColumns(subType, organType)
+        this.initColumns(subType, organType, priceLimit)
         this.loadData(1)
       },
       initColumns(subType, organType) {
+        let needRemoveColumns = this.priceLimit ? ['totalPrice', 'totalTaxLastMoney'] : []
         for(let i=0; i<this.columns.length; i++) {
           if (this.columns[i].dataIndex === 'organName') {
             this.columns[i].title = organType
+          }
+          if (needRemoveColumns.includes(this.columns[i].dataIndex)) {
+            this.columns.splice(i, 1)
+            i = i - 1
           }
         }
         if(subType === '请购单') {
@@ -255,10 +263,10 @@
             if(this.columns[i].dataIndex === 'organName') {
               this.columns.splice(i, 1)
             }
-            if(this.columns[i].dataIndex === 'totalPrice') {
+            if (this.columns[i].dataIndex === 'totalPrice') {
               this.columns.splice(i, 1)
             }
-            if(this.columns[i].dataIndex === 'totalTaxLastMoney') {
+            if (this.columns[i].dataIndex === 'totalTaxLastMoney') {
               this.columns.splice(i, 1)
             }
           }

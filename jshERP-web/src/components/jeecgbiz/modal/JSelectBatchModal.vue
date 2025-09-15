@@ -81,6 +81,7 @@
           {dataIndex: 'standard', title: '规格', width: 80, ellipsis:true},
           {dataIndex: 'model', title: '型号', width: 80, ellipsis:true},
           {dataIndex: 'commodityUnit', title: '单位', width: 60, ellipsis:true},
+          {dataIndex: 'productionDateStr', title: '生产日期', width: 80},
           {dataIndex: 'expirationDateStr', title: '有效期至', width: 80},
           {dataIndex: 'totalNum', title: '库存', width: 80}
         ],

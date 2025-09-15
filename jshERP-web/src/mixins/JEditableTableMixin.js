@@ -59,7 +59,7 @@ export const JEditableTableMixin = {
         item.add(rowNum)
       })
       if (typeof this.addAfter === 'function') this.addAfter(this.model)
-      this.edit({})
+      this.edit({ 'priceLimit': this.priceLimit })
     },
     /** 当点击了编辑（修改）按钮时调用此方法 */
     edit(record) {

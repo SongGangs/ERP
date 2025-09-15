@@ -112,6 +112,7 @@
         disableMixinCreated: true,
         organLabel: '',
         supplierList: [],
+        priceLimit: false,
         queryParam: {
           organId: "",
           number: "",
@@ -172,7 +173,8 @@
     created() {
     },
     methods: {
-      show(type, subType, organType, organId) {
+      show(type, subType, organType, organId, priceLimit) {
+        this.priceLimit = priceLimit
         this.queryParam.type = type
         this.queryParam.subType = subType
         this.organLabel = organType
@@ -183,9 +185,14 @@
         this.loadData(1)
       },
       initColumns(subType, organType) {
-        for(let i=0; i<this.columns.length; i++) {
+        let needRemoveColumns = this.priceLimit ? ['totalPrice', 'totalTaxLastMoney'] : []
+        for (let i = 0; i < this.columns.length; i++) {
           if (this.columns[i].dataIndex === 'organName') {
             this.columns[i].title = organType
+          }
+          if (needRemoveColumns.includes(this.columns[i].dataIndex)) {
+            this.columns.splice(i, 1)
+            i = i - 1
           }
         }
         if(subType === '请购单') {
@@ -253,7 +260,7 @@
           if (res && res.code === 200) {
             let type = res.data.depotHeadType
             type = type.replace('其它','')
-            that.$refs.billDetail.show(res.data, type);
+            that.$refs.billDetail.show(res.data, type, null, this.priceLimit);
             that.$refs.billDetail.title="详情";
           }
         })
