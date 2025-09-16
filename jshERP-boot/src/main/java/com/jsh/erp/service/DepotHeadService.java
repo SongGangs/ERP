@@ -2,6 +2,7 @@ package com.jsh.erp.service;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Lists;
 import com.jsh.erp.constants.BusinessConstants;
 import com.jsh.erp.constants.ExceptionConstants;
 import com.jsh.erp.datasource.entities.*;
@@ -211,10 +212,11 @@ public class DepotHeadService {
                         dh.setTotalPrice(null);
                         dh.setDiscountLastMoney(null);
                     }
-                    if ("采购".equals(subType) && StringUtil.isNotEmpty(dh.getLinkNumber())
+                    if ("采购订单".equals(subType) && StringUtil.isNotEmpty(dh.getLinkApply())
                             && StringUtil.isNotEmpty(dh.getSalesMan()) && !dh.getUserName().equals(dh.getSalesMan())) {
                         dh.setUserName(dh.getSalesMan());
-                    } else if ("采购订单".equals(subType) && StringUtil.isNotEmpty(dh.getLinkApply())
+                    } else if (Lists.newArrayList("采购", "采购退货").contains(subType)
+                            && StringUtil.isNotEmpty(dh.getLinkNumber())
                             && StringUtil.isNotEmpty(dh.getSalesMan()) && !dh.getUserName().equals(dh.getSalesMan())) {
                         dh.setUserName(dh.getSalesMan());
                     }
@@ -1152,7 +1154,14 @@ public class DepotHeadService {
         }
         Long creator = userInfo.getId();
         // 采购订单转采购入库，创建人使用请购单人员
-        if ("采购".equals(subType) && StringUtil.isNotEmpty(depotHead.getLinkNumber())) {
+        if ("采购订单".equals(subType) && StringUtil.isNotEmpty(depotHead.getLinkApply())) {
+            DepotHead qgdDepotHead = getDepotHead(depotHead.getLinkApply());
+            creator = Objects.nonNull(qgdDepotHead) ? qgdDepotHead.getCreator() : creator;
+            if (!Objects.equals(creator, userInfo.getId())) {
+                // 实际操作人入库
+                depotHead.setSalesMan(userInfo.getUsername());
+            }
+        } else if ("采购".equals(subType) && StringUtil.isNotEmpty(depotHead.getLinkNumber())) {
             DepotHead cgddDepotHead = getDepotHead(depotHead.getLinkNumber());
             if (Objects.nonNull(cgddDepotHead) && StringUtil.isNotEmpty(cgddDepotHead.getLinkApply())) {
                 DepotHead qgdDepotHead = getDepotHead(cgddDepotHead.getLinkApply());
@@ -1162,12 +1171,18 @@ public class DepotHeadService {
                     depotHead.setSalesMan(userInfo.getUsername());
                 }
             }
-        } else if ("采购订单".equals(subType) && StringUtil.isNotEmpty(depotHead.getLinkApply())) {
-            DepotHead qgdDepotHead = getDepotHead(depotHead.getLinkApply());
-            creator = Objects.nonNull(qgdDepotHead) ? qgdDepotHead.getCreator() : creator;
-            if (!Objects.equals(creator, userInfo.getId())) {
-                // 实际操作人入库
-                depotHead.setSalesMan(userInfo.getUsername());
+        } else if ("采购退货".equals(subType) && StringUtil.isNotEmpty(depotHead.getLinkNumber())) {
+            DepotHead cgrkDepotHead = getDepotHead(depotHead.getLinkNumber());
+            if (Objects.nonNull(cgrkDepotHead) && StringUtil.isNotEmpty(cgrkDepotHead.getLinkNumber())) {
+                DepotHead cgddDepotHead = getDepotHead(cgrkDepotHead.getLinkNumber());
+                if (Objects.nonNull(cgddDepotHead) && StringUtil.isNotEmpty(cgddDepotHead.getLinkApply())) {
+                    DepotHead qgdDepotHead = getDepotHead(cgddDepotHead.getLinkApply());
+                    creator = Objects.nonNull(qgdDepotHead) ? qgdDepotHead.getCreator() : creator;
+                    if (!Objects.equals(creator, userInfo.getId())) {
+                        // 实际操作人入库
+                        depotHead.setSalesMan(userInfo.getUsername());
+                    }
+                }
             }
         }
         depotHead.setCreator(creator);
