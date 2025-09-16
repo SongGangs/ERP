@@ -385,7 +385,7 @@ public class DepotItemService {
     }
 
     @Transactional(value = "transactionManager", rollbackFor = Exception.class)
-    public void saveDetials(String rows, Long headerId, String actionType, boolean priceLimit, HttpServletRequest request) throws Exception {
+    public void saveDetials(String rows, Long headerId, String actionType, HttpServletRequest request) throws Exception {
         //查询单据主表信息
         DepotHead depotHead =depotHeadMapper.selectByPrimaryKey(headerId);
         //删除序列号和回收序列号
@@ -1269,6 +1269,7 @@ public class DepotItemService {
                 depotId, barCode, batchNumber, forceFlag, inOutManageFlag);
         for(DepotItemVoBatchNumberList bn: list) {
             if(bn.getTotalNum()!=null && bn.getTotalNum().compareTo(BigDecimal.ZERO)>0) {
+                bn.setProductionDateStr(Tools.parseDateToStr(bn.getProductionDate()));
                 bn.setExpirationDateStr(Tools.parseDateToStr(bn.getExpirationDate()));
                 if(bn.getUnitId()!=null) {
                     Unit unit = unitService.getUnit(bn.getUnitId());

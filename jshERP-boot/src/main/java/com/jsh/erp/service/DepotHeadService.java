@@ -1120,7 +1120,7 @@ public class DepotHeadService {
                                       HttpServletRequest request) throws Exception {
         /**处理单据主表数据*/
         DepotHead depotHead = JSONObject.parseObject(beanJson, DepotHead.class);
-        boolean priceLimit = handleDeportHeadPriceLimit(depotHead, request);
+//        boolean priceLimit = handleDeportHeadPriceLimit(depotHead, request);
         //判断用户是否已经登录过，登录过不再处理
         User userInfo=userService.getCurrentUser();
         //通过redis去校验重复
@@ -1233,7 +1233,7 @@ public class DepotHeadService {
         if(list!=null) {
             Long headId = list.get(0).getId();
             /**入库和出库处理单据子表信息*/
-            depotItemService.saveDetials(rows, headId, "add", priceLimit, request);
+            depotItemService.saveDetials(rows, headId, "add", request);
         }
         logService.insertLog("单据",
                 new StringBuffer(BusinessConstants.LOG_OPERATION_TYPE_ADD).append(depotHead.getNumber()).toString(),
@@ -1251,7 +1251,7 @@ public class DepotHeadService {
     public void updateDepotHeadAndDetail(String beanJson, String rows,HttpServletRequest request)throws Exception {
         /**更新单据主表信息*/
         DepotHead depotHead = JSONObject.parseObject(beanJson, DepotHead.class);
-        boolean priceLimit = handleDeportHeadPriceLimit(depotHead, request);
+//        boolean priceLimit = handleDeportHeadPriceLimit(depotHead, request);
         //校验单号是否重复
         if(checkIsBillNumberExist(depotHead.getId(), depotHead.getNumber())>0) {
             throw new BusinessRunTimeException(ExceptionConstants.DEPOT_HEAD_BILL_NUMBER_EXIST_CODE,
@@ -1335,7 +1335,7 @@ public class DepotHeadService {
             }
         }
         /**入库和出库处理单据子表信息*/
-        depotItemService.saveDetials(rows, depotHead.getId(), "update", priceLimit, request);
+        depotItemService.saveDetials(rows, depotHead.getId(), "update", request);
         logService.insertLog("单据",
                 new StringBuffer(BusinessConstants.LOG_OPERATION_TYPE_EDIT).append(depotHead.getNumber()).toString(),
                 ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest());
@@ -1857,7 +1857,7 @@ public class DepotHeadService {
             if(list!=null) {
                 Long headId = list.get(0).getId();
                 /**入库和出库处理单据子表信息*/
-                depotItemService.saveDetials(rows, headId, "add", priceLimit, request);
+                depotItemService.saveDetials(rows, headId, "add", request);
             }
         }
         logService.insertLog("单据",

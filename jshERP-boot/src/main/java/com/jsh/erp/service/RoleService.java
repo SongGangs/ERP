@@ -262,17 +262,17 @@ public class RoleService {
      * @throws Exception
      */
     public BigDecimal parseBillPriceByLimit(BigDecimal price, String billCategory, String priceLimit, HttpServletRequest request) throws Exception {
-        if(StringUtil.isNotEmpty(priceLimit)) {
-            if("buy".equals(billCategory) && priceLimit.contains("4")) {
-                return BigDecimal.ZERO;
-            }
-            if("retail".equals(billCategory) && priceLimit.contains("5")) {
-                return BigDecimal.ZERO;
-            }
-            if("sale".equals(billCategory) && priceLimit.contains("6")) {
-                return BigDecimal.ZERO;
-            }
-        }
+//        if(StringUtil.isNotEmpty(priceLimit)) {
+//            if("buy".equals(billCategory) && priceLimit.contains("4")) {
+//                return BigDecimal.ZERO;
+//            }
+//            if("retail".equals(billCategory) && priceLimit.contains("5")) {
+//                return BigDecimal.ZERO;
+//            }
+//            if("sale".equals(billCategory) && priceLimit.contains("6")) {
+//                return BigDecimal.ZERO;
+//            }
+//        }
         return price;
     }
 
