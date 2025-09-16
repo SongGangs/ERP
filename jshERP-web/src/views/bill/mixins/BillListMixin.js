@@ -701,7 +701,7 @@ export const BillListMixin = {
       } else {
         this.settingDataIndex = this.defDataIndex
       }
-      let needRemoveColumns = this.priceLimit ? ['totalPrice', 'totalTaxLastMoney', 'discount', 'discountMoney', 'otherMoney', 'needInMoney', 'changeAmount', 'debt', 'needBackMoney']
+      let needRemoveColumns = this.priceLimit ? ['totalPrice', 'totalTaxLastMoney', 'discount', 'discountMoney', 'discountLastMoney', 'otherMoney', 'needInMoney', 'changeAmount', 'deposit','debt', 'needBackMoney']
         : []
       this.columns = this.defColumns.filter(item => {
         if(this.purchaseBySaleFlag) {

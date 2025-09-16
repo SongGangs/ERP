@@ -106,7 +106,19 @@
               <a-checkbox-group @change="onColChange" v-model="settingDataIndex" :defaultValue="settingDataIndex">
                 <a-row style="width: 500px">
                   <template v-for="(item,index) in defColumns">
-                    <template>
+                    <template v-if="priceLimit && !['totalPrice', 'totalTaxLastMoney', 'discount', 'discountMoney', 'discountLastMoney', 'otherMoney', 'needInMoney', 'changeAmount', 'deposit','debt', 'needBackMoney'].includes(item.dataIndex)">
+                      <a-col :span="8" v-if="purchaseBySaleFlag">
+                        <a-checkbox :value="item.dataIndex">
+                          <j-ellipsis :value="item.title" :length="10"></j-ellipsis>
+                        </a-checkbox>
+                      </a-col>
+                      <a-col :span="8" v-if="!purchaseBySaleFlag && item.dataIndex!=='linkNumber'">
+                        <a-checkbox :value="item.dataIndex">
+                          <j-ellipsis :value="item.title" :length="10"></j-ellipsis>
+                        </a-checkbox>
+                      </a-col>
+                    </template>
+                    <template v-else>
                       <a-col :span="8" v-if="purchaseBySaleFlag">
                         <a-checkbox :value="item.dataIndex">
                           <j-ellipsis :value="item.title" :length="10"></j-ellipsis>

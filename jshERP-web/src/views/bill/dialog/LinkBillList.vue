@@ -277,7 +277,7 @@
           if (res && res.code === 200) {
             let type = res.data.depotHeadType
             type = type.replace('其它','')
-            this.$refs.billDetail.show(res.data, type)
+            this.$refs.billDetail.show(res.data, type, null, this.priceLimit)
             this.$refs.billDetail.title=type+"-详情"
           }
         })
@@ -332,6 +332,13 @@
         }
       },
       initListColumns() {
+        let needRemoveColumns = this.priceLimit ? ['unitPrice', 'allPrice', 'taxRate', 'taxMoney', 'taxLastMoney'] : []
+        for (let i = 0; i < this.columnsDetail.length; i++) {
+          if (needRemoveColumns.includes(this.columnsDetail[i].dataIndex)) {
+            this.columnsDetail.splice(i, 1)
+            i = i - 1
+          }
+        }
         if(this.queryParam.subType === '请购单') {
           for(let i=0; i<this.columnsDetail.length; i++){
             if(this.columnsDetail[i].dataIndex === 'unitPrice') {
