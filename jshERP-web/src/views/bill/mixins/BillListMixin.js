@@ -95,9 +95,9 @@ export const BillListMixin = {
         { title: '颜色', dataIndex: 'color'},
         { title: '品牌', dataIndex: 'brand'},
         { title: '制造商', dataIndex: 'mfrs'},
-        { title: '扩展1', dataIndex: 'otherField1'},
-        { title: '扩展2', dataIndex: 'otherField2'},
-        { title: '扩展3', dataIndex: 'otherField3'},
+        // { title: '扩展1', dataIndex: 'otherField1'},
+        // { title: '扩展2', dataIndex: 'otherField2'},
+        // { title: '扩展3', dataIndex: 'otherField3'},
         { title: '单位', dataIndex: 'unit'},
         { title: '多属性', dataIndex: 'sku'},
         { title: '数量', dataIndex: 'operNumber'},
@@ -112,9 +112,9 @@ export const BillListMixin = {
         { title: '颜色', dataIndex: 'color'},
         { title: '品牌', dataIndex: 'brand'},
         { title: '制造商', dataIndex: 'mfrs'},
-        { title: '扩展1', dataIndex: 'otherField1'},
-        { title: '扩展2', dataIndex: 'otherField2'},
-        { title: '扩展3', dataIndex: 'otherField3'},
+        // { title: '扩展1', dataIndex: 'otherField1'},
+        // { title: '扩展2', dataIndex: 'otherField2'},
+        // { title: '扩展3', dataIndex: 'otherField3'},
         { title: '库存', dataIndex: 'stock'},
         { title: '单位', dataIndex: 'unit'},
         { title: '多属性', dataIndex: 'sku'},
@@ -136,9 +136,9 @@ export const BillListMixin = {
         { title: '颜色', dataIndex: 'color'},
         { title: '品牌', dataIndex: 'brand'},
         { title: '制造商', dataIndex: 'mfrs'},
-        { title: '扩展1', dataIndex: 'otherField1'},
-        { title: '扩展2', dataIndex: 'otherField2'},
-        { title: '扩展3', dataIndex: 'otherField3'},
+        // { title: '扩展1', dataIndex: 'otherField1'},
+        // { title: '扩展2', dataIndex: 'otherField2'},
+        // { title: '扩展3', dataIndex: 'otherField3'},
         { title: '库存', dataIndex: 'stock'},
         { title: '单位', dataIndex: 'unit'},
         { title: '序列号', dataIndex: 'snList', width:300},
@@ -166,9 +166,9 @@ export const BillListMixin = {
         { title: '颜色', dataIndex: 'color'},
         { title: '品牌', dataIndex: 'brand'},
         { title: '制造商', dataIndex: 'mfrs'},
-        { title: '扩展1', dataIndex: 'otherField1'},
-        { title: '扩展2', dataIndex: 'otherField2'},
-        { title: '扩展3', dataIndex: 'otherField3'},
+        // { title: '扩展1', dataIndex: 'otherField1'},
+        // { title: '扩展2', dataIndex: 'otherField2'},
+        // { title: '扩展3', dataIndex: 'otherField3'},
         { title: '库存', dataIndex: 'stock'},
         { title: '单位', dataIndex: 'unit'},
         { title: '序列号', dataIndex: 'snList', width:300},
@@ -955,12 +955,18 @@ export const BillListMixin = {
       if(record.status === '3') {
         //部分采购|部分销售的时候显示全部列
         for(let i=0; i<this.defDetailColumns.length; i++){
+          if (this.priceLimit && ['unitPrice', 'allPrice', 'taxRate', 'taxMoney', 'taxLastMoney'].includes(this.defDetailColumns[i].dataIndex)) {
+            continue
+          }
           currentCol.push(this.defDetailColumns[i])
         }
         this.detailColumns = currentCol
       } else if(record.purchaseStatus === '3') {
         //将已出库的标题转为已采购，针对销售订单转采购订单的场景
         for(let i=0; i<this.defDetailColumns.length; i++){
+          if (this.priceLimit && ['unitPrice', 'allPrice', 'taxRate', 'taxMoney', 'taxLastMoney'].includes(this.defDetailColumns[i].dataIndex)) {
+            continue
+          }
           let info = {}
           info.title = this.defDetailColumns[i].title
           info.dataIndex = this.defDetailColumns[i].dataIndex

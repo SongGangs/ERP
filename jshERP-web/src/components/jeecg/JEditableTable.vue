@@ -1280,8 +1280,9 @@
               sourceValue = (typeof sourceValue === 'number' || sourceValue) ? sourceValue : defaultValue
             }
             let sourceValueIsEmpty = (sourceValue == null || sourceValue === '')
-
-            if (column.type === FormTypes.inputNumber) {
+            let priceLimitColumns = ['allPrice', 'taxMoney', 'taxLastMoney']
+            if (column.type === FormTypes.inputNumber
+              || (column.type === FormTypes.hidden && priceLimitColumns.includes(column.key))) {
               // 判断是否是排序字段，如果是就赋最大值
               if (column.isOrder === true) {
                 value[column.key] = this.getInputNumberMaxValue(column) + 1
@@ -2333,7 +2334,7 @@
         // 做单个表单验证
         this.validateOneInput(value, row, column, this.notPassedIds, true, 'input')
 
-        if (type === FormTypes.inputNumber) {
+        if (type === FormTypes.inputNumber || type === FormTypes.hidden) {
           this.recalcOneStatisticsColumn(column.key)
         }
 
