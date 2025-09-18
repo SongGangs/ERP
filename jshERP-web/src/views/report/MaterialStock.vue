@@ -195,6 +195,7 @@
         currentStock: '',
         currentStockPrice: '',
         currentWeight: '',
+        priceLimit: false,
         pageName: 'materialStock',
         // 默认索引
         defDataIndex:['rowIndex','action','mBarCode','name','standard','model','color','categoryName', 'position','unitName',
@@ -316,6 +317,7 @@
         this.$refs.materialInOutList.show(record, depotIds);
         this.$refs.materialInOutList.title = "查看商品库存流水";
         this.$refs.materialInOutList.disableSubmit = false;
+        this.$refs.materialInOutList.priceLimit = this.priceLimit;
       },
       exportExcel() {
         let list = []

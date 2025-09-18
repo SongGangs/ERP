@@ -86,6 +86,7 @@
         title:"操作",
         visible: false,
         disableMixinCreated: false,
+        priceLimit: false,
         toFromType: '',
         currentMaterialId: '',
         // 查询条件
@@ -177,7 +178,7 @@
         findBillDetailByNumber({ number: record.number }).then((res) => {
           if (res && res.code === 200) {
             this.$refs.billDetail.isCanBackCheck = false
-            that.$refs.billDetail.show(res.data, record.type);
+            that.$refs.billDetail.show(res.data, record.type, record.number.substring(0, 4), this.priceLimit)
             that.$refs.billDetail.title="详情";
           }
         })

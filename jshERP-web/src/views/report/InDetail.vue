@@ -223,6 +223,7 @@
         operNumberTotalStr: '0',
         allPriceTotalStr: '0',
         tabKey: "1",
+        priceLimit: false,
         pageName: 'inDetail',
         // 默认索引
         defDataIndex:['rowIndex','number','barCode','mname','standard','model','mUnit','operNumber', 'unitPrice','allPrice',
@@ -359,7 +360,7 @@
         findBillDetailByNumber({ number: record.number }).then((res) => {
           if (res && res.code === 200) {
             this.$refs.modalDetail.isCanBackCheck = false
-            this.handleDetail(res.data, record.newType)
+            this.handleDetail(res.data, record.newType, record.number.substring(0, 4), this.priceLimit)
           }
         })
       },

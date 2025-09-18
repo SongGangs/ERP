@@ -277,7 +277,7 @@
           if (res && res.code === 200) {
             let type = res.data.depotHeadType
             type = type.replace('其它','')
-            this.$refs.billDetail.show(res.data, type, null, this.priceLimit)
+            this.$refs.billDetail.show(res.data, type, record.number.substring(0, 4), this.priceLimit)
             this.$refs.billDetail.title=type+"-详情"
           }
         })

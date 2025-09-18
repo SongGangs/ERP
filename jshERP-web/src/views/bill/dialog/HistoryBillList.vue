@@ -260,7 +260,7 @@
           if (res && res.code === 200) {
             let type = res.data.depotHeadType
             type = type.replace('其它','')
-            that.$refs.billDetail.show(res.data, type, null, this.priceLimit);
+            that.$refs.billDetail.show(res.data, type, record.number.substring(0, 4), this.priceLimit)
             that.$refs.billDetail.title="详情";
           }
         })

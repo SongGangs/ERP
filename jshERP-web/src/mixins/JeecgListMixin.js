@@ -290,8 +290,18 @@ export const JeecgListMixin = {
       this.$refs.modalDetail.show(record, type, prefixNo, priceLimit);
       this.$refs.modalDetail.title=type+"-详情";
     },
+    async getCurrentPriceLimit() {
+      if (['materialStock', 'inDetail', 'outDetail'].includes(this.pageName)) {
+        await getAction('/user/getCurrentPriceLimit', {}).then(res => {
+          if (res && res.code === 200) {
+            this.priceLimit = res.data.priceLimit && res.data.priceLimit.includes(4)
+          }
+        })
+      }
+    },
     //加载初始化列
-    initColumnsSetting(){
+    async initColumnsSetting(){
+      await this.getCurrentPriceLimit()
       let columnsStr = Vue.ls.get(this.pageName)
       if(columnsStr && columnsStr.indexOf(',')>-1) {
         this.settingDataIndex = columnsStr.split(',')
