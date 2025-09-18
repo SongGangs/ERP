@@ -421,6 +421,7 @@
         this.materialTable.columns[1].type = FormTypes.normal
         this.changeFormTypes(this.materialTable.columns, 'preNumber', 1)
         this.changeFormTypes(this.materialTable.columns, 'finishNumber', 1)
+        this.form.setFieldsValue({ 'linkNumber': linkNumber })
         if(selectBillDetailRows && selectBillDetailRows.length>0) {
           let listEx = []
           let allTaxLastMoney = 0

@@ -152,8 +152,14 @@ export const BillModalMixin = {
         if(columns[i].key === key) {
           if(type){
             if(key === 'snList' || key === 'batchNumber') {
-              if(this.prefixNo === 'LSCK' || this.prefixNo === 'CGTH'  || this.prefixNo === 'XSCK' || this.prefixNo === 'QTCK' || this.prefixNo === 'DBCK') {
+              if(this.prefixNo === 'LSCK' || this.prefixNo === 'XSCK' || this.prefixNo === 'QTCK' || this.prefixNo === 'DBCK') {
                 columns[i].type = FormTypes.popupJsh //显示
+              } else if (this.prefixNo === 'CGTH') {
+                if(key === 'batchNumber' && this.form.getFieldsValue(['linkNumber'])['linkNumber']) {
+                  columns[i].type = FormTypes.normal //显示
+                } else {
+                  columns[i].type = FormTypes.popupJsh //显示
+                }
               } else {
                 if(key === 'snList') {
                   columns[i].type = FormTypes.popupJsh //显示
@@ -556,12 +562,12 @@ export const BillModalMixin = {
                     operNumber = totalNum
                   }
                   taxRate = row.taxRate-0 //税率
-                  unitPrice = row.unitPrice-0 //单价
+                  unitPrice = info.unitPrice-0 //单价
                   allPrice = (unitPrice*operNumber).toFixed(2)-0
                   taxMoney =((taxRate*0.01)*allPrice).toFixed(2)-0
                   taxLastMoney = (allPrice + taxMoney).toFixed(2)-0
                   target.setValues([{rowKey: row.id, values: {expirationDate: info.expirationDateStr,
-                      productionDate: info.productionDateStr, operNumber: operNumber,
+                      productionDate: info.productionDateStr, operNumber: operNumber, unitPrice: unitPrice,
                       allPrice: allPrice, taxMoney: taxMoney, taxLastMoney: taxLastMoney}}])
                   target.recalcAllStatisticsColumns()
                   that.autoChangePrice(target)
