@@ -1724,7 +1724,7 @@
         //移除列
         let needRemoveKeywords = ['finishNumber','snList','batchNumber','productionDate','expirationDate','sku','weight','position',
           'brand','mfrs','otherField1','otherField2','otherField3','taxRate','remark']
-        if (this.priceLimit) {
+        if (this.priceLimit && this.prefixNo !== 'QTRK') {
           needRemoveKeywords.push('unitPrice', 'allPrice', 'taxRate', 'taxMoney', 'taxLastMoney')
         }
         for(let i=0; i<this.defColumns.length; i++){
@@ -2066,17 +2066,27 @@
       otherExportExcel() {
         let list = []
         let organType = ''
+        let hiddenPrice = false
+        let head = '仓库名称,条码,名称,规格,型号,颜色,' + this.otherFieldTitle + ',库存,单位,序列号,批号,生产日期,有效期,多属性,数量,单价,金额,备注'
         if(this.billType === '其它入库') {
           organType = '供应商：'
         } else if(this.billType === '其它出库') {
           organType = '客户：'
+          if (this.priceLimit) {
+            hiddenPrice = true
+            head = '仓库名称,条码,名称,规格,型号,颜色,' + this.otherFieldTitle + ',库存,单位,序列号,批号,生产日期,有效期,多属性,数量,备注'
+          }
         }
-        let head = '仓库名称,条码,名称,规格,型号,颜色,' + this.otherFieldTitle + ',库存,单位,序列号,批号,生产日期,有效期,多属性,数量,单价,金额,备注'
         for (let i = 0; i < this.dataSource.length; i++) {
           let item = []
           let ds = this.dataSource[i]
-          item.push(ds.depotName, ds.barCode, ds.name, ds.standard, ds.model, ds.color, ds.otherField1, ds.otherField2, ds.otherField3, ds.stock, ds.unit,
-            ds.snList, ds.batchNumber, ds.productionDate, ds.expirationDate, ds.sku, ds.operNumber, ds.unitPrice, ds.allPrice, ds.remark)
+          if (hiddenPrice) {
+            item.push(ds.depotName, ds.barCode, ds.name, ds.standard, ds.model, ds.color, ds.otherField1, ds.otherField2, ds.otherField3, ds.stock, ds.unit,
+              ds.snList, ds.batchNumber, ds.productionDate, ds.expirationDate, ds.sku, ds.operNumber, ds.remark)
+          } else {
+            item.push(ds.depotName, ds.barCode, ds.name, ds.standard, ds.model, ds.color, ds.otherField1, ds.otherField2, ds.otherField3, ds.stock, ds.unit,
+              ds.snList, ds.batchNumber, ds.productionDate, ds.expirationDate, ds.sku, ds.operNumber, ds.unitPrice, ds.allPrice, ds.remark)
+          }
           list.push(item)
         }
         let organName = this.model.organName? this.model.organName: ''

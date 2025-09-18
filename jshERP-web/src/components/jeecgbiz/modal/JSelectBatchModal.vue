@@ -29,6 +29,13 @@
               </span>
             </a-row>
           </a-form>
+          <a-row :gutter="24">
+            <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
+                <a-col :md="12" :sm="24">
+                  <span style="color:red;font-size:16px;">温馨提示：优先选择即将到期商品</span>
+                </a-col>
+              </span>
+          </a-row>
           <a-table
             ref="table"
             :scroll="scrollTrigger"
@@ -58,7 +65,7 @@
     props: ['rows', 'multi', 'barCode'],
     data() {
       return {
-        modalWidth: 1100,
+        modalWidth: 1200,
         queryParam: {
           name: "",
           depotItemId: '',
@@ -75,7 +82,7 @@
         },
         categoryTree:[],
         columns: [
-          {dataIndex: 'batchNumber', title: '批号', width: 100, align: 'left', ellipsis:true},
+          {dataIndex: 'batchNumber', title: '批号', width: 120, align: 'left', ellipsis:true},
           {dataIndex: 'barCode', title: '条码', width: 100, ellipsis:true},
           {dataIndex: 'name', title: '名称', width: 100, ellipsis:true},
           {dataIndex: 'standard', title: '规格', width: 80, ellipsis:true},
@@ -83,7 +90,8 @@
           {dataIndex: 'commodityUnit', title: '单位', width: 60, ellipsis:true},
           {dataIndex: 'productionDateStr', title: '生产日期', width: 80},
           {dataIndex: 'expirationDateStr', title: '有效期至', width: 80},
-          {dataIndex: 'totalNum', title: '库存', width: 80}
+          {dataIndex: 'unitPrice', title: '单价', width: 60},
+          {dataIndex: 'totalNum', title: '库存', width: 60}
         ],
         scrollTrigger: {},
         dataSource: [],

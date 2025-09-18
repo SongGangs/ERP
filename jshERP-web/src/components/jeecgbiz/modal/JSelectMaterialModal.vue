@@ -74,21 +74,21 @@
                     <a-input placeholder="请输入制造商" v-model="queryParam.mfrs"></a-input>
                   </a-form-item>
                 </a-col>
-                <a-col :md="6" :sm="8">
-                  <a-form-item :label="queryTitle.mp1" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
-                    <a-input :placeholder="'请输入'+ queryTitle.mp1" v-model="queryParam.otherField1"></a-input>
-                  </a-form-item>
-                </a-col>
-                <a-col :md="6" :sm="8">
-                  <a-form-item :label="queryTitle.mp2" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
-                    <a-input :placeholder="'请输入'+ queryTitle.mp2" v-model="queryParam.otherField2"></a-input>
-                  </a-form-item>
-                </a-col>
-                <a-col :md="6" :sm="8">
-                  <a-form-item :label="queryTitle.mp3" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
-                    <a-input :placeholder="'请输入'+ queryTitle.mp3" v-model="queryParam.otherField3"></a-input>
-                  </a-form-item>
-                </a-col>
+<!--                <a-col :md="6" :sm="8">-->
+<!--                  <a-form-item :label="queryTitle.mp1" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">-->
+<!--                    <a-input :placeholder="'请输入'+ queryTitle.mp1" v-model="queryParam.otherField1"></a-input>-->
+<!--                  </a-form-item>-->
+<!--                </a-col>-->
+<!--                <a-col :md="6" :sm="8">-->
+<!--                  <a-form-item :label="queryTitle.mp2" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">-->
+<!--                    <a-input :placeholder="'请输入'+ queryTitle.mp2" v-model="queryParam.otherField2"></a-input>-->
+<!--                  </a-form-item>-->
+<!--                </a-col>-->
+<!--                <a-col :md="6" :sm="8">-->
+<!--                  <a-form-item :label="queryTitle.mp3" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">-->
+<!--                    <a-input :placeholder="'请输入'+ queryTitle.mp3" v-model="queryParam.otherField3"></a-input>-->
+<!--                  </a-form-item>-->
+<!--                </a-col>-->
                 <a-col :md="6" :sm="24">
                   <a-form-item label="序列号" :labelCol="labelCol" :wrapperCol="wrapperCol">
                     <a-select placeholder="有无序列号" v-model="queryParam.enableSerialNumber">
@@ -202,9 +202,9 @@
           {dataIndex: 'unit', title: '单位'},
           {dataIndex: 'sku', title: '多属性'},
           {dataIndex: 'stock', title: '库存'},
-          {dataIndex: 'otherField1', title: '扩展1'},
-          {dataIndex: 'otherField2', title: '扩展2'},
-          {dataIndex: 'otherField3', title: '扩展3'}
+          // {dataIndex: 'otherField1', title: '扩展1'},
+          // {dataIndex: 'otherField2', title: '扩展2'},
+          // {dataIndex: 'otherField3', title: '扩展3'}
         ],
         scrollTrigger: {},
         dataSource: [],

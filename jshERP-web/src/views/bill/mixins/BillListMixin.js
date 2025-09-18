@@ -277,13 +277,14 @@ export const BillListMixin = {
         { title: '颜色', dataIndex: 'color'},
         { title: '品牌', dataIndex: 'brand'},
         { title: '制造商', dataIndex: 'mfrs'},
-        { title: '扩展1', dataIndex: 'otherField1'},
-        { title: '扩展2', dataIndex: 'otherField2'},
-        { title: '扩展3', dataIndex: 'otherField3'},
+        // { title: '扩展1', dataIndex: 'otherField1'},
+        // { title: '扩展2', dataIndex: 'otherField2'},
+        // { title: '扩展3', dataIndex: 'otherField3'},
         { title: '库存', dataIndex: 'stock'},
         { title: '单位', dataIndex: 'unit'},
         { title: '序列号', dataIndex: 'snList', width:300},
         { title: '批号', dataIndex: 'batchNumber'},
+        { title: '生产日期', dataIndex: 'productionDate'},
         { title: '有效期', dataIndex: 'expirationDate'},
         { title: '多属性', dataIndex: 'sku'},
         { title: '数量', dataIndex: 'operNumber'},
@@ -302,13 +303,14 @@ export const BillListMixin = {
         { title: '颜色', dataIndex: 'color'},
         { title: '品牌', dataIndex: 'brand'},
         { title: '制造商', dataIndex: 'mfrs'},
-        { title: '扩展1', dataIndex: 'otherField1'},
-        { title: '扩展2', dataIndex: 'otherField2'},
-        { title: '扩展3', dataIndex: 'otherField3'},
+        // { title: '扩展1', dataIndex: 'otherField1'},
+        // { title: '扩展2', dataIndex: 'otherField2'},
+        // { title: '扩展3', dataIndex: 'otherField3'},
         { title: '库存', dataIndex: 'stock'},
         { title: '单位', dataIndex: 'unit'},
         { title: '序列号', dataIndex: 'snList', width:300},
         { title: '批号', dataIndex: 'batchNumber'},
+        { title: '生产日期', dataIndex: 'productionDate'},
         { title: '有效期', dataIndex: 'expirationDate'},
         { title: '多属性', dataIndex: 'sku'},
         { title: '数量', dataIndex: 'operNumber'},
@@ -467,7 +469,6 @@ export const BillListMixin = {
     },
     myHandleCopyAdd(record) {
       this.$refs.modalForm.action = "copyAdd";
-      this.$refs.modalForm.priceLimit = this.priceLimit
       if(this.btnEnableList.indexOf(2)===-1) {
         this.$refs.modalForm.isCanCheck = false
       }
@@ -475,6 +476,7 @@ export const BillListMixin = {
       record.linkNumber = ''
       record.billType = ''
       record.deposit = ''
+      record.priceLimit = this.priceLimit
       this.$refs.modalForm.edit(record);
       this.$refs.modalForm.title = "复制新增";
       this.$refs.modalForm.disableSubmit = false;
@@ -684,7 +686,7 @@ export const BillListMixin = {
       })
     },
     async getCurrentPriceLimit(prefixNo) {
-      if (prefixNo === 'CGRK' || prefixNo == 'CGDD' || prefixNo == 'CGTH') {
+      if (prefixNo === 'CGRK' || prefixNo === 'CGDD' || prefixNo === 'CGTH' || prefixNo === 'QTCK' || prefixNo === 'QTRK') {
         await getAction('/user/getCurrentPriceLimit', {}).then(res => {
           if (res && res.code === 200) {
             this.priceLimit = res.data.priceLimit && res.data.priceLimit.includes(4)
@@ -986,7 +988,7 @@ export const BillListMixin = {
         //移除列
         let needRemoveKeywords = ['finishNumber', 'snList', 'batchNumber', 'productionDate', 'expirationDate', 'sku', 'weight', 'position',
           'brand', 'mfrs', 'otherField1', 'otherField2', 'otherField3', 'taxRate', 'remark']
-        if (this.priceLimit) {
+        if (this.priceLimit && this.prefixNo !== 'QTRK') {
           needRemoveKeywords.push('unitPrice', 'allPrice', 'taxRate', 'taxMoney', 'taxLastMoney')
         }
         for(let i=0; i<this.defDetailColumns.length; i++){

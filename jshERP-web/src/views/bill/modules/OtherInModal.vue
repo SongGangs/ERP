@@ -171,6 +171,7 @@
         rowCanEdit: true,
         //出入库管理开关，适合独立仓管场景
         inOutManageFlag: false,
+        priceLimit: false,
         model: {},
         labelCol: {
           xs: { span: 24 },
@@ -204,16 +205,17 @@
             { title: '库存', key: 'stock', width: '5%', type: FormTypes.normal },
             { title: '单位', key: 'unit', width: '4%', type: FormTypes.normal },
             { title: '序列号', key: 'snList', width: '12%', type: FormTypes.popupJsh, kind: 'snAdd', multi: true },
-            { title: '批号', key: 'batchNumber', width: '7%', type: FormTypes.input },
+            { title: '批号', key: 'batchNumber', width: '12%', type: FormTypes.input },
+            { title: '生产日期', key: 'productionDate',width: '7%', type: FormTypes.date },
             { title: '有效期', key: 'expirationDate',width: '7%', type: FormTypes.date },
             { title: '多属性', key: 'sku', width: '9%', type: FormTypes.normal },
             { title: '原数量', key: 'preNumber', width: '4%', type: FormTypes.normal },
             { title: '已入库', key: 'finishNumber', width: '4%', type: FormTypes.normal },
-            { title: '数量', key: 'operNumber', width: '5%', type: FormTypes.inputNumber, statistics: true,
+            { title: '数量', key: 'operNumber', width: '4%', type: FormTypes.inputNumber, statistics: true,
               validateRules: [{ required: true, message: '${title}不能为空' }]
             },
-            { title: '单价', key: 'unitPrice', width: '5%', type: FormTypes.inputNumber},
-            { title: '金额', key: 'allPrice', width: '5%', type: FormTypes.inputNumber, statistics: true },
+            { title: '单价', key: 'unitPrice', width: '4%', type: FormTypes.inputNumber},
+            { title: '金额', key: 'allPrice', width: '4%', type: FormTypes.inputNumber, statistics: true },
             { title: '备注', key: 'remark', width: '5%', type: FormTypes.input },
             { title: '关联id', key: 'linkId', width: '5%', type: FormTypes.hidden },
           ]
@@ -247,7 +249,10 @@
     },
     methods: {
       //调用完edit()方法之后会自动调用此方法
-      editAfter() {
+      editAfter(record) {
+        if (record){
+          this.priceLimit = record.priceLimit
+        }
         this.billStatus = '0'
         this.currentSelectDepotId = ''
         this.rowCanEdit = true
@@ -255,6 +260,7 @@
         this.changeColumnHide()
         this.changeFormTypes(this.materialTable.columns, 'snList', 0)
         this.changeFormTypes(this.materialTable.columns, 'batchNumber', 0)
+        this.changeFormTypes(this.materialTable.columns, 'productionDate', 0)
         this.changeFormTypes(this.materialTable.columns, 'expirationDate', 0)
         this.changeFormTypes(this.materialTable.columns, 'preNumber', 0)
         this.changeFormTypes(this.materialTable.columns, 'finishNumber', 0)

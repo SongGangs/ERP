@@ -115,6 +115,9 @@ export const BillModalMixin = {
           }
         })
       })
+      // if (amountNum === 'QTCK'){
+      //   this.initCustomer(1)
+      // }
       this.accountIdList = []
       this.accountMoneyList = []
       this.manyAccountBtnStatus = false
@@ -514,6 +517,12 @@ export const BillModalMixin = {
                   }
                 })
               }
+              if (this.prefixNo === 'QTCK') {
+                target.setValues([{
+                  rowKey: row.id,
+                  values: { expirationDate: '', batchNumber: '', productionDate: '' }
+                }])
+              }
             }
           });
           break;
@@ -547,7 +556,7 @@ export const BillModalMixin = {
             }
             getBatchNumberList({name:'', depotItemId: depotItemId, depotId: row.depotId, barCode: row.barCode, batchNumber: batchNumber}).then((res) => {
               if (res && res.code === 200) {
-                if(res.data && res.data.rows) {
+                if(res.data && res.data.rows.length > 0) {
                   let info = res.data.rows[0]
                   let preNumber = row.preNumber-0 //原数量
                   let finishNumber = row.finishNumber-0 //已出库
@@ -569,9 +578,13 @@ export const BillModalMixin = {
                   target.setValues([{rowKey: row.id, values: {expirationDate: info.expirationDateStr,
                       productionDate: info.productionDateStr, operNumber: operNumber, unitPrice: unitPrice,
                       allPrice: allPrice, taxMoney: taxMoney, taxLastMoney: taxLastMoney}}])
-                  target.recalcAllStatisticsColumns()
-                  that.autoChangePrice(target)
+                } else {
+                  target.setValues([{rowKey: row.id, values: {expirationDate: "",
+                      productionDate: "", operNumber: 0, unitPrice: 0,
+                      allPrice: 0, taxMoney: 0, taxLastMoney: 0}}])
                 }
+                target.recalcAllStatisticsColumns()
+                that.autoChangePrice(target)
               }
             })
           }
@@ -642,6 +655,9 @@ export const BillModalMixin = {
     },
     //转为商品对象
     parseInfoToObj(mInfo) {
+      if (this.priceLimit && this.prefixNo === 'QTRK') {
+        mInfo['billPrice'] = 0
+      }
       return {
         barCode: mInfo.mBarCode,
         name: mInfo.name,
@@ -736,7 +752,7 @@ export const BillModalMixin = {
     },
     hiddenPriceColumns() {
       let prefixNo = this.prefixNo
-      if (prefixNo === 'CGRK' || prefixNo == 'CGDD' || prefixNo == 'CGTH') {
+      if (prefixNo === 'CGRK' || prefixNo === 'CGDD' || prefixNo === 'CGTH' || prefixNo === 'QTCK') {
         if (this.priceLimit) {
           let priceColumns = ['unitPrice', 'allPrice', 'taxRate', 'taxMoney', 'taxLastMoney']
           priceColumns.forEach(item => {
