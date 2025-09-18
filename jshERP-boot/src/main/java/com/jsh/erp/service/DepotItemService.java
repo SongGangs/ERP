@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.jsh.erp.constants.BusinessConstants;
 import com.jsh.erp.constants.ExceptionConstants;
+import com.jsh.erp.constants.PriceLimitConstants;
 import com.jsh.erp.datasource.entities.*;
 import com.jsh.erp.datasource.mappers.*;
 import com.jsh.erp.datasource.vo.DepotItemStockWarningCount;
@@ -296,10 +297,14 @@ public class DepotItemService {
         return list;
     }
 
-    public List<DepotItemVo4WithInfoEx> getInOutStock(String materialParam, List<Long> categoryIdList, String endTime, Integer offset, Integer rows)throws Exception {
+    public List<DepotItemVo4WithInfoEx> getInOutStock(String materialParam, List<Long> categoryIdList, String endTime, Integer offset, Integer rows, String priceLimit)throws Exception {
         List<DepotItemVo4WithInfoEx> list =null;
         try{
             list = depotItemMapperEx.getInOutStock(materialParam, categoryIdList, endTime, offset, rows);
+            list.forEach(item -> {
+                item.setCurrentUnitPrice(roleService.parseMaterialPriceByLimit(item.getCurrentUnitPrice(), PriceLimitConstants.BUY, priceLimit));
+                item.setPurchaseDecimal(roleService.parseMaterialPriceByLimit(item.getPurchaseDecimal(), PriceLimitConstants.BUY, priceLimit));
+            });
         }catch(Exception e){
             JshException.readFail(logger, e);
         }
@@ -1275,6 +1280,7 @@ public class DepotItemService {
                     Unit unit = unitService.getUnit(bn.getUnitId());
                     String commodityUnit = bn.getCommodityUnit();
                     bn.setTotalNum(unitService.parseStockByUnit(bn.getTotalNum(), unit, commodityUnit));
+                    bn.setUnitPrice(unitService.parseUnitPriceByUnit(bn.getUnitPrice(), unit, commodityUnit));
                 }
                 reslist.add(bn);
             }

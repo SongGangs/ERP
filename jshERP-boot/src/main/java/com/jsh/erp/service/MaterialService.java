@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.jsh.erp.constants.BusinessConstants;
 import com.jsh.erp.constants.ExceptionConstants;
+import com.jsh.erp.constants.PriceLimitConstants;
 import com.jsh.erp.datasource.entities.*;
 import com.jsh.erp.datasource.mappers.*;
 import com.jsh.erp.datasource.vo.MaterialVoSearch;
@@ -47,6 +48,8 @@ public class MaterialService {
     private LogService logService;
     @Resource
     private UserService userService;
+    @Resource
+    private RoleService roleService;
     @Resource
     private DepotItemMapperEx depotItemMapperEx;
     @Resource
@@ -1357,7 +1360,7 @@ public class MaterialService {
 
     public List<MaterialVo4Unit> getListWithStock(List<Long> depotList, List<Long> idList, String position, String materialParam,
                                                   Boolean moveAvgPriceFlag, Integer zeroStock, String column, String order,
-                                                  Integer offset, Integer rows) throws Exception {
+                                                  Integer offset, Integer rows, String priceLimit) throws Exception {
         Map<Long, BigDecimal> initialStockMap = new HashMap<>();
         List<MaterialInitialStockWithMaterial> initialStockList = getInitialStockWithMaterial(depotList);
         for (MaterialInitialStockWithMaterial mism: initialStockList) {
@@ -1365,6 +1368,10 @@ public class MaterialService {
         }
         List<MaterialVo4Unit> dataList = materialMapperEx.getListWithStock(depotList, idList, position, materialParam, zeroStock, column, order, offset, rows);
         for(MaterialVo4Unit item: dataList) {
+            item.setCurrentUnitPrice(roleService.parseMaterialPriceByLimit(item.getCurrentUnitPrice(),PriceLimitConstants.BUY, priceLimit));
+            item.setPurchaseDecimal(roleService.parseMaterialPriceByLimit(item.getPurchaseDecimal(),PriceLimitConstants.BUY, priceLimit));
+            item.setCurrentStockPrice(roleService.parseMaterialPriceByLimit(item.getCurrentStockPrice(),PriceLimitConstants.BUY, priceLimit));
+            item.setCurrentStockMovePrice(roleService.parseMaterialPriceByLimit(item.getCurrentStockMovePrice(),PriceLimitConstants.BUY, priceLimit));
             if(moveAvgPriceFlag) {
                 item.setPurchaseDecimal(item.getCurrentUnitPrice());
                 item.setCurrentStockPrice(item.getCurrentStockMovePrice());
@@ -1384,8 +1391,11 @@ public class MaterialService {
         return materialMapperEx.getListWithStockCount(depotList, idList, position, materialParam, zeroStock);
     }
 
-    public MaterialVo4Unit getTotalStockAndPrice(List<Long> depotList, List<Long> idList, String position, String materialParam) {
-        return materialMapperEx.getTotalStockAndPrice(depotList, idList, position, materialParam);
+    public MaterialVo4Unit getTotalStockAndPrice(List<Long> depotList, List<Long> idList, String position, String materialParam, String priceLimit) {
+        MaterialVo4Unit result = materialMapperEx.getTotalStockAndPrice(depotList, idList, position, materialParam);
+        result.setCurrentStockPrice(roleService.parseMaterialPriceByLimit(result.getCurrentStockPrice(), PriceLimitConstants.BUY, priceLimit));
+        result.setCurrentStockMovePrice(roleService.parseMaterialPriceByLimit(result.getCurrentStockMovePrice(), PriceLimitConstants.BUY, priceLimit));
+        return result;
     }
 
     /**

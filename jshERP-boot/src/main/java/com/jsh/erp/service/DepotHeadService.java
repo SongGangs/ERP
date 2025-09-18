@@ -1805,7 +1805,7 @@ public class DepotHeadService {
         List<DepotHead> dhList = getDepotHeadListByIds(ids);
         StringBuilder sb = new StringBuilder();
         User userInfo=userService.getCurrentUser();
-        boolean priceLimit = roleService.isPriceLimit(getBillCategory(BusinessConstants.SUB_TYPE_OTHER), request);
+//        boolean priceLimit = roleService.isPriceLimit(getBillCategory(BusinessConstants.SUB_TYPE_OTHER), request);
         for(DepotHead depotHead : dhList) {
             String prefixNo = BusinessConstants.DEPOTHEAD_TYPE_IN.equals(depotHead.getType())?"QTRK":"QTCK";
             //关联单据单号

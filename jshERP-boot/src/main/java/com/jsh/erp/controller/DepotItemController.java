@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.jsh.erp.constants.BusinessConstants;
 import com.jsh.erp.constants.ExceptionConstants;
+import com.jsh.erp.constants.PriceLimitConstants;
 import com.jsh.erp.datasource.entities.*;
 import com.jsh.erp.datasource.vo.DepotItemStockWarningCount;
 import com.jsh.erp.datasource.vo.DepotItemVoBatchNumberList;
@@ -107,6 +108,7 @@ public class DepotItemController {
                 batchNumber, StringUtil.toNull(number), beginTime, endTime, mId, (currentPage-1)*pageSize, pageSize);
         JSONArray dataArray = new JSONArray();
         if (list != null) {
+            String priceLimit = roleService.getCurrentPriceLimit(request);
             for (DepotItemVo4DetailByTypeAndMId d: list) {
                 JSONObject item = new JSONObject();
                 item.put("number", d.getNumber()); //编号
@@ -121,8 +123,8 @@ public class DepotItemController {
                 }
                 item.put("depotName", d.getDepotName()); //仓库名称
                 item.put("basicNumber", d.getBnum()); //数量
-                item.put("unitPrice", d.getUnitPrice()); //单价
-                item.put("allPrice", d.getAllPrice()); //金额
+                item.put("unitPrice", roleService.parseMaterialPriceByLimit(d.getUnitPrice(), PriceLimitConstants.BUY,priceLimit)); //单价
+                item.put("allPrice", roleService.parseMaterialPriceByLimit(d.getUnitPrice(), PriceLimitConstants.BUY, priceLimit)); //金额
                 item.put("operTime", Tools.getCenternTime(d.getOtime())); //时间
                 dataArray.add(item);
             }
@@ -346,8 +348,9 @@ public class DepotItemController {
             beginTime = Tools.parseDayToTime(beginTime, BusinessConstants.DAY_FIRST_TIME);
             endTime = Tools.parseDayToTime(endTime,BusinessConstants.DAY_LAST_TIME);
             List<Long> depotList = parseListByDepotIds(depotIds);
+            String priceLimit = roleService.getCurrentPriceLimit(request);
             List<DepotItemVo4WithInfoEx> dataList = depotItemService.getInOutStock(StringUtil.toNull(materialParam),
-                    categoryIdList, endTime,(currentPage-1)*pageSize, pageSize);
+                    categoryIdList, endTime,(currentPage-1)*pageSize, pageSize, priceLimit);
             int total = depotItemService.getInOutStockCount(StringUtil.toNull(materialParam), categoryIdList, endTime);
             map.put("total", total);
             //存放数据json数组
@@ -437,8 +440,9 @@ public class DepotItemController {
             }
             endTime = Tools.parseDayToTime(endTime,BusinessConstants.DAY_LAST_TIME);
             List<Long> depotList = parseListByDepotIds(depotIds);
+            String priceLimit = roleService.getCurrentPriceLimit(request);
             List<DepotItemVo4WithInfoEx> dataList = depotItemService.getInOutStock(StringUtil.toNull(materialParam),
-                    categoryIdList, endTime, null, null);
+                    categoryIdList, endTime, null, null, priceLimit);
             BigDecimal thisAllStock = BigDecimal.ZERO;
             BigDecimal thisAllPrice = BigDecimal.ZERO;
             if (null != dataList) {

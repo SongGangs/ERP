@@ -103,6 +103,7 @@
         <result column="batch_number" jdbcType="VARCHAR" property="batchNumber" />
         <result column="production_date" jdbcType="TIMESTAMP" property="productionDate" />
         <result column="expiration_date" jdbcType="TIMESTAMP" property="expirationDate" />
+        <result column="unit_price" jdbcType="DECIMAL" property="unitPrice" />
         <result column="total_num" jdbcType="VARCHAR" property="totalNum" />
     </resultMap>
 
@@ -1014,9 +1015,10 @@
 
     <select id="getBatchNumberList" resultMap="batchNumberListMap">
         select id, bar_code, name, standard, model, unit_id,
-        commodity_unit, batch_number, production_date, expiration_date, sum(basic_number) total_num from
+        commodity_unit, batch_number, production_date, expiration_date,unit_price, sum(basic_number) total_num from
         (select di.batch_number id, me.bar_code, m.name, m.standard, m.model, m.unit_id,
          me.commodity_unit, di.batch_number,di.production_date,di.expiration_date,
+         di.all_price / di.basic_number as unit_price,
          di.basic_number*(case dh.type when '入库' then 1 when '出库' then -1 end) as basic_number
         from jsh_depot_head dh
         left join jsh_depot_item di on dh.id=di.header_id

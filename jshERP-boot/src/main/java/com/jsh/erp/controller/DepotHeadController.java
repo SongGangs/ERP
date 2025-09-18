@@ -6,22 +6,20 @@ import com.jsh.erp.base.BaseController;
 import com.jsh.erp.base.TableDataInfo;
 import com.jsh.erp.constants.BusinessConstants;
 import com.jsh.erp.constants.ExceptionConstants;
+import com.jsh.erp.constants.PriceLimitConstants;
 import com.jsh.erp.datasource.entities.DepotHead;
 import com.jsh.erp.datasource.entities.DepotHeadVo4Body;
 import com.jsh.erp.datasource.vo.DepotHeadVo4InDetail;
 import com.jsh.erp.datasource.vo.DepotHeadVo4InOutMCount;
 import com.jsh.erp.datasource.vo.DepotHeadVo4List;
 import com.jsh.erp.datasource.vo.DepotHeadVo4StatementAccount;
-import com.jsh.erp.service.DepotService;
-import com.jsh.erp.service.DepotHeadService;
-import com.jsh.erp.service.MaterialService;
-import com.jsh.erp.service.SystemConfigService;
-import com.jsh.erp.service.UserService;
+import com.jsh.erp.service.*;
 import com.jsh.erp.utils.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -59,6 +57,8 @@ public class DepotHeadController extends BaseController {
 
     @Resource
     private UserService userService;
+    @Autowired
+    private RoleService roleService;
 
     @GetMapping(value = "/info")
     @ApiOperation(value = "根据id获取信息")
@@ -224,6 +224,7 @@ public class DepotHeadController extends BaseController {
             endTime = Tools.parseDayToTime(endTime,BusinessConstants.DAY_LAST_TIME);
             Boolean forceFlag = systemConfigService.getForceApprovalFlag();
             Boolean inOutManageFlag = systemConfigService.getInOutManageFlag();
+            String priceLimit = roleService.getCurrentPriceLimit(request);
             List<DepotHeadVo4InDetail> list = depotHeadService.findInOutDetail(beginTime, endTime, type, creatorArray, organArray, categoryList, forceFlag, inOutManageFlag,
                     StringUtil.toNull(materialParam), depotList, oId, StringUtil.toNull(number), creator, remark,
                     StringUtil.safeSqlParse(column), StringUtil.safeSqlParse(order), (currentPage-1)*pageSize, pageSize);
@@ -232,13 +233,19 @@ public class DepotHeadController extends BaseController {
             map.put("total", total);
             //存放数据json数组
             if (null != list) {
+                list.forEach(item -> {
+                    item.setUnitPrice(roleService.parseMaterialPriceByLimit(item.getUnitPrice(), PriceLimitConstants.BUY, priceLimit));
+                    item.setAllPrice(roleService.parseMaterialPriceByLimit(item.getAllPrice(), PriceLimitConstants.BUY, priceLimit));
+                    item.setTaxRate(roleService.parseMaterialPriceByLimit(item.getTaxRate(), PriceLimitConstants.BUY, priceLimit));
+                    item.setTaxMoney(roleService.parseMaterialPriceByLimit(item.getTaxMoney(), PriceLimitConstants.BUY, priceLimit));
+                });
                 resList.addAll(list);
             }
             map.put("rows", resList);
             DepotHeadVo4InDetail statistic = depotHeadService.findInOutDetailStatistic(beginTime, endTime, type, creatorArray, organArray, categoryList, forceFlag, inOutManageFlag,
                     StringUtil.toNull(materialParam), depotList, oId, StringUtil.toNull(number), creator, remark);
             map.put("operNumberTotal", statistic.getOperNumber());
-            map.put("allPriceTotal", statistic.getAllPrice());
+            map.put("allPriceTotal", roleService.parseMaterialPriceByLimit(statistic.getAllPrice(), PriceLimitConstants.BUY, priceLimit));
             res.code = 200;
             res.data = map;
         } catch(Exception e){
@@ -299,9 +306,13 @@ public class DepotHeadController extends BaseController {
             endTime = Tools.parseDayToTime(endTime,BusinessConstants.DAY_LAST_TIME);
             Boolean forceFlag = systemConfigService.getForceApprovalFlag();
             Boolean inOutManageFlag = systemConfigService.getInOutManageFlag();
+            String priceLimit = roleService.getCurrentPriceLimit(request);
             List<DepotHeadVo4InOutMCount> list = depotHeadService.findInOutMaterialCount(beginTime, endTime, type, categoryList, forceFlag, inOutManageFlag,
                     StringUtil.toNull(materialParam), depotList, organizationId, oId, StringUtil.safeSqlParse(column), StringUtil.safeSqlParse(order),
                     (currentPage-1)*pageSize, pageSize);
+            list.forEach(item -> {
+                item.setPriceSum(roleService.parseMaterialPriceByLimit(item.getPriceSum(), PriceLimitConstants.BUY, priceLimit));
+            });
             int total = depotHeadService.findInOutMaterialCountTotal(beginTime, endTime, type, categoryList, forceFlag, inOutManageFlag,
                     StringUtil.toNull(materialParam), depotList, organizationId, oId);
             map.put("total", total);
@@ -309,7 +320,7 @@ public class DepotHeadController extends BaseController {
             DepotHeadVo4InOutMCount statistic = depotHeadService.findInOutMaterialCountStatistic(beginTime, endTime, type, categoryList, forceFlag, inOutManageFlag,
                     StringUtil.toNull(materialParam), depotList, organizationId, oId);
             map.put("numSumTotal", statistic.getNumSum());
-            map.put("priceSumTotal", statistic.getPriceSum());
+            map.put("priceSumTotal", roleService.parseMaterialPriceByLimit(statistic.getPriceSum(), PriceLimitConstants.BUY, priceLimit));
             res.code = 200;
             res.data = map;
         } catch(Exception e){

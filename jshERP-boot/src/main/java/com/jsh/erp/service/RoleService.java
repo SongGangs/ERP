@@ -2,6 +2,7 @@ package com.jsh.erp.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.jsh.erp.constants.BusinessConstants;
+import com.jsh.erp.constants.PriceLimitConstants;
 import com.jsh.erp.datasource.entities.Role;
 import com.jsh.erp.datasource.entities.RoleEx;
 import com.jsh.erp.datasource.entities.RoleExample;
@@ -279,22 +280,21 @@ public class RoleService {
 
     /**
      * 根据权限进行屏蔽价格-物料
+     *
      * @param price
      * @param type
      * @return
      */
-    public Object parseMaterialPriceByLimit(BigDecimal price, String type, String emptyInfo, HttpServletRequest request) throws Exception {
-        Long userId = userService.getUserId(request);
-        String priceLimit = userService.getRoleTypeByUserId(userId).getPriceLimit();
-        if(StringUtil.isNotEmpty(priceLimit)) {
-            if("buy".equals(type) && priceLimit.contains("4")) {
-                return emptyInfo;
+    public BigDecimal parseMaterialPriceByLimit(BigDecimal price, String type, String priceLimit) {
+        if (StringUtil.isNotEmpty(priceLimit)) {
+            if (PriceLimitConstants.BUY.equals(type) && priceLimit.contains("4")) {
+                return BigDecimal.ZERO;
             }
-            if("retail".equals(type) && priceLimit.contains("5")) {
-                return emptyInfo;
+            if (PriceLimitConstants.RETAIL.equals(type) && priceLimit.contains("5")) {
+                return BigDecimal.ZERO;
             }
-            if("sale".equals(type) && priceLimit.contains("6")) {
-                return emptyInfo;
+            if (PriceLimitConstants.SALES.equals(type) && priceLimit.contains("6")) {
+                return BigDecimal.ZERO;
             }
         }
         return price;
