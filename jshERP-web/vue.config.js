@@ -47,8 +47,8 @@ module.exports = {
     devServer: {
         port: 3000,
         proxy: {
-            '/jshERP-boot': {
-                target: 'http://localhost:9999', // 请求本地 需要jshERP-boot后台项目
+            '/erp-boot': {
+                target: process.env.VUE_APP_API_URL, // 请求本地 需要erp-boot后台项目
                 ws: false,
                 changeOrigin: true
             }
