@@ -282,7 +282,7 @@ alter table jsh_systemconfig add company_tel varchar(20) DEFAULT null COMMENT '�
 alter table jsh_systemconfig add company_fax varchar(20) DEFAULT null COMMENT '公司传真';
 alter table jsh_systemconfig add company_post_code varchar(20) DEFAULT null COMMENT '公司邮编';
 delete from jsh_systemconfig;
-insert into jsh_systemconfig (`company_name`, `company_contacts`, `company_address`, `company_tel`, `company_fax`, `company_post_code`) values("南通jshERP公司","张三","南通市通州区某某路","0513-10101010","0513-18181818","226300");
+insert into jsh_systemconfig (`company_name`, `company_contacts`, `company_address`, `company_tel`, `company_fax`, `company_post_code`) values("南通erp公司","张三","南通市通州区某某路","0513-10101010","0513-18181818","226300");
 
 -- ----------------------------
 -- 时间：2019年3月9日
