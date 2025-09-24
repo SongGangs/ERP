@@ -25,6 +25,7 @@ public class DepotItemVoBatchNumberList {
     private String batchNumber;
     private Date productionDate;
     private String productionDateStr;
+    private Integer expiryNum;
     private Date expirationDate;
     private String expirationDateStr;
     private BigDecimal unitPrice;
