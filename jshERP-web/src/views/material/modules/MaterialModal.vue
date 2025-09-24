@@ -672,6 +672,10 @@
           this.$message.warning('抱歉，多属性商品不能勾选多单位，请切换为单个单位！');
           return;
         }
+        if (formData.enableBatchNumber === '1' && (formData.expiryNum === null || formData.expiryNum <= 0)) {
+          this.$message.warning('抱歉，批号商品必须填写保质期天数！')
+          return;
+        }
         //校验商品是否存在，通过校验商品的名称、型号、规格、颜色、单位、制造商等
         let param = {
           id: this.model.id?this.model.id:0,

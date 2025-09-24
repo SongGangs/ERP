@@ -141,10 +141,11 @@ export const BillListMixin = {
         // { title: '扩展3', dataIndex: 'otherField3'},
         { title: '库存', dataIndex: 'stock'},
         { title: '单位', dataIndex: 'unit'},
-        { title: '序列号', dataIndex: 'snList', width:300},
-        { title: '批号', dataIndex: 'batchNumber'},
+        { title: '序列号', dataIndex: 'snList', width:180},
+        { title: '批号', dataIndex: 'batchNumber', width:180},
         { title: '生产日期', dataIndex: 'productionDate'},
-        { title: '有效期', dataIndex: 'expirationDate'},
+        { title: '保质期', dataIndex: 'expiryNum'},
+        { title: '有效期至', dataIndex: 'expirationDate'},
         { title: '多属性', dataIndex: 'sku'},
         { title: '数量', dataIndex: 'operNumber'},
         { title: '已入库', dataIndex: 'finishNumber'},
@@ -171,10 +172,11 @@ export const BillListMixin = {
         // { title: '扩展3', dataIndex: 'otherField3'},
         { title: '库存', dataIndex: 'stock'},
         { title: '单位', dataIndex: 'unit'},
-        { title: '序列号', dataIndex: 'snList', width:300},
-        { title: '批号', dataIndex: 'batchNumber'},
+        { title: '序列号', dataIndex: 'snList', width:180},
+        { title: '批号', dataIndex: 'batchNumber', width:180},
         { title: '生产日期', dataIndex: 'productionDate'},
-        { title: '有效期', dataIndex: 'expirationDate'},
+        { title: '保质期', dataIndex: 'expiryNum'},
+        { title: '有效期至', dataIndex: 'expirationDate'},
         { title: '多属性', dataIndex: 'sku'},
         { title: '数量', dataIndex: 'operNumber'},
         { title: '已出库', dataIndex: 'finishNumber'},
@@ -282,9 +284,10 @@ export const BillListMixin = {
         // { title: '扩展3', dataIndex: 'otherField3'},
         { title: '库存', dataIndex: 'stock'},
         { title: '单位', dataIndex: 'unit'},
-        { title: '序列号', dataIndex: 'snList', width:300},
-        { title: '批号', dataIndex: 'batchNumber'},
+        { title: '序列号', dataIndex: 'snList', width:180},
+        { title: '批号', dataIndex: 'batchNumber', width:180},
         { title: '生产日期', dataIndex: 'productionDate'},
+        { title: '保质期', dataIndex: 'expiryNum'},
         { title: '有效期', dataIndex: 'expirationDate'},
         { title: '多属性', dataIndex: 'sku'},
         { title: '数量', dataIndex: 'operNumber'},
@@ -308,9 +311,10 @@ export const BillListMixin = {
         // { title: '扩展3', dataIndex: 'otherField3'},
         { title: '库存', dataIndex: 'stock'},
         { title: '单位', dataIndex: 'unit'},
-        { title: '序列号', dataIndex: 'snList', width:300},
-        { title: '批号', dataIndex: 'batchNumber'},
+        { title: '序列号', dataIndex: 'snList', width:180},
+        { title: '批号', dataIndex: 'batchNumber', width:180},
         { title: '生产日期', dataIndex: 'productionDate'},
+        { title: '保质期', dataIndex: 'expiryNum'},
         { title: '有效期', dataIndex: 'expirationDate'},
         { title: '多属性', dataIndex: 'sku'},
         { title: '数量', dataIndex: 'operNumber'},
@@ -919,6 +923,9 @@ export const BillListMixin = {
         if(ds[i].productionDate) {
           needAddkeywords.push('productionDate')
         }
+        if(ds[i].expiryNum) {
+          needAddkeywords.push('expiryNum')
+        }
         if(ds[i].expirationDate) {
           needAddkeywords.push('expirationDate')
         }
@@ -986,7 +993,7 @@ export const BillListMixin = {
         this.detailColumns = currentCol
       } else {
         //移除列
-        let needRemoveKeywords = ['finishNumber', 'snList', 'batchNumber', 'productionDate', 'expirationDate', 'sku', 'weight', 'position',
+        let needRemoveKeywords = ['finishNumber', 'snList', 'batchNumber', 'productionDate', 'expiryNum', 'expirationDate', 'sku', 'weight', 'position',
           'brand', 'mfrs', 'otherField1', 'otherField2', 'otherField3', 'taxRate', 'remark']
         if (this.priceLimit && this.prefixNo !== 'QTRK') {
           needRemoveKeywords.push('unitPrice', 'allPrice', 'taxRate', 'taxMoney', 'taxLastMoney')

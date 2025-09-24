@@ -1354,7 +1354,8 @@
           { title: '序列号', dataIndex: 'snList', width:300},
           { title: '批号', dataIndex: 'batchNumber'},
           { title: '生产日期', dataIndex: 'productionDate'},
-          { title: '有效期', dataIndex: 'expirationDate'},
+          { title: '保质期', dataIndex: 'expiryNum'},
+          { title: '有效期至', dataIndex: 'expirationDate'},
           { title: '多属性', dataIndex: 'sku'},
           { title: '数量', dataIndex: 'operNumber'},
           { title: '已入库', dataIndex: 'finishNumber'},
@@ -1384,7 +1385,8 @@
           { title: '序列号', dataIndex: 'snList', width:300},
           { title: '批号', dataIndex: 'batchNumber'},
           { title: '生产日期', dataIndex: 'productionDate'},
-          { title: '有效期', dataIndex: 'expirationDate'},
+          { title: '保质期', dataIndex: 'expiryNum'},
+          { title: '有效期至', dataIndex: 'expirationDate'},
           { title: '多属性', dataIndex: 'sku'},
           { title: '数量', dataIndex: 'operNumber'},
           { title: '已出库', dataIndex: 'finishNumber'},
@@ -1495,7 +1497,8 @@
           { title: '序列号', dataIndex: 'snList', width:300},
           { title: '批号', dataIndex: 'batchNumber'},
           { title: '生产日期', dataIndex: 'productionDate'},
-          { title: '有效期', dataIndex: 'expirationDate'},
+          { title: '保质期', dataIndex: 'expiryNum'},
+          { title: '有效期至', dataIndex: 'expirationDate'},
           { title: '多属性', dataIndex: 'sku'},
           { title: '数量', dataIndex: 'operNumber'},
           { title: '单价', dataIndex: 'unitPrice'},
@@ -1521,7 +1524,8 @@
           { title: '序列号', dataIndex: 'snList', width:300},
           { title: '批号', dataIndex: 'batchNumber'},
           { title: '生产日期', dataIndex: 'productionDate'},
-          { title: '有效期', dataIndex: 'expirationDate'},
+          { title: '保质期', dataIndex: 'expiryNum'},
+          { title: '有效期至', dataIndex: 'expirationDate'},
           { title: '多属性', dataIndex: 'sku'},
           { title: '数量', dataIndex: 'operNumber'},
           { title: '单价', dataIndex: 'unitPrice'},
@@ -1673,6 +1677,9 @@
           if(ds[i].productionDate) {
             needAddkeywords.push('productionDate')
           }
+          if(ds[i].expiryNum) {
+            needAddkeywords.push('expiryNum')
+          }
           if(ds[i].expirationDate) {
             needAddkeywords.push('expirationDate')
           }
@@ -1722,7 +1729,7 @@
           }
         }]
         //移除列
-        let needRemoveKeywords = ['finishNumber','snList','batchNumber','productionDate','expirationDate','sku','weight','position',
+        let needRemoveKeywords = ['finishNumber','snList','batchNumber','productionDate','expiryNum','expirationDate','sku','weight','position',
           'brand','mfrs','otherField1','otherField2','otherField3','taxRate','remark']
         if (this.priceLimit && this.prefixNo !== 'QTRK') {
           needRemoveKeywords.push('unitPrice', 'allPrice', 'taxRate', 'taxMoney', 'taxLastMoney')
@@ -2040,19 +2047,19 @@
         } else if(this.billType === '销售出库' || this.billType === '销售退货入库') {
           organType = '客户：'
         }
-        let head = '仓库名称,条码,名称,规格,型号,颜色,' + this.otherFieldTitle + ',库存,单位,序列号,批号,生产日期,有效期,多属性,数量,单价,金额,税率(%),税额,价税合计,重量,备注'
+        let head = '仓库名称,条码,名称,规格,型号,颜色,' + this.otherFieldTitle + ',库存,单位,序列号,批号,生产日期,保质期,有效期至,多属性,数量,单价,金额,税率(%),税额,价税合计,重量,备注'
         if (this.priceLimit) {
-          head = '仓库名称,条码,名称,规格,型号,颜色,' + this.otherFieldTitle + ',库存,单位,序列号,批号,生产日期,有效期,多属性,数量,重量,备注'
+          head = '仓库名称,条码,名称,规格,型号,颜色,' + this.otherFieldTitle + ',库存,单位,序列号,批号,生产日期,保质期,有效期至,多属性,数量,重量,备注'
         }
         for (let i = 0; i < this.dataSource.length; i++) {
           let item = []
           let ds = this.dataSource[i]
           if (this.priceLimit) {
             item.push(ds.depotName, ds.barCode, ds.name, ds.standard, ds.model, ds.color, ds.otherField1, ds.otherField2, ds.otherField3, ds.stock, ds.unit,
-              ds.snList, ds.batchNumber, ds.productionDate, ds.expirationDate, ds.sku, ds.operNumber, ds.weight, ds.remark)
+              ds.snList, ds.batchNumber, ds.productionDate, ds.expiryNum, ds.expirationDate, ds.sku, ds.operNumber, ds.weight, ds.remark)
           } else {
             item.push(ds.depotName, ds.barCode, ds.name, ds.standard, ds.model, ds.color, ds.otherField1, ds.otherField2, ds.otherField3, ds.stock, ds.unit,
-              ds.snList, ds.batchNumber, ds.productionDate, ds.expirationDate, ds.sku, ds.operNumber, ds.unitPrice, ds.allPrice, ds.taxRate, ds.taxMoney, ds.taxLastMoney, ds.weight, ds.remark)
+              ds.snList, ds.batchNumber, ds.productionDate, ds.expiryNum, ds.expirationDate, ds.sku, ds.operNumber, ds.unitPrice, ds.allPrice, ds.taxRate, ds.taxMoney, ds.taxLastMoney, ds.weight, ds.remark)
           }
           list.push(item)
         }
@@ -2067,14 +2074,14 @@
         let list = []
         let organType = ''
         let hiddenPrice = false
-        let head = '仓库名称,条码,名称,规格,型号,颜色,' + this.otherFieldTitle + ',库存,单位,序列号,批号,生产日期,有效期,多属性,数量,单价,金额,备注'
+        let head = '仓库名称,条码,名称,规格,型号,颜色,' + this.otherFieldTitle + ',库存,单位,序列号,批号,生产日期,保质期,有效期至,多属性,数量,单价,金额,备注'
         if(this.billType === '其它入库') {
           organType = '供应商：'
         } else if(this.billType === '其它出库') {
           organType = '客户：'
           if (this.priceLimit) {
             hiddenPrice = true
-            head = '仓库名称,条码,名称,规格,型号,颜色,' + this.otherFieldTitle + ',库存,单位,序列号,批号,生产日期,有效期,多属性,数量,备注'
+            head = '仓库名称,条码,名称,规格,型号,颜色,' + this.otherFieldTitle + ',库存,单位,序列号,批号,生产日期,保质期,有效期至,多属性,数量,备注'
           }
         }
         for (let i = 0; i < this.dataSource.length; i++) {
@@ -2082,10 +2089,10 @@
           let ds = this.dataSource[i]
           if (hiddenPrice) {
             item.push(ds.depotName, ds.barCode, ds.name, ds.standard, ds.model, ds.color, ds.otherField1, ds.otherField2, ds.otherField3, ds.stock, ds.unit,
-              ds.snList, ds.batchNumber, ds.productionDate, ds.expirationDate, ds.sku, ds.operNumber, ds.remark)
+              ds.snList, ds.batchNumber, ds.productionDate, ds.expiryNum, ds.expirationDate, ds.sku, ds.operNumber, ds.remark)
           } else {
             item.push(ds.depotName, ds.barCode, ds.name, ds.standard, ds.model, ds.color, ds.otherField1, ds.otherField2, ds.otherField3, ds.stock, ds.unit,
-              ds.snList, ds.batchNumber, ds.productionDate, ds.expirationDate, ds.sku, ds.operNumber, ds.unitPrice, ds.allPrice, ds.remark)
+              ds.snList, ds.batchNumber, ds.productionDate, ds.expiryNum, ds.expirationDate, ds.sku, ds.operNumber, ds.unitPrice, ds.allPrice, ds.remark)
           }
           list.push(item)
         }

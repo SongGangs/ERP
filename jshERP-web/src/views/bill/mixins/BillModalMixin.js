@@ -575,11 +575,11 @@ export const BillModalMixin = {
                   allPrice = (unitPrice*operNumber).toFixed(2)-0
                   taxMoney =((taxRate*0.01)*allPrice).toFixed(2)-0
                   taxLastMoney = (allPrice + taxMoney).toFixed(2)-0
-                  target.setValues([{rowKey: row.id, values: {expirationDate: info.expirationDateStr,
+                  target.setValues([{rowKey: row.id, values: {expirationDate: info.expirationDateStr,expiryNum: info.expiryNum,
                       productionDate: info.productionDateStr, operNumber: operNumber, unitPrice: unitPrice,
                       allPrice: allPrice, taxMoney: taxMoney, taxLastMoney: taxLastMoney}}])
                 } else {
-                  target.setValues([{rowKey: row.id, values: {expirationDate: "",
+                  target.setValues([{rowKey: row.id, values: {expirationDate: "", expiryNum: null,
                       productionDate: "", operNumber: 0, unitPrice: 0,
                       allPrice: 0, taxMoney: 0, taxLastMoney: 0}}])
                 }
@@ -650,6 +650,14 @@ export const BillModalMixin = {
           target.setValues([{rowKey: row.id, values: {unitPrice: unitPrice, allPrice: allPrice, taxMoney: taxMoney}}])
           target.recalcAllStatisticsColumns()
           that.autoChangePrice(target)
+          break;
+        case "productionDate":
+          if (row.expiryNum) {
+            let expiryNum = row.expiryNum -0;
+            let expirationDate = new Date(row.productionDate)
+            expirationDate.setDate(expirationDate.getDate() + expiryNum)
+            target.setValues([{ rowKey: row.id, values: { expirationDate: expirationDate } }])
+          }
           break;
       }
     },
@@ -732,6 +740,7 @@ export const BillModalMixin = {
         } else {
           this.changeFormTypes(this.materialTable.columns, 'batchNumber', 1)
           this.changeFormTypes(this.materialTable.columns, 'productionDate', 1)
+          this.changeFormTypes(this.materialTable.columns, 'expiryNum', 1)
           this.changeFormTypes(this.materialTable.columns, 'expirationDate', 1)
         }
       }
