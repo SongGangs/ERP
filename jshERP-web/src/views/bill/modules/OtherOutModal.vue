@@ -206,7 +206,7 @@
             { title: '库存', key: 'stock', width: '5%', type: FormTypes.normal },
             { title: '单位', key: 'unit', width: '4%', type: FormTypes.normal },
             { title: '序列号', key: 'snList', width: '12%', type: FormTypes.popupJsh, kind: 'sn', multi: true },
-            { title: '批号', key: 'batchNumber', width: '12%', type: FormTypes.popupJsh, kind: 'batch', multi: false },
+            { title: '批号', key: 'batchNumber', width: '7%', type: FormTypes.popupJsh, kind: 'batch', multi: false },
             { title: '生产日期', key: 'productionDate',width: '7%', type: FormTypes.input, readonly: true },
             { title: '保质期', key: 'expiryNum',width: '4%', type: FormTypes.normal },
             { title: '有效期至', key: 'expirationDate',width: '7%', type: FormTypes.input, readonly: true },

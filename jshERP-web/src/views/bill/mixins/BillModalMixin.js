@@ -2,7 +2,7 @@ import { FormTypes, getListData } from '@/utils/JEditableTableUtil'
 import { findBySelectCus, findBySelectRetail, findBySelectSup, findStockByDepotAndBarCode, getAccount,
   getBatchNumberList, getCurrentSystemConfig, getMaterialByBarCode, getPersonByNumType, getPlatformConfigByKey } from '@/api/api'
 import { getAction } from '@/api/manage'
-import { getCheckFlag, getMpListShort, getNowFormatDateTime } from '@/utils/util'
+import { formatDate, getCheckFlag, getMpListShort, getNowFormatDateTime } from '@/utils/util'
 import { USER_INFO } from '@/store/mutation-types'
 import Vue from 'vue'
 
@@ -263,6 +263,19 @@ export const BillModalMixin = {
                 item.options.push(depotInfo)
               }
             }
+          }
+        }
+      })
+    },
+    initModelDepot(isChecked) {
+      let that = this
+      getDepot({}).then((res) => {
+        if (res && res.code === 200) {
+          let list = res.data
+          let lastId = list.length > 0 ? list[0].id : ''
+          that.depotList = list
+          if (isChecked) {
+            that.form.setFieldsValue({ 'depotId': lastId })
           }
         }
       })
@@ -544,7 +557,7 @@ export const BillModalMixin = {
           break;
         case "batchNumber":
           //只针对销售出库、采购退货、其它出库
-          if(this.prefixNo === 'XSCK' || this.prefixNo === 'CGTH' || this.prefixNo === 'QTCK') {
+          if(this.prefixNo === 'XSCK' || this.prefixNo === 'CGTH' || this.prefixNo === 'QTCK' || this.prefixNo === 'DBCK') {
             batchNumber = value
             let depotItemId = ''
             if(this.model.id) {
@@ -652,12 +665,18 @@ export const BillModalMixin = {
           that.autoChangePrice(target)
           break;
         case "productionDate":
-          if (row.expiryNum) {
-            let expiryNum = row.expiryNum -0;
-            let expirationDate = new Date(row.productionDate)
-            expirationDate.setDate(expirationDate.getDate() + expiryNum)
-            target.setValues([{ rowKey: row.id, values: { expirationDate: expirationDate } }])
+          batchNumber = ""
+          let expirationDate
+          if (row.productionDate) {
+            batchNumber = row.productionDate.replaceAll('-', '')
+            if (row.expiryNum) {
+              let expiryNum = row.expiryNum - 0
+              expirationDate = new Date(row.productionDate)
+              expirationDate.setDate(expirationDate.getDate() + expiryNum)
+              expirationDate = expirationDate.toLocaleDateString()
+            }
           }
+          target.setValues([{rowKey: row.id, values: {expirationDate: expirationDate, batchNumber: batchNumber}}])
           break;
       }
     },
@@ -679,6 +698,7 @@ export const BillModalMixin = {
         otherField3: mInfo.otherField3,
         unit: mInfo.commodityUnit,
         sku: mInfo.sku,
+        expiryNum: mInfo.expiryNum,
         operNumber: 1,
         unitPrice: mInfo.billPrice,
         allPrice: mInfo.billPrice,

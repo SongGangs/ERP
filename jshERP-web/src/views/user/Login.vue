@@ -239,7 +239,7 @@
         }
         if(res.data && res.data.user) {
           if(res.data.user.loginName === 'admin'){
-            let desc = 'admin只是平台运维用户，真正的管理员是租户(测试账号为jsh），admin不能编辑任何业务数据，只能配置平台菜单和创建租户'
+            let desc = 'admin只是平台运维用户，admin不能编辑任何业务数据，只能配置平台菜单和创建租户'
             this.$message.info(desc,30)
           } else {
             getPlatformConfigByKey({ "platformKey": "bill_excel_url" }).then((res) => {

@@ -294,7 +294,7 @@ export const JeecgListMixin = {
       if (['materialStock', 'inDetail', 'outDetail'].includes(this.pageName)) {
         await getAction('/user/getCurrentPriceLimit', {}).then(res => {
           if (res && res.code === 200) {
-            this.priceLimit = res.data.priceLimit && res.data.priceLimit.includes(4)
+            this.priceLimit = res.data.priceLimit.includes(4)
           }
         })
       }

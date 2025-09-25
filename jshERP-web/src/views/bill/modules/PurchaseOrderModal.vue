@@ -344,6 +344,10 @@
             this.rowCanEdit = false
             this.materialTable.columns[1].type = FormTypes.normal
           }
+          if(this.model.linkApply) {
+            this.changeFormTypes(this.materialTable.columns, 'preNumber', 1)
+            this.changeFormTypes(this.materialTable.columns, 'finishNumber', 1)
+          }
           this.model.operTime = this.model.operTimeStr
           if(this.model.accountId == null && this.model.accountIdList) {
             this.model.accountId = 0

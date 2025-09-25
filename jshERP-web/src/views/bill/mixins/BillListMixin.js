@@ -142,7 +142,7 @@ export const BillListMixin = {
         { title: '库存', dataIndex: 'stock'},
         { title: '单位', dataIndex: 'unit'},
         { title: '序列号', dataIndex: 'snList', width:180},
-        { title: '批号', dataIndex: 'batchNumber', width:180},
+        { title: '批号', dataIndex: 'batchNumber'},
         { title: '生产日期', dataIndex: 'productionDate'},
         { title: '保质期', dataIndex: 'expiryNum'},
         { title: '有效期至', dataIndex: 'expirationDate'},
@@ -173,7 +173,7 @@ export const BillListMixin = {
         { title: '库存', dataIndex: 'stock'},
         { title: '单位', dataIndex: 'unit'},
         { title: '序列号', dataIndex: 'snList', width:180},
-        { title: '批号', dataIndex: 'batchNumber', width:180},
+        { title: '批号', dataIndex: 'batchNumber'},
         { title: '生产日期', dataIndex: 'productionDate'},
         { title: '保质期', dataIndex: 'expiryNum'},
         { title: '有效期至', dataIndex: 'expirationDate'},
@@ -285,7 +285,7 @@ export const BillListMixin = {
         { title: '库存', dataIndex: 'stock'},
         { title: '单位', dataIndex: 'unit'},
         { title: '序列号', dataIndex: 'snList', width:180},
-        { title: '批号', dataIndex: 'batchNumber', width:180},
+        { title: '批号', dataIndex: 'batchNumber'},
         { title: '生产日期', dataIndex: 'productionDate'},
         { title: '保质期', dataIndex: 'expiryNum'},
         { title: '有效期', dataIndex: 'expirationDate'},
@@ -312,7 +312,7 @@ export const BillListMixin = {
         { title: '库存', dataIndex: 'stock'},
         { title: '单位', dataIndex: 'unit'},
         { title: '序列号', dataIndex: 'snList', width:180},
-        { title: '批号', dataIndex: 'batchNumber', width:180},
+        { title: '批号', dataIndex: 'batchNumber'},
         { title: '生产日期', dataIndex: 'productionDate'},
         { title: '保质期', dataIndex: 'expiryNum'},
         { title: '有效期', dataIndex: 'expirationDate'},
@@ -693,7 +693,7 @@ export const BillListMixin = {
       if (prefixNo === 'CGRK' || prefixNo === 'CGDD' || prefixNo === 'CGTH' || prefixNo === 'QTCK' || prefixNo === 'QTRK') {
         await getAction('/user/getCurrentPriceLimit', {}).then(res => {
           if (res && res.code === 200) {
-            this.priceLimit = res.data.priceLimit && res.data.priceLimit.includes(4)
+            this.priceLimit = res.data.priceLimit.includes(4)
           }
         })
       }
@@ -765,6 +765,10 @@ export const BillListMixin = {
         this.$message.warning('只能选择一条记录！')
       } else {
         let info = this.selectionRows[0]
+        this.doTransferBill(type, quickBtnStr, info)
+      }
+    },
+    doTransferBill(type, quickBtnStr, info) {
         if(info.status === '1' || info.status === '3') {
           let linkType = 'basic'
           if(type === '转采购订单-以销定购') {
@@ -815,7 +819,6 @@ export const BillListMixin = {
         } else {
           this.$message.warning('该状态不能' + type + '！')
         }
-      }
     },
     //列设置更改事件
     onColChange (checkedValues) {

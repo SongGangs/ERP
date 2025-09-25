@@ -171,9 +171,9 @@
             <template slot="customRenderStatus" slot-scope="status">
               <a-tag v-if="status == '0'" color="red">未审核</a-tag>
               <a-tag v-if="status == '1'" color="green">已审核</a-tag>
-              <a-tag v-if="status == '2'" color="cyan">完成出库</a-tag>
-              <a-tag v-if="status == '3'" color="blue">部分出库</a-tag>
-              <a-tag v-if="status == '9'" color="orange">审核中</a-tag>
+<!--              <a-tag v-if="status == '2'" color="cyan">完成出库</a-tag>-->
+<!--              <a-tag v-if="status == '3'" color="blue">部分出库</a-tag>-->
+<!--              <a-tag v-if="status == '9'" color="orange">审核中</a-tag>-->
             </template>
             <a-table
               bordered
@@ -248,13 +248,16 @@
           'needBackMoney','changeAmount','debt','status'],
         // 默认列
         defColumns: [
+          { title: '状态', dataIndex: 'status', width: 80, align: "center",
+            scopedSlots: { customRender: 'customRenderStatus' }
+          },
           {
             title: '操作',
             dataIndex: 'action',
             align:"center", width: 180,
             scopedSlots: { customRender: 'action' },
           },
-          { title: '供应商', dataIndex: 'organName',width:120, ellipsis:true},
+          // { title: '供应商', dataIndex: 'organName',width:120, ellipsis:true},
           { title: '单据编号', dataIndex: 'number',width:160,
             customRender:function (text,record,index) {
               text = record.linkNumber?text+"[转]":text
@@ -288,10 +291,7 @@
           { title: '结算账户', dataIndex: 'accountName',width:80},
           { title: '本次退款', dataIndex: 'changeAmount',width:80},
           { title: '本次欠款', dataIndex: 'debt',width:80},
-          { title: '备注', dataIndex: 'remark',width:200},
-          { title: '状态', dataIndex: 'status', width: 80, align: "center",
-            scopedSlots: { customRender: 'customRenderStatus' }
-          }
+          { title: '备注', dataIndex: 'remark',width:200}
         ],
         url: {
           list: "/depotHead/list",

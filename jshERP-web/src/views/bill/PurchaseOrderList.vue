@@ -73,11 +73,11 @@
                 <a-col :md="6" :sm="24">
                   <a-form-item label="单据状态" :labelCol="labelCol" :wrapperCol="wrapperCol">
                     <a-select placeholder="请选择单据状态" allow-clear v-model="queryParam.status">
-                      <a-select-option value="0" v-if="btnEnableList.indexOf(1)>-1">未审核</a-select-option>
+                      <a-select-option value="0" v-if="btnEnableList.indexOf(1)>-1">未完全采购</a-select-option>
                       <a-select-option value="9" v-if="!checkFlag">审核中</a-select-option>
-                      <a-select-option value="1">已审核</a-select-option>
-                      <a-select-option value="3">部分采购</a-select-option>
-                      <a-select-option value="2">完成采购</a-select-option>
+                      <a-select-option value="1">采购完毕</a-select-option>
+                      <a-select-option value="3">部分入库</a-select-option>
+                      <a-select-option value="2">完成入库</a-select-option>
                     </a-select>
                   </a-form-item>
                 </a-col>
@@ -94,12 +94,12 @@
         <div class="table-operator"  style="margin-top: 5px">
           <a-button v-if="btnEnableList.indexOf(1)>-1" @click="myHandleAdd" type="primary" icon="plus">新增</a-button>
           <a-button v-if="btnEnableList.indexOf(1)>-1" icon="delete" @click="batchDel">删除</a-button>
-          <a-button v-if="quickBtn.purchaseIn.indexOf(1)>-1" icon="share-alt" @click="transferBill('转采购入库', quickBtn.purchaseIn)">转采购入库</a-button>
-          <a-tooltip title="可将状态是部分采购的单据强制完成">
+          <a-button v-if="quickBtn.purchaseIn.indexOf(1)>-1" icon="share-alt" @click="transferBill('转采购入库', quickBtn.purchaseIn)">入库</a-button>
+          <a-tooltip title="可将状态是部分入库的单据强制完成">
             <a-button v-if="btnEnableList.indexOf(1)>-1" icon="issues-close" @click="batchForceClose">强制结单</a-button>
           </a-tooltip>
-          <a-button v-if="checkFlag && btnEnableList.indexOf(2)>-1" icon="check" @click="batchSetStatus(1)">审核</a-button>
-          <a-button v-if="checkFlag && btnEnableList.indexOf(7)>-1" icon="stop" @click="batchSetStatus(0)">反审核</a-button>
+          <a-button v-if="checkFlag && btnEnableList.indexOf(2)>-1" icon="check" @click="batchSetStatus(1)">完成采购</a-button>
+          <a-button v-if="checkFlag && btnEnableList.indexOf(7)>-1" icon="stop" @click="batchSetStatus(0)">取消采购</a-button>
           <a-button v-if="isShowExcel && btnEnableList.indexOf(3)>-1" icon="download" @click="handleExport">导出</a-button>
           <a-popover trigger="click" placement="right">
             <template slot="content">
@@ -153,8 +153,10 @@
             @change="handleTableChange">
             <span slot="action" slot-scope="text, record">
               <a @click="myHandleDetail(record, '采购订单', prefixNo)">查看</a>
-              <a-divider v-if="btnEnableList.indexOf(1)>-1" type="vertical" />
-              <a v-if="btnEnableList.indexOf(1)>-1" @click="myHandleEdit(record)">编辑</a>
+              <a-divider v-if="quickBtn.purchaseIn.indexOf(1)>-1 && btnEnableList.indexOf(1)>-1 && (record.status === '1' || record.status === '3')" type="vertical" />
+              <a v-if="quickBtn.purchaseIn.indexOf(1)>-1 && btnEnableList.indexOf(1)>-1 && (record.status === '1' || record.status === '3')" @click="doTransferBill('转采购入库', quickBtn.purchaseIn, record)" style="color: red;">入库</a>
+              <a-divider v-if="btnEnableList.indexOf(1)>-1 && record.status === '0'" type="vertical" />
+              <a v-if="btnEnableList.indexOf(1)>-1 && record.status === '0'" @click="myHandleEdit(record)">编辑</a>
               <a-divider v-if="btnEnableList.indexOf(1)>-1" type="vertical" />
               <a v-if="btnEnableList.indexOf(1)>-1" @click="myHandleCopyAdd(record)">复制</a>
               <a-divider v-if="btnEnableList.indexOf(1)>-1" type="vertical" />
@@ -163,11 +165,11 @@
               </a-popconfirm>
             </span>
             <template slot="customRenderStatus" slot-scope="status">
-              <a-tag v-if="status == '0'" color="red">未审核</a-tag>
-              <a-tag v-if="status == '1'" color="green">已审核</a-tag>
-              <a-tag v-if="status == '2'" color="cyan">完成采购</a-tag>
-              <a-tag v-if="status == '3'" color="blue">部分采购</a-tag>
-              <a-tag v-if="status == '9'" color="orange">审核中</a-tag>
+              <a-tag v-if="status == '0'" color="orange">未完全采购</a-tag>
+              <a-tag v-if="status == '1'" color="cyan">采购完毕</a-tag>
+              <a-tag v-if="status == '2'" color="green">完成入库</a-tag>
+              <a-tag v-if="status == '3'" color="red">部分入库</a-tag>
+<!--              <a-tag v-if="status == '9'" color="orange">审核中</a-tag>-->
             </template>
             <a-table
               bordered
@@ -243,13 +245,16 @@
           'changeAmount','status'],
         // 默认列
         defColumns: [
+          { title: '状态', dataIndex: 'status', width: 80, align: "center",
+            scopedSlots: { customRender: 'customRenderStatus' }
+          },
           {
             title: '操作',
             dataIndex: 'action',
             align:"center", width: 180,
             scopedSlots: { customRender: 'action' },
           },
-          { title: '供应商', dataIndex: 'organName',width:120, ellipsis:true},
+          // { title: '供应商', dataIndex: 'organName',width:120, ellipsis:true},
           { title: '单据编号', dataIndex: 'number',width:160,
             customRender:function (text,record,index) {
               text = record.linkApply?text+"[请]":text
@@ -282,10 +287,7 @@
           { title: '优惠后金额', dataIndex: 'discountLastMoney',width:100},
           { title: '结算账户', dataIndex: 'accountName',width:80},
           { title: '支付订金', dataIndex: 'changeAmount',width:80},
-          { title: '备注', dataIndex: 'remark',width:200},
-          { title: '状态', dataIndex: 'status', width: 80, align: "center",
-            scopedSlots: { customRender: 'customRenderStatus' }
-          }
+          { title: '备注', dataIndex: 'remark',width:200}
         ],
         url: {
           list: "/depotHead/list",

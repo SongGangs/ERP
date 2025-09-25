@@ -22,8 +22,10 @@
                 </a-form-item>
               </a-col>
               <a-col :md="6" :sm="8">
-                <a-form-item label="规格型号" :labelCol="labelCol" :wrapperCol="wrapperCol">
-                  <a-input placeholder="请输入规格、型号" v-model="queryParam.standardOrModel"></a-input>
+                <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="类别">
+                  <a-tree-select style="width:100%" :dropdownStyle="{maxHeight:'200px',overflow:'auto'}" allow-clear
+                                 :treeData="categoryTree" v-model="queryParam.categoryId" placeholder="请选择类别">
+                  </a-tree-select>
                 </a-form-item>
               </a-col>
               <a-col :md="6" :sm="8">
@@ -63,10 +65,8 @@
                   </a-form-item>
                 </a-col>
                 <a-col :md="6" :sm="8">
-                  <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="类别">
-                    <a-tree-select style="width:100%" :dropdownStyle="{maxHeight:'200px',overflow:'auto'}" allow-clear
-                                   :treeData="categoryTree" v-model="queryParam.categoryId" placeholder="请选择类别">
-                    </a-tree-select>
+                  <a-form-item label="规格型号" :labelCol="labelCol" :wrapperCol="wrapperCol">
+                    <a-input placeholder="请输入规格、型号" v-model="queryParam.standardOrModel"></a-input>
                   </a-form-item>
                 </a-col>
                 <a-col :md="6" :sm="8">
@@ -195,13 +195,14 @@
           {dataIndex: 'name', title: '名称', scopedSlots: { customRender: 'customName' }},
           {dataIndex: 'categoryName', title: '类别'},
           {dataIndex: 'standard', title: '规格'},
-          {dataIndex: 'model', title: '型号'},
-          {dataIndex: 'color', title: '颜色'},
-          {dataIndex: 'brand', title: '品牌'},
-          {dataIndex: 'mfrs', title: '制造商'},
+          // {dataIndex: 'model', title: '型号'},
+          // {dataIndex: 'color', title: '颜色'},
+          // {dataIndex: 'brand', title: '品牌'},
+          // {dataIndex: 'mfrs', title: '制造商'},
           {dataIndex: 'unit', title: '单位'},
           {dataIndex: 'sku', title: '多属性'},
           {dataIndex: 'stock', title: '库存'},
+          { dataIndex: 'expiryNum', title: '保质期' }
           // {dataIndex: 'otherField1', title: '扩展1'},
           // {dataIndex: 'otherField2', title: '扩展2'},
           // {dataIndex: 'otherField3', title: '扩展3'}

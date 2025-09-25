@@ -166,6 +166,11 @@
             { title: '库存', key: 'stock', width: '5%', type: FormTypes.normal },
             { title: '调入仓库', key: 'anotherDepotId', width: '8%', type: FormTypes.select, placeholder: '请选择${title}', options: [], allowSearch:true},
             { title: '单位', key: 'unit', width: '4%', type: FormTypes.normal },
+            { title: '序列号', key: 'snList', width: '12%', type: FormTypes.popupJsh, kind: 'sn', multi: true },
+            { title: '批号', key: 'batchNumber', width: '7%', type: FormTypes.popupJsh, kind: 'batch', multi: false },
+            { title: '生产日期', key: 'productionDate',width: '7%', type: FormTypes.input, readonly: true },
+            { title: '保质期', key: 'expiryNum',width: '4%', type: FormTypes.normal },
+            { title: '有效期至', key: 'expirationDate',width: '7%', type: FormTypes.input, readonly: true },
             { title: '多属性', key: 'sku', width: '9%', type: FormTypes.normal },
             { title: '数量', key: 'operNumber', width: '5%', type: FormTypes.inputNumber, statistics: true,
               validateRules: [{ required: true, message: '${title}不能为空' }]
@@ -210,6 +215,8 @@
         this.changeColumnHide()
         this.changeFormTypes(this.materialTable.columns, 'snList', 0)
         this.changeFormTypes(this.materialTable.columns, 'batchNumber', 0)
+        this.changeFormTypes(this.materialTable.columns, 'productionDate', 0)
+        this.changeFormTypes(this.materialTable.columns, 'expiryNum', 0)
         this.changeFormTypes(this.materialTable.columns, 'expirationDate', 0)
         if (this.action === 'add') {
           this.addInit(this.prefixNo)

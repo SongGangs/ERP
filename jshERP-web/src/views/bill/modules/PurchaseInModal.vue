@@ -292,13 +292,13 @@
             { title: '库存', key: 'stock', width: '4%', type: FormTypes.normal },
             { title: '单位', key: 'unit', width: '4%', type: FormTypes.normal },
             { title: '序列号', key: 'snList', width: '10%', type: FormTypes.popupJsh, kind: 'snAdd', multi: true },
-            { title: '批号', key: 'batchNumber', width: '8%', type: FormTypes.input },
-            { title: '生产日期', key: 'productionDate',width: '8%', type: FormTypes.date },
+            { title: '批号', key: 'batchNumber', width: '7%', type: FormTypes.input, readonly: true},
+            { title: '生产日期', key: 'productionDate',width: '7%', type: FormTypes.date },
             { title: '保质期', key: 'expiryNum',width: '4%', type: FormTypes.normal },
-            { title: '有效期至', key: 'expirationDate',width: '8%', type: FormTypes.date, disabled: true },
+            { title: '有效期至', key: 'expirationDate',width: '7%', type: FormTypes.date, disabled: true },
             { title: '多属性', key: 'sku', width: '9%', type: FormTypes.normal },
-            { title: '原数量', key: 'preNumber', width: '3%', type: FormTypes.normal },
-            { title: '已入库', key: 'finishNumber', width: '3%', type: FormTypes.normal },
+            { title: '原数量', key: 'preNumber', width: '4%', type: FormTypes.normal },
+            { title: '已入库', key: 'finishNumber', width: '4%', type: FormTypes.normal },
             { title: '数量', key: 'operNumber', width: '3%', type: FormTypes.inputNumber, statistics: true,
               validateRules: [{ required: true, message: '${title}不能为空' }]
             },
@@ -383,6 +383,8 @@
           if(this.model.linkNumber) {
             this.rowCanEdit = false
             this.materialTable.columns[1].type = FormTypes.normal
+            this.changeFormTypes(this.materialTable.columns, 'preNumber', 1)
+            this.changeFormTypes(this.materialTable.columns, 'finishNumber', 1)
           }
           this.model.operTime = this.model.operTimeStr
           if(this.model.deposit) {

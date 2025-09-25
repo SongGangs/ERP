@@ -56,7 +56,7 @@
                     <a-select placeholder="请选择单据状态" allow-clear v-model="queryParam.status">
                       <a-select-option value="0">未审核</a-select-option>
                       <a-select-option value="9" v-if="!checkFlag">审核中</a-select-option>
-                      <a-select-option value="1">已审核</a-select-option>
+                      <a-select-option value="1">同意采购</a-select-option>
                       <a-select-option value="3">部分采购</a-select-option>
                       <a-select-option value="2">完成采购</a-select-option>
                     </a-select>
@@ -75,7 +75,7 @@
         <div class="table-operator"  style="margin-top: 5px">
           <a-button v-if="btnEnableList.indexOf(1)>-1" @click="myHandleAdd" type="primary" icon="plus">新增</a-button>
           <a-button v-if="btnEnableList.indexOf(1)>-1" icon="delete" @click="batchDel">删除</a-button>
-          <a-button v-if="quickBtn.purchaseOrder.indexOf(1)>-1 && btnEnableList.indexOf(1)>-1" icon="share-alt" @click="transferBill('转采购订单', quickBtn.purchaseOrder)">转采购订单</a-button>
+          <a-button v-if="quickBtn.purchaseOrder.indexOf(1)>-1 && btnEnableList.indexOf(1)>-1" icon="share-alt" @click="transferBill('转采购订单', quickBtn.purchaseOrder)">采购</a-button>
           <a-tooltip title="可将状态是部分采购的单据强制完成">
             <a-button v-if="btnEnableList.indexOf(1)>-1" icon="issues-close" @click="batchForceClose">强制结单</a-button>
           </a-tooltip>
@@ -129,8 +129,10 @@
             @change="handleTableChange">
             <span slot="action" slot-scope="text, record">
               <a @click="myHandleDetail(record, '请购单', prefixNo)">查看</a>
-              <a-divider v-if="btnEnableList.indexOf(1)>-1" type="vertical" />
-              <a v-if="btnEnableList.indexOf(1)>-1" @click="myHandleEdit(record)">编辑</a>
+              <a-divider v-if="quickBtn.purchaseOrder.indexOf(1)>-1 && btnEnableList.indexOf(1)>-1 && (record.status === '1' || record.status === '3')" type="vertical" />
+              <a v-if="quickBtn.purchaseOrder.indexOf(1)>-1 && btnEnableList.indexOf(1)>-1 && (record.status === '1' || record.status === '3')" @click="transferBill('转采购订单', quickBtn.purchaseOrder, record)" style="color: red;">采购</a>
+              <a-divider v-if="btnEnableList.indexOf(1)>-1 && record.status === '0'" type="vertical" />
+              <a v-if="btnEnableList.indexOf(1)>-1 && record.status === '0'" @click="myHandleEdit(record)">编辑</a>
               <a-divider v-if="btnEnableList.indexOf(1)>-1" type="vertical" />
               <a v-if="btnEnableList.indexOf(1)>-1" @click="myHandleCopyAdd(record)">复制</a>
               <a-divider v-if="btnEnableList.indexOf(1)>-1" type="vertical" />
@@ -139,11 +141,11 @@
               </a-popconfirm>
             </span>
             <template slot="customRenderStatus" slot-scope="status">
-              <a-tag v-if="status == '0'" color="red">未审核</a-tag>
-              <a-tag v-if="status == '1'" color="green">已审核</a-tag>
-              <a-tag v-if="status == '2'" color="cyan">完成采购</a-tag>
-              <a-tag v-if="status == '3'" color="blue">部分采购</a-tag>
-              <a-tag v-if="status == '9'" color="orange">审核中</a-tag>
+              <a-tag v-if="status == '0'" color="orange">未审核</a-tag>
+              <a-tag v-if="status == '1'" color="cyan">同意采购</a-tag>
+              <a-tag v-if="status == '2'" color="green">完成采购</a-tag>
+              <a-tag v-if="status == '3'" color="red">部分采购</a-tag>
+<!--              <a-tag v-if="status == '9'" color="orange">审核中</a-tag>-->
             </template>
             <a-table
               bordered
@@ -214,6 +216,9 @@
         defDataIndex:['action','number','materialsList','operTimeStr','userName','materialCount','status'],
         // 默认列
         defColumns: [
+          { title: '状态', dataIndex: 'status', width: 100, align: "center",
+            scopedSlots: { customRender: 'customRenderStatus' }
+          },
           {
             title: '操作',
             dataIndex: 'action',
@@ -225,10 +230,7 @@
           { title: '单据日期', dataIndex: 'operTimeStr',width:185},
           { title: '操作员', dataIndex: 'userName',width:120, ellipsis:true},
           { title: '数量', dataIndex: 'materialCount',width:80},
-          { title: '备注', dataIndex: 'remark',width:250},
-          { title: '状态', dataIndex: 'status', width: 100, align: "center",
-            scopedSlots: { customRender: 'customRenderStatus' }
-          }
+          { title: '备注', dataIndex: 'remark',width:250}
         ],
         url: {
           list: "/depotHead/list",
