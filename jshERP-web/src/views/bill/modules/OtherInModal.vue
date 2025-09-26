@@ -171,7 +171,6 @@
         rowCanEdit: true,
         //出入库管理开关，适合独立仓管场景
         inOutManageFlag: false,
-        priceLimit: false,
         model: {},
         labelCol: {
           xs: { span: 24 },
@@ -208,7 +207,7 @@
             { title: '批号', key: 'batchNumber', width: '7%', type: FormTypes.input, readonly: true},
             { title: '生产日期', key: 'productionDate',width: '7%', type: FormTypes.date },
             { title: '保质期', key: 'expiryNum',width: '4%', type: FormTypes.normal },
-            { title: '有效期至', key: 'expirationDate',width: '7%', type: FormTypes.date },
+            { title: '有效期至', key: 'expirationDate',width: '7%', type: FormTypes.date, disabled: true },
             { title: '多属性', key: 'sku', width: '9%', type: FormTypes.normal },
             { title: '原数量', key: 'preNumber', width: '4%', type: FormTypes.normal },
             { title: '已入库', key: 'finishNumber', width: '4%', type: FormTypes.normal },
@@ -250,10 +249,7 @@
     },
     methods: {
       //调用完edit()方法之后会自动调用此方法
-      editAfter(record) {
-        if (record){
-          this.priceLimit = record.priceLimit
-        }
+      editAfter() {
         this.billStatus = '0'
         this.currentSelectDepotId = ''
         this.rowCanEdit = true

@@ -942,6 +942,11 @@
         <section ref="print" id="otherOutPrint">
           <a-row class="form-row" :gutter="24">
             <a-col :span="6">
+              <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="出库类型">
+                {{ convertOutType(model.outType) }}
+              </a-form-item>
+            </a-col>
+            <a-col :span="6">
               <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="客户">
                 <a-input v-decorator="['id']" hidden/>
                 {{model.organName}}
@@ -957,14 +962,14 @@
                 {{model.number}}
               </a-form-item>
             </a-col>
-            <a-col :span="6">
-              <a-form-item v-if="model.billType" :labelCol="labelCol" :wrapperCol="wrapperCol" label="关联单据">
-                {{model.linkNumber}} {{model.billType}}
-              </a-form-item>
-              <a-form-item v-if="!model.billType" :labelCol="labelCol" :wrapperCol="wrapperCol" label="关联单据">
-                <a @click="myHandleDetail(model.linkNumber)">{{model.linkNumber}}</a>
-              </a-form-item>
-            </a-col>
+<!--            <a-col :span="6">-->
+<!--              <a-form-item v-if="model.billType" :labelCol="labelCol" :wrapperCol="wrapperCol" label="关联单据">-->
+<!--                {{model.linkNumber}} {{model.billType}}-->
+<!--              </a-form-item>-->
+<!--              <a-form-item v-if="!model.billType" :labelCol="labelCol" :wrapperCol="wrapperCol" label="关联单据">-->
+<!--                <a @click="myHandleDetail(model.linkNumber)">{{model.linkNumber}}</a>-->
+<!--              </a-form-item>-->
+<!--            </a-col>-->
           </a-row>
           <div :style="tableWidth">
             <a-table
@@ -2109,7 +2114,7 @@
           list.push(item)
         }
         let organName = this.model.organName? this.model.organName: ''
-        let tip = organType + organName + ' ' + '单据日期：' + this.model.operTimeStr + ' ' + '单据编号：' + this.model.number
+        let tip = '出库类型：' + this.convertOutType(this.model.outType) + ' ' + organType + organName + ' ' + '单据日期：' + this.model.operTimeStr + ' ' + '单据编号：' + this.model.number
         exportXlsPost(this.billType + '_' + this.model.number, '单据导出', head, tip, list)
       },
       //调拨出库
@@ -2154,6 +2159,9 @@
         let linkNumber = this.model.linkNumber? this.model.linkNumber: ''
         let tip = '单据日期：' + this.model.operTimeStr + ' ' + '单据编号：' + this.model.number + '' + '关联单号：' + linkNumber
         exportXlsPost(this.billType + '_' + this.model.number, '单据导出', head, tip, list)
+      },
+      convertOutType(outType){
+        return outType === 1 ? '原材料消耗' : (outType === 2 ? '损坏报损' : (outType === 3 ? '临期过期报损' : ''))
       }
     }
   }

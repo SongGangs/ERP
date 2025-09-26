@@ -306,7 +306,6 @@
       },
       handleOk () {
         if(this.selectType === 'list') {
-          this.getDepotByCurrentUser()
           this.getSelectBillRows();
           if(this.selectBillRows && this.selectBillRows.length>0) {
             this.selectType = 'detail'
@@ -318,10 +317,14 @@
             this.accountId = record.accountId
             this.salesMan = record.salesMan
             this.discountMoney = record.discountMoney
+            this.defaultDepotId = record.depotId
             this.deposit = record.changeAmount - record.finishDeposit
             this.remark = record.remark
             this.initListColumns()
             this.loadDetailData(1)
+            if (record.depotId == null){
+              this.getDepotByCurrentUser()
+            }
           } else {
             this.$message.warning('抱歉，请选择单据！')
           }

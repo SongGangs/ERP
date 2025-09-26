@@ -160,6 +160,11 @@
               <a-tag v-if="status == '1'" color="green">已审核</a-tag>
               <a-tag v-if="status == '9'" color="orange">审核中</a-tag>
             </template>
+            <template slot="customRenderOutType" slot-scope="outType">
+              <a-tag v-if="outType === 1" color="cyan">原材料消耗</a-tag>
+              <a-tag v-if="outType === 2" color="green">损坏报损</a-tag>
+              <a-tag v-if="outType === 3" color="orange">临期过期报损</a-tag>
+            </template>
             <a-table
               bordered
               size="small"
@@ -231,9 +236,12 @@
           offset: 1
         },
         // 默认索引
-        defDataIndex:['action','organName','number','materialsList','operTimeStr','userName','materialCount','totalPrice','status'],
+        defDataIndex:['action','outType','number','materialsList','operTimeStr','userName','materialCount','totalPrice','status'],
         // 默认列
         defColumns: [
+          { title: '状态', dataIndex: 'status', width: 80, align: "center",
+            scopedSlots: { customRender: 'customRenderStatus' }
+          },
           {
             title: '操作',
             dataIndex: 'action',
@@ -241,6 +249,9 @@
             scopedSlots: { customRender: 'action' },
           },
           { title: '客户', dataIndex: 'organName',width:120, ellipsis:true},
+          { title: '出库类型', dataIndex: 'outType', width: 80, align: "center",
+            scopedSlots: { customRender: 'customRenderOutType' }
+          },
           { title: '单据编号', dataIndex: 'number',width:160,
             customRender:function (text,record,index) {
               text = record.linkNumber?text+"[转]":text
@@ -253,10 +264,7 @@
           { title: '操作员', dataIndex: 'userName',width:80, ellipsis:true},
           { title: '数量', dataIndex: 'materialCount',width:60},
           { title: '金额合计', dataIndex: 'totalPrice',width:80},
-          { title: '备注', dataIndex: 'remark',width:200},
-          { title: '状态', dataIndex: 'status', width: 80, align: "center",
-            scopedSlots: { customRender: 'customRenderStatus' }
-          }
+          { title: '备注', dataIndex: 'remark',width:200}
         ],
         url: {
           list: "/depotHead/list",

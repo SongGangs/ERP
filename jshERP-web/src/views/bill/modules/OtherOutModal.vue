@@ -25,6 +25,16 @@
       <a-form :form="form">
         <a-row class="form-row" :gutter="24">
           <a-col :lg="6" :md="12" :sm="24">
+            <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="出库类型">
+              <a-select placeholder="请选择出库类型" v-decorator="[ 'outType', validatorRules.outType ]"
+                        :dropdownMatchSelectWidth="false" showSearch optionFilterProp="children">
+                <a-select-option :value="1">原材料消耗</a-select-option>
+                <a-select-option :value="2">损坏报损</a-select-option>
+                <a-select-option :value="3">临期过期报损</a-select-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
+          <a-col :lg="6" :md="12" :sm="24">
             <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="客户">
               <a-select placeholder="请选择客户" v-decorator="[ 'organId' ]" :disabled="!rowCanEdit"
                         :dropdownMatchSelectWidth="false" showSearch optionFilterProp="children">
@@ -243,6 +253,11 @@
             rules: [
               { required: true, message: '请选择类型!' }
             ]
+          },
+          outType:{
+            rules: [
+              { required: true, message: '请选择出库类型!' }
+            ]
           }
         },
         url: {
@@ -282,7 +297,7 @@
           this.model.operTime = this.model.operTimeStr
           this.fileList = this.model.fileName
           this.$nextTick(() => {
-            this.form.setFieldsValue(pick(this.model,'organId', 'operTime', 'number', 'linkNumber', 'remark',
+            this.form.setFieldsValue(pick(this.model,'outType', 'organId', 'operTime', 'number', 'linkNumber', 'remark',
               'discount','discountMoney','discountLastMoney','otherMoney','accountId','changeAmount'))
           });
           // 加载子表数据
