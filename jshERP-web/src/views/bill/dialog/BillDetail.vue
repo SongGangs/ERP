@@ -900,14 +900,14 @@
                 {{model.number}}
               </a-form-item>
             </a-col>
-            <a-col :span="6">
-              <a-form-item v-if="model.billType" :labelCol="labelCol" :wrapperCol="wrapperCol" label="关联单据">
-                {{model.linkNumber}} {{model.billType}}
-              </a-form-item>
-              <a-form-item v-if="!model.billType" :labelCol="labelCol" :wrapperCol="wrapperCol" label="关联单据">
-                <a @click="myHandleDetail(model.linkNumber)">{{model.linkNumber}}</a>
-              </a-form-item>
-            </a-col>
+<!--            <a-col :span="6">-->
+<!--              <a-form-item v-if="model.billType" :labelCol="labelCol" :wrapperCol="wrapperCol" label="关联单据">-->
+<!--                {{model.linkNumber}} {{model.billType}}-->
+<!--              </a-form-item>-->
+<!--              <a-form-item v-if="!model.billType" :labelCol="labelCol" :wrapperCol="wrapperCol" label="关联单据">-->
+<!--                <a @click="myHandleDetail(model.linkNumber)">{{model.linkNumber}}</a>-->
+<!--              </a-form-item>-->
+<!--            </a-col>-->
           </a-row>
           <div :style="tableWidth">
             <a-table
@@ -932,6 +932,37 @@
             <a-col :lg="24" :md="24" :sm="24">
               <a-form-item :labelCol="labelCol" :wrapperCol="{xs: { span: 24 },sm: { span: 24 }}" label="" style="padding:20px 10px;">
                 {{model.remark}}
+              </a-form-item>
+            </a-col>
+          </a-row>
+          <a-row class="form-row" :gutter="24">
+            <a-col :span="6">
+              <a-form-item :labelCol="{xs: { span: 24 },sm: { span: 6 }}" :wrapperCol="wrapperCol" label="金额">
+                {{model.discountLastMoney}}
+              </a-form-item>
+            </a-col>
+            <a-col :span="6">
+              <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="其它费用">
+                {{model.otherMoney}}
+              </a-form-item>
+            </a-col>
+            <a-col :span="6">
+              <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="本次付款">
+                {{model.changeAmount}}
+              </a-form-item>
+            </a-col>
+            <a-col :span="6">
+              <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="本次欠款">
+                {{model.debt}}
+              </a-form-item>
+            </a-col>
+          </a-row>
+          <a-row class="form-row" :gutter="24">
+            <a-col v-if="financialBillNoList.length" :span="6">
+              <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="付款单号">
+                <template v-for="(item, index) in financialBillNoList">
+                  <a @click="myHandleFinancialDetail(item.billNo)">{{item.billNo}}</a><br/>
+                </template>
               </a-form-item>
             </a-col>
           </a-row>
@@ -1873,7 +1904,7 @@
               this.form.setFieldsValue(pick(this.model, 'id'))
             });
             let showType = 'basic'
-            if(item.subType === '采购' || item.subType === '采购退货' || item.subType === '销售' || item.subType === '销售退货') {
+            if(item.subType === '采购' || item.subType === '采购退货' || item.subType === '其它' || item.subType === '销售' || item.subType === '销售退货') {
               if (item.status === '3') {
                 showType = 'other'
               }

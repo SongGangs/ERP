@@ -103,6 +103,50 @@
           </a-col>
         </a-row>
         <a-row class="form-row" :gutter="24">
+          <a-col :lg="6" :md="12" :sm="24" hidden>
+            <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="优惠率" data-step="5" data-title="优惠率"
+                         data-intro="针对单据明细中商品总金额进行优惠的比例">
+              <a-input style="width:80%;" placeholder="请输入优惠率" v-decorator.trim="[ 'discount' ]" suffix="%" @change="onChangeDiscount"/>
+            </a-form-item>
+          </a-col>
+          <a-col :lg="6" :md="12" :sm="24" hidden>
+            <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="付款优惠" data-step="6" data-title="付款优惠"
+                         data-intro="针对单据明细中商品总金额进行优惠的金额">
+              <a-input placeholder="请输入付款优惠" v-decorator.trim="[ 'discountMoney' ]" @change="onChangeDiscountMoney"/>
+            </a-form-item>
+          </a-col>
+          <a-col :lg="6" :md="12" :sm="24">
+            <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="金额" data-step="7" data-title="金额"
+                         data-intro="针对单据明细中商品总金额进行优惠后的金额">
+              <a-input placeholder="请输入优惠后金额" v-decorator.trim="[ 'discountLastMoney' ]" :readOnly="true"/>
+            </a-form-item>
+          </a-col>
+          <a-col :lg="6" :md="12" :sm="24">
+            <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="其它费用" data-step="8" data-title="其它费用"
+                         data-intro="比如快递费、油费、过路费">
+              <a-input placeholder="请输入其它费用" v-decorator.trim="[ 'otherMoney' ]" @change="onChangeOtherMoney"/>
+            </a-form-item>
+          </a-col>
+          <a-col :lg="6" :md="12" :sm="24">
+            <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="本次付款">
+              <a-input placeholder="请输入本次付款" v-decorator.trim="[ 'changeAmount', validatorRules.changeAmount ]" @change="onChangeChangeAmount"/>
+            </a-form-item>
+          </a-col>
+          <a-col :lg="6" :md="12" :sm="24">
+            <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="本次欠款" data-step="10" data-title="本次欠款"
+                         data-intro="欠款产生的费用，后续可以在付款单进行支付">
+              <a-input placeholder="请输入本次欠款" v-decorator.trim="[ 'debt', validatorRules.price ]" :readOnly="true"/>
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row class="form-row" :gutter="24">
+          <a-col v-if="depositStatus" :lg="6" :md="12" :sm="24">
+            <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="扣除订金">
+              <a-input v-decorator.trim="[ 'deposit' ]" @change="onChangeDeposit"/>
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row class="form-row" :gutter="24">
           <a-col :lg="6" :md="12" :sm="24">
             <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="附件">
               <j-upload v-model="fileList" bizPath="bill"></j-upload>
@@ -216,6 +260,9 @@
             },
             { title: '单价', key: 'unitPrice', width: '4%', type: FormTypes.inputNumber},
             { title: '金额', key: 'allPrice', width: '4%', type: FormTypes.inputNumber, statistics: true },
+            { title: '税率', key: 'taxRate', width: '3%', type: FormTypes.hidden,placeholder: '%'},
+            { title: '税额', key: 'taxMoney', width: '3%', type: FormTypes.hidden, readonly: true, statistics: true },
+            { title: '价税合计', key: 'taxLastMoney', width: '5%', type: FormTypes.hidden, statistics: true },
             { title: '备注', key: 'remark', width: '5%', type: FormTypes.input },
             { title: '关联id', key: 'linkId', width: '5%', type: FormTypes.hidden },
           ]
@@ -271,10 +318,11 @@
             this.materialTable.columns[1].type = FormTypes.normal
           }
           this.model.operTime = this.model.operTimeStr
+          this.model.debt = (this.model.discountLastMoney + this.model.otherMoney - this.model.deposit - this.model.changeAmount).toFixed(2)
           this.fileList = this.model.fileName
           this.$nextTick(() => {
             this.form.setFieldsValue(pick(this.model,'organId', 'operTime', 'number', 'linkNumber', 'remark',
-              'discount','discountMoney','discountLastMoney','otherMoney','accountId','changeAmount'))
+              'discount','discountMoney','discountLastMoney','otherMoney','accountId','deposit','changeAmount','debt'))
           });
           // 加载子表数据
           let params = {
@@ -309,6 +357,7 @@
           totalPrice += item.allPrice-0
         }
         billMain.totalPrice = 0-totalPrice
+        billMain.changeAmount = 0-billMain.changeAmount
         if(this.fileList && this.fileList.length > 0) {
           billMain.fileName = this.fileList
         } else {

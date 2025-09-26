@@ -970,7 +970,7 @@ export const BillModalMixin = {
     },
     //切换收付款的金额为0
     setZeroChangeAmount() {
-      if(this.prefixNo === 'CGRK'||this.prefixNo === 'CGTH'||this.prefixNo === 'XSCK'||this.prefixNo === 'XSTH') {
+      if(this.prefixNo === 'QTRK'||this.prefixNo === 'CGTH'||this.prefixNo === 'XSCK'||this.prefixNo === 'XSTH') {
         if(this.zeroChangeAmountFlag) {
           let oldChangeAmount = this.form.getFieldValue('changeAmount')-0
           this.form.setFieldsValue({'changeAmount':0, 'debt':oldChangeAmount})
