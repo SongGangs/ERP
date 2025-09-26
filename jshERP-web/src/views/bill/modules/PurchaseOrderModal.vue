@@ -68,6 +68,14 @@
             </a-form-item>
           </a-col>
         </a-row>
+        <a-row class="form-row" :gutter="24">
+          <a-col v-if="currentSelectDepotId" :lg="6" :md="12" :sm="24">
+            <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="仓库">
+              <a-input v-decorator="['depotId']" hidden/>
+              <a-input v-decorator="['depotName']" disabled/>
+            </a-form-item>
+          </a-col>
+        </a-row>
         <j-editable-table id="billModal"
           :ref="refKeys[0]"
           :loading="materialTable.loading"
@@ -239,6 +247,7 @@
         fileList:[],
         rowCanEdit: true,
         priceLimit: false,
+        defaultDepotId: '',
         //以销定购的场景开关
         purchaseBySaleFlag: false,
         model: {},
@@ -322,7 +331,7 @@
           this.priceLimit = record.priceLimit
         }
         this.billStatus = '0'
-        this.currentSelectDepotId = ''
+        this.currentSelectDepotId = (record.depotId || this.defaultDepotId)
         this.rowCanEdit = true
         this.materialTable.columns[1].type = FormTypes.popupJsh
         this.changeColumnHide()
@@ -359,7 +368,7 @@
           }
           this.fileList = this.model.fileName
           this.$nextTick(() => {
-            this.form.setFieldsValue(pick(this.model,'organId', 'operTime', 'number', 'linkApply', 'linkNumber', 'remark',
+            this.form.setFieldsValue(pick(this.model, 'depotId', 'depotName','organId', 'operTime', 'number', 'linkApply', 'linkNumber', 'remark',
             'discount','discountMoney','discountLastMoney','accountId','changeAmount'))
           });
           // 加载子表数据
@@ -392,7 +401,7 @@
         billMain.type = '其它'
         billMain.subType = '采购订单'
         for(let item of detailArr){
-          item.depotId = '' //订单不需要仓库
+          item.depotId = billMain.depotId
           totalPrice += item.allPrice-0
         }
         billMain.totalPrice = 0-totalPrice
@@ -427,7 +436,7 @@
         this.$refs.linkBillList.title = "请选择销售订单"
       },
       onSearchLinkApply() {
-        this.$refs.linkBillList.purchaseShow('其它', '请购单', '客户', "1,3", this.priceLimit)
+        this.$refs.linkBillList.purchaseShow('其它', '请购单', '客户', "1,3")
         this.$refs.linkBillList.title = "请选择请购单"
       },
       linkBillListOk(selectBillDetailRows, linkNumber, organId) {
@@ -463,7 +472,9 @@
                 //关联请购单
                 this.$nextTick(() => {
                   this.form.setFieldsValue({
-                    'linkApply': linkNumber
+                    'linkApply': linkNumber,
+                    'depotId': res.data.depotId,
+                    'depotName': res.data.depotName
                   })
                 })
               } else {

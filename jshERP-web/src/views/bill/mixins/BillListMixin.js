@@ -787,6 +787,7 @@ export const BillListMixin = {
                 list: res.data.rows,
                 number: info.number,
                 organId: info.organId,
+                depotId: info.depotId,
                 discountMoney: info.discountMoney,
                 deposit: info.deposit,
                 remark: info.remark,
@@ -806,7 +807,7 @@ export const BillListMixin = {
               } else {
                 this.$refs.transferModalForm.action = "add"
                 this.$refs.transferModalForm.transferParam = transferParam
-                this.$refs.transferModalForm.defaultDepotId = this.defaultDepotId
+                this.$refs.transferModalForm.defaultDepotId = (info.depotId || this.defaultDepotId)
                 this.$refs.transferModalForm.add()
                 this.$refs.transferModalForm.title = type
                 this.$refs.transferModalForm.priceLimit = this.priceLimit

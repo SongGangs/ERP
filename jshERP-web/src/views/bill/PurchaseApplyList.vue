@@ -130,7 +130,7 @@
             <span slot="action" slot-scope="text, record">
               <a @click="myHandleDetail(record, '请购单', prefixNo)">查看</a>
               <a-divider v-if="quickBtn.purchaseOrder.indexOf(1)>-1 && btnEnableList.indexOf(1)>-1 && (record.status === '1' || record.status === '3')" type="vertical" />
-              <a v-if="quickBtn.purchaseOrder.indexOf(1)>-1 && btnEnableList.indexOf(1)>-1 && (record.status === '1' || record.status === '3')" @click="transferBill('转采购订单', quickBtn.purchaseOrder, record)" style="color: red;">采购</a>
+              <a v-if="quickBtn.purchaseOrder.indexOf(1)>-1 && btnEnableList.indexOf(1)>-1 && (record.status === '1' || record.status === '3')" @click="doTransferBill('转采购订单', quickBtn.purchaseOrder, record)" style="color: red;">采购</a>
               <a-divider v-if="btnEnableList.indexOf(1)>-1 && record.status === '0'" type="vertical" />
               <a v-if="btnEnableList.indexOf(1)>-1 && record.status === '0'" @click="myHandleEdit(record)">编辑</a>
               <a-divider v-if="btnEnableList.indexOf(1)>-1" type="vertical" />
@@ -213,7 +213,7 @@
           offset: 1
         },
         // 默认索引
-        defDataIndex:['action','number','materialsList','operTimeStr','userName','materialCount','status'],
+        defDataIndex:['action','number','materialsList','operTimeStr','userName','materialCount','depotName','status'],
         // 默认列
         defColumns: [
           { title: '状态', dataIndex: 'status', width: 100, align: "center",
@@ -230,6 +230,7 @@
           { title: '单据日期', dataIndex: 'operTimeStr',width:185},
           { title: '操作员', dataIndex: 'userName',width:120, ellipsis:true},
           { title: '数量', dataIndex: 'materialCount',width:80},
+          { title: '仓库', dataIndex: 'depotName',width:180},
           { title: '备注', dataIndex: 'remark',width:250}
         ],
         url: {
@@ -245,7 +246,6 @@
       this.initSystemConfig()
       this.initUser()
       this.initQuickBtn()
-      this.getDepotByCurrentUser()
     },
     computed: {
     },

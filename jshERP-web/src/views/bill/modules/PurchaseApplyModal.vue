@@ -26,6 +26,23 @@
       <a-form :form="form">
         <a-row class="form-row" :gutter="24">
           <a-col :lg="6" :md="12" :sm="24">
+            <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="仓库" data-title="仓库"
+                         data-intro="仓库必须选择，如果发现需要选择的仓库尚未录入，可以在下拉框中点击新增仓库进行录入">
+              <a-select placeholder="请选择仓库" v-decorator="[ 'depotId', validatorRules.depotId ]"
+                        :dropdownMatchSelectWidth="false" showSearch optionFilterProp="children">
+                <div slot="dropdownDepot" slot-scope="menu">
+                  <v-nodes :vnodes="menu" />
+                  <a-divider style="margin: 4px 0;" />
+                  <div v-if="quickBtn.depot" class="dropdown-btn" @mousedown="e => e.preventDefault()" @click="addDepot"><a-icon type="plus" /> 新增仓库</div>
+                  <div class="dropdown-btn" @mousedown="e => e.preventDefault()" @click="initModelDepot(0)"><a-icon type="reload" /> 刷新列表</div>
+                </div>
+                <a-select-option v-for="(item,index) in depotList" :key="index" :value="item.id">
+                  {{ item.depotName }}
+                </a-select-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
+          <a-col :lg="6" :md="12" :sm="24">
             <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="单据日期">
               <j-date v-decorator="['operTime', validatorRules.operTime]" :show-time="true"/>
             </a-form-item>
@@ -35,8 +52,6 @@
               data-intro="单据编号自动生成、自动累加、开头是单据类型的首字母缩写，累加的规则是每次打开页面会自动占用一个新的编号">
               <a-input placeholder="请输入单据编号" v-decorator.trim="[ 'number', validatorRules.number ]" />
             </a-form-item>
-          </a-col>
-          <a-col :lg="6" :md="12" :sm="24">
           </a-col>
           <a-col :lg="6" :md="12" :sm="24">
           </a-col>
@@ -114,10 +129,12 @@
   import JUpload from '@/components/jeecg/JUpload'
   import JDate from '@/components/jeecg/JDate'
   import Vue from 'vue'
+  import DepotModal from '@views/system/modules/DepotModal.vue'
   export default {
     name: "PurchaseApplyModal",
     mixins: [JEditableTableMixin,BillModalMixin],
     components: {
+      DepotModal,
       ImportItemModal,
       HistoryBillList,
       WorkflowIframe,
@@ -195,9 +212,9 @@
               { required: true, message: '请输入单据编号!' }
             ]
           },
-          organId:{
+          depotId:{
             rules: [
-              { required: true, message: '请选择供应商!' }
+              { required: true, message: '请选择仓库!' }
             ]
           }
         },
@@ -226,17 +243,13 @@
           })
         } else {
           this.model.operTime = this.model.operTimeStr
-          if(this.model.accountId == null && this.model.accountIdList) {
-            this.model.accountId = 0
-            this.manyAccountBtnStatus = true
-            this.accountIdList = this.model.accountIdList
-            this.accountMoneyList = this.model.accountMoneyList
-          } else {
-            this.manyAccountBtnStatus = false
+          if(this.model.depotId == null && this.model.depotIdList) {
+            this.model.depotId = 0
+            this.depotIdList = this.model.depotIdList
           }
           this.fileList = this.model.fileName
           this.$nextTick(() => {
-            this.form.setFieldsValue(pick(this.model, 'operTime', 'number', 'remark'))
+            this.form.setFieldsValue(pick(this.model, 'depotId', 'operTime', 'number', 'remark'))
           });
           // 加载子表数据
           let params = {
@@ -254,6 +267,7 @@
           this.copyAddInit(this.prefixNo)
         }
         this.initSystemConfig()
+        this.initModelDepot(0)
         this.initPlatform()
         this.initQuickBtn()
         this.handleChangeOtherField()
@@ -265,8 +279,10 @@
         let detailArr = allValues.tablesValue[0].values
         billMain.type = '其它'
         billMain.subType = '请购单'
+        billMain.organId = this.model.depotId
         for(let item of detailArr){
           totalPrice += item.allPrice-0
+          item.depotId = this.model.depotId
         }
         billMain.totalPrice = 0-totalPrice
         if(this.fileList && this.fileList.length > 0) {
@@ -284,8 +300,7 @@
         }
       },
       handleHistoryBillList() {
-        let organId = this.form.getFieldValue('organId')
-        this.$refs.historyBillListModalForm.show('其它', '请购单', '', organId);
+        this.$refs.historyBillListModalForm.show('其它', '请购单');
         this.$refs.historyBillListModalForm.disableSubmit = false;
       },
     }

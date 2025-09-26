@@ -267,6 +267,7 @@
           { title: '商品信息', dataIndex: 'materialsList',width:220, ellipsis:true},
           { title: '单据日期', dataIndex: 'operTimeStr',width:145},
           { title: '操作员', dataIndex: 'userName',width:80, ellipsis:true},
+          { title: '仓库', dataIndex: 'depotName',width:140},
           { title: '数量', dataIndex: 'materialCount',width:60},
           { title: '金额合计', dataIndex: 'totalPrice',width:80},
           { title: '含税合计', dataIndex: 'totalTaxLastMoney',width:80,

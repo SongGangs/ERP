@@ -177,6 +177,7 @@
           { title: '单据日期', dataIndex: 'operTimeStr',width:145},
           { title: '操作员', dataIndex: 'userName',width:70},
           { title: '数量', dataIndex: 'materialCount',width:60},
+          { title: '仓库', dataIndex: 'depotName',width:150},
           { title: '金额合计', dataIndex: 'totalPrice',width:70},
           { title: '含税合计', dataIndex: 'totalTaxLastMoney',width:70,
             customRender:function (text,record,index) {
@@ -254,6 +255,9 @@
             this.columns[i].title = organType
           }
           if (needRemoveColumns.includes(this.columns[i].dataIndex)) {
+            this.columns.splice(i, 1)
+            i = i - 1
+          } else if (subType !== '请购单' && this.columns[i].dataIndex === 'depotName') {
             this.columns.splice(i, 1)
             i = i - 1
           }

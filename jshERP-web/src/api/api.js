@@ -45,6 +45,7 @@ const findInOutItemByParam = (params)=>getAction("/inOutItem/findBySelect",param
 const addDepot = (params)=>postAction("/depot/add",params);
 const editDepot = (params)=>putAction("/depot/update",params);
 const checkDepot = (params)=>getAction("/depot/checkIsNameExist",params);
+const getDepot = (params)=>getAction("/depot/findDepotByCurrentUser",params);
 //商品属性
 const addOrUpdateMaterialProperty = (params)=>postAction("/materialProperty/addOrUpdate",params);
 //商品类型
@@ -151,6 +152,7 @@ export {
   addDepot,
   editDepot,
   checkDepot,
+  getDepot,
   addOrUpdateMaterialProperty,
   queryMaterialCategoryTreeList,
   queryMaterialCategoryById,

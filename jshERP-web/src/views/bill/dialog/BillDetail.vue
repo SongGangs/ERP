@@ -223,6 +223,12 @@
         <section ref="print" id="purchaseApplyPrint">
           <a-row class="form-row" :gutter="24">
             <a-col :span="6">
+              <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="仓库">
+                <a-input v-decorator="['depotId']" hidden/>
+                {{model.depotName}}
+              </a-form-item>
+            </a-col>
+            <a-col :span="6">
               <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="单据日期">
                 {{model.operTimeStr}}
               </a-form-item>
@@ -269,6 +275,12 @@
       <template v-else-if="billType === '采购订单'">
         <section ref="print" id="purchaseOrderPrint">
           <a-row class="form-row" :gutter="24">
+            <a-col v-if="model.depotId" :span="6">
+              <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="仓库">
+                <a-input v-decorator="['depotId']" hidden/>
+                {{model.depotName}}
+              </a-form-item>
+            </a-col>
             <a-col :span="6">
               <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="供应商">
                 <a-input v-decorator="['id']" hidden/>

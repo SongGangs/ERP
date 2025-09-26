@@ -1,5 +1,5 @@
 import { FormTypes, getListData } from '@/utils/JEditableTableUtil'
-import { findBySelectCus, findBySelectRetail, findBySelectSup, findStockByDepotAndBarCode, getAccount,
+import { findBySelectCus, findBySelectRetail, findBySelectSup, findStockByDepotAndBarCode, getAccount, getDepot,
   getBatchNumberList, getCurrentSystemConfig, getMaterialByBarCode, getPersonByNumType, getPlatformConfigByKey } from '@/api/api'
 import { getAction } from '@/api/manage'
 import { formatDate, getCheckFlag, getMpListShort, getNowFormatDateTime } from '@/utils/util'
@@ -22,6 +22,7 @@ export const BillModalMixin = {
       transferParam: {},
       defaultDepotId: '',
       depotList: [],
+      depotIdList: [],
       accountList: [],
       accountIdList: [],
       accountMoneyList: [],
@@ -271,11 +272,18 @@ export const BillModalMixin = {
       let that = this
       getDepot({}).then((res) => {
         if (res && res.code === 200) {
-          let list = res.data
-          let lastId = list.length > 0 ? list[0].id : ''
-          that.depotList = list
-          if (isChecked) {
-            that.form.setFieldsValue({ 'depotId': lastId })
+          that.depotList = res.data
+          if (res.data.length > 0) {
+            if (isChecked) {
+              that.form.setFieldsValue({ 'depotId': res.data[0].id })
+              for (let i = 0; i < arr.length; i++) {
+                if(arr[i].isDefault){
+                  that.form.setFieldsValue({ 'depotId': arr[i].id })
+                }
+              }
+            } else if (res.data.length === 1) {
+              that.form.setFieldsValue({ 'depotId': res.data[0].id })
+            }
           }
         }
       })
@@ -673,7 +681,7 @@ export const BillModalMixin = {
               let expiryNum = row.expiryNum - 0
               expirationDate = new Date(row.productionDate)
               expirationDate.setDate(expirationDate.getDate() + expiryNum)
-              expirationDate = expirationDate.toLocaleDateString()
+              expirationDate = formatDate(expirationDate)
             }
           }
           target.setValues([{rowKey: row.id, values: {expirationDate: expirationDate, batchNumber: batchNumber}}])
