@@ -14,14 +14,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class DepotService {
@@ -389,5 +389,14 @@ public class DepotService {
             JshException.writeFail(logger, e);
         }
         return result;
+    }
+
+    public Map<Long, String> getMapByIds(List<Long> depotIds) {
+        if (CollectionUtils.isEmpty(depotIds)) {
+            return Collections.emptyMap();
+        }
+        DepotExample example = new DepotExample();
+        example.createCriteria().andIdIn(depotIds);
+        return depotMapper.selectByExample(example).stream().collect(Collectors.toMap(Depot::getId, Depot::getName));
     }
 }

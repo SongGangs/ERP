@@ -394,7 +394,7 @@ public class UserController extends BaseController {
         try {
             Map<String, Object> data = new HashMap<>();
             String priceLimit = roleService.getCurrentPriceLimit(request);
-            data.put("priceLimit", priceLimit);
+            data.put("priceLimit", StringUtil.filterNull(priceLimit));
             res.code = 200;
             res.data = data;
         } catch(Exception e){

@@ -2,14 +2,14 @@ package com.jsh.erp.datasource.vo;
 
 import com.jsh.erp.datasource.entities.DepotHead;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 
 @Data
-@Builder
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class DepotHeadVo4List extends DepotHead{
@@ -17,6 +17,10 @@ public class DepotHeadVo4List extends DepotHead{
     private String projectName;
 
     private String organName;
+
+    private Long depotId;
+
+    private String depotName;
 
     private String userName;
 

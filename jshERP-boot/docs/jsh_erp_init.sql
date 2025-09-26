@@ -1,4 +1,4 @@
-
+DROP TABLE IF EXISTS `jsh_account`;
 CREATE TABLE `jsh_account`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '名称',
@@ -14,6 +14,7 @@ CREATE TABLE `jsh_account`  (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB COMMENT = '账户信息';
 
+DROP TABLE IF EXISTS `jsh_account_head`;
 CREATE TABLE `jsh_account_head`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `type` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '类型(支出/收入/收款/付款/转账)',
@@ -38,6 +39,7 @@ CREATE TABLE `jsh_account_head`  (
   INDEX `FK9F4C0D8DC4170B37`(`hands_person_id`) USING BTREE
 ) ENGINE = InnoDB COMMENT = '财务主表';
 
+DROP TABLE IF EXISTS `jsh_account_item`;
 CREATE TABLE `jsh_account_item`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `header_id` bigint(20) NOT NULL COMMENT '表头Id',
@@ -56,6 +58,7 @@ CREATE TABLE `jsh_account_item`  (
   INDEX `FK9F4CBAC0D203EDC5`(`in_out_item_id`) USING BTREE
 ) ENGINE = InnoDB COMMENT = '财务子表';
 
+DROP TABLE IF EXISTS `jsh_depot`;
 CREATE TABLE `jsh_depot`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `name` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '仓库名称',
@@ -73,6 +76,7 @@ CREATE TABLE `jsh_depot`  (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB COMMENT = '仓库表';
 
+DROP TABLE IF EXISTS `jsh_depot_head`;
 CREATE TABLE `jsh_depot_head`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `type` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '类型(出库/入库)',
@@ -111,6 +115,7 @@ CREATE TABLE `jsh_depot_head`  (
   INDEX `FK2A80F214AAE50527`(`account_id`) USING BTREE
 ) ENGINE = InnoDB COMMENT = '单据主表';
 
+DROP TABLE IF EXISTS `jsh_depot_item`;
 CREATE TABLE `jsh_depot_item`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `header_id` bigint(20) NOT NULL COMMENT '表头Id',
@@ -145,6 +150,7 @@ CREATE TABLE `jsh_depot_item`  (
   INDEX `FK2A819F47729F5392`(`another_depot_id`) USING BTREE
 ) ENGINE = InnoDB COMMENT = '单据子表';
 
+DROP TABLE IF EXISTS `jsh_function`;
 CREATE TABLE `jsh_function`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `number` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '编号',
@@ -180,7 +186,7 @@ INSERT INTO `jsh_function` VALUES (25, '01020101', '供应商信息', '0102', '/
 INSERT INTO `jsh_function` VALUES (26, '010202', '仓库信息', '0102', '/system/depot', '/system/DepotList', b'0', '0270', b'1', '电脑版', '1', 'profile', '0');
 INSERT INTO `jsh_function` VALUES (31, '010206', '经手人管理', '0102', '/system/person', '/system/PersonList', b'0', '0284', b'1', '电脑版', '1', 'profile', '0');
 INSERT INTO `jsh_function` VALUES (32, '0502', '采购管理', '0', '/bill', '/layouts/TabLayout', b'0', '0330', b'1', '电脑版', '', 'retweet', '0');
-INSERT INTO `jsh_function` VALUES (33, '050201', '采购入库', '0502', '/bill/purchase_in', '/bill/PurchaseInList', b'0', '0340', b'1', '电脑版', '1,2,3,7', 'profile', '0');
+INSERT INTO `jsh_function` VALUES (33, '050201', '入库单', '0502', '/bill/purchase_in', '/bill/PurchaseInList', b'0', '0340', b'1', '电脑版', '1,2,3,7', 'profile', '0');
 INSERT INTO `jsh_function` VALUES (38, '0603', '销售管理', '0', '/billB', '/layouts/TabLayout', b'0', '0390', b'1', '电脑版', '', 'shopping-cart', '0');
 INSERT INTO `jsh_function` VALUES (40, '080107', '调拨出库', '0801', '/bill/allocation_out', '/bill/AllocationOutList', b'0', '0807', b'1', '电脑版', '1,2,3,7', 'profile', '0');
 INSERT INTO `jsh_function` VALUES (41, '060303', '销售出库', '0603', '/bill/sale_out', '/bill/SaleOutList', b'0', '0394', b'1', '电脑版', '1,2,3,7', 'profile', '0');
@@ -231,6 +237,7 @@ INSERT INTO `jsh_function` VALUES (258, '000112', '平台配置', '0001', '/syst
 INSERT INTO `jsh_function` VALUES (259, '030105', '零售统计', '0301', '/report/retail_out_report', '/report/RetailOutReport', b'0', '0615', b'1', '电脑版', '', 'profile', '0');
 INSERT INTO `jsh_function` VALUES (261, '050203', '请购单', '0502', '/bill/purchase_apply', '/bill/PurchaseApplyList', b'0', '0330', b'1', '电脑版', '1,2,3,7', 'profile', '0');
 
+DROP TABLE IF EXISTS `jsh_in_out_item`;
 CREATE TABLE `jsh_in_out_item`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '名称',
@@ -243,6 +250,7 @@ CREATE TABLE `jsh_in_out_item`  (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB COMMENT = '收支项目';
 
+DROP TABLE IF EXISTS `jsh_log`;
 CREATE TABLE `jsh_log`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `user_id` bigint(20) NULL DEFAULT NULL COMMENT '用户id',
@@ -256,6 +264,7 @@ CREATE TABLE `jsh_log`  (
   INDEX `FKF2696AA13E226853`(`user_id`) USING BTREE
 ) ENGINE = InnoDB COMMENT = '操作日志';
 
+DROP TABLE IF EXISTS `jsh_material`;
 CREATE TABLE `jsh_material`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `category_id` bigint(20) NULL DEFAULT NULL COMMENT '产品类型id',
@@ -287,6 +296,7 @@ CREATE TABLE `jsh_material`  (
   INDEX `UnitId`(`unit_id`) USING BTREE
 ) ENGINE = InnoDB COMMENT = '产品表';
 
+DROP TABLE IF EXISTS `jsh_material_attribute`;
 CREATE TABLE `jsh_material_attribute`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `attribute_name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '属性名',
@@ -296,6 +306,7 @@ CREATE TABLE `jsh_material_attribute`  (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB COMMENT = '产品属性表';
 
+DROP TABLE IF EXISTS `jsh_material_category`;
 CREATE TABLE `jsh_material_category`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '名称',
@@ -312,6 +323,7 @@ CREATE TABLE `jsh_material_category`  (
   INDEX `FK3EE7F725237A77D8`(`parent_id`) USING BTREE
 ) ENGINE = InnoDB COMMENT = '产品类型表';
 
+DROP TABLE IF EXISTS `jsh_material_current_stock`;
 CREATE TABLE `jsh_material_current_stock`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `material_id` bigint(20) NULL DEFAULT NULL COMMENT '产品id',
@@ -323,6 +335,7 @@ CREATE TABLE `jsh_material_current_stock`  (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB COMMENT = '产品当前库存';
 
+DROP TABLE IF EXISTS `jsh_material_extend`;
 CREATE TABLE `jsh_material_extend`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `material_id` bigint(20) NULL DEFAULT NULL COMMENT '商品id',
@@ -343,6 +356,7 @@ CREATE TABLE `jsh_material_extend`  (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB COMMENT = '产品价格扩展';
 
+DROP TABLE IF EXISTS `jsh_material_initial_stock`;
 CREATE TABLE `jsh_material_initial_stock`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `material_id` bigint(20) NULL DEFAULT NULL COMMENT '产品id',
@@ -355,6 +369,7 @@ CREATE TABLE `jsh_material_initial_stock`  (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB COMMENT = '产品初始库存' ;
 
+DROP TABLE IF EXISTS `jsh_material_property`;
 CREATE TABLE `jsh_material_property`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `native_name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '原始名称',
@@ -366,6 +381,7 @@ CREATE TABLE `jsh_material_property`  (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB COMMENT = '产品扩展字段表';
 
+DROP TABLE IF EXISTS `jsh_msg`;
 CREATE TABLE `jsh_msg`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `msg_title` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '消息标题',
@@ -379,6 +395,7 @@ CREATE TABLE `jsh_msg`  (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB COMMENT = '消息表' ;
 
+DROP TABLE IF EXISTS `jsh_orga_user_rel`;
 CREATE TABLE `jsh_orga_user_rel`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `orga_id` bigint(20) NOT NULL COMMENT '机构id',
@@ -393,6 +410,7 @@ CREATE TABLE `jsh_orga_user_rel`  (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB COMMENT = '机构用户关系表';
 
+DROP TABLE IF EXISTS `jsh_organization`;
 CREATE TABLE `jsh_organization`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `org_no` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '机构编号',
@@ -407,6 +425,7 @@ CREATE TABLE `jsh_organization`  (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB COMMENT = '机构表';
 
+DROP TABLE IF EXISTS `jsh_person`;
 CREATE TABLE `jsh_person`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `type` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '类型',
@@ -418,6 +437,7 @@ CREATE TABLE `jsh_person`  (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB COMMENT = '经手人表';
 
+DROP TABLE IF EXISTS `jsh_platform_config`;
 CREATE TABLE `jsh_platform_config`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `platform_key` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '关键词',
@@ -448,6 +468,7 @@ INSERT INTO `jsh_platform_config` VALUES (16, 'aliOss_bucketName', '阿里OSS-bu
 INSERT INTO `jsh_platform_config` VALUES (17, 'aliOss_linkUrl', '阿里OSS-linkUrl', '');
 INSERT INTO `jsh_platform_config` VALUES (18, 'bill_excel_url', '单据Excel地址', '');
 
+DROP TABLE IF EXISTS `jsh_role`;
 CREATE TABLE `jsh_role`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '名称',
@@ -462,6 +483,13 @@ CREATE TABLE `jsh_role`  (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB COMMENT = '角色表';
 
+-- ----------------------------
+-- Records of jsh_role
+-- ----------------------------
+INSERT INTO `jsh_role` VALUES ('1', '管理员', '全部数据', null, null, null, '', null, null, '0');
+INSERT INTO `jsh_role` VALUES ('2', '租户', '全部数据', null, null, '', '', null, null, '0');
+
+DROP TABLE IF EXISTS `jsh_sequence`;
 CREATE TABLE `jsh_sequence`  (
   `seq_name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '序列名称',
   `min_value` bigint(20) NOT NULL COMMENT '最小值',
@@ -477,6 +505,7 @@ CREATE TABLE `jsh_sequence`  (
 -- ----------------------------
 INSERT INTO `jsh_sequence` VALUES ('depot_number_seq', 1, 999999999999999999, 1, 1, '单据编号sequence');
 
+DROP TABLE IF EXISTS `jsh_serial_number`;
 CREATE TABLE `jsh_serial_number`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `material_id` bigint(20) NULL DEFAULT NULL COMMENT '产品表id',
@@ -496,6 +525,7 @@ CREATE TABLE `jsh_serial_number`  (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB COMMENT = '序列号表';
 
+DROP TABLE IF EXISTS `jsh_supplier`;
 CREATE TABLE `jsh_supplier`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `supplier` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '供应商名称',
@@ -525,6 +555,7 @@ CREATE TABLE `jsh_supplier`  (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB COMMENT = '供应商/客户信息表';
 
+DROP TABLE IF EXISTS `jsh_system_config`;
 CREATE TABLE `jsh_system_config`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `company_name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '公司名称',
@@ -554,6 +585,7 @@ CREATE TABLE `jsh_system_config`  (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB COMMENT = '系统参数';
 
+DROP TABLE IF EXISTS `jsh_tenant`;
 CREATE TABLE `jsh_tenant`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `tenant_id` bigint(20) NULL DEFAULT NULL COMMENT '用户id',
@@ -568,6 +600,7 @@ CREATE TABLE `jsh_tenant`  (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB COMMENT = '租户';
 
+DROP TABLE IF EXISTS `jsh_unit`;
 CREATE TABLE `jsh_unit`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '名称，支持多单位',
@@ -584,6 +617,7 @@ CREATE TABLE `jsh_unit`  (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB COMMENT = '多单位表';
 
+DROP TABLE IF EXISTS `jsh_user`;
 CREATE TABLE `jsh_user`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `username` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '用户姓名--例如张三',
@@ -605,6 +639,12 @@ CREATE TABLE `jsh_user`  (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB COMMENT = '用户表';
 
+-- ----------------------------
+-- Records of jsh_user
+-- ----------------------------
+INSERT INTO `jsh_user` VALUES ('1', '管理员', 'admin', '054774d71b5cc6d9ea2a926d0927f75c', '0', null, null, null, null, '1', '0', '0', null, null, null, '0', '0');
+
+DROP TABLE IF EXISTS `jsh_user_business`;
 CREATE TABLE `jsh_user_business`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `type` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '类别',
@@ -615,3 +655,10 @@ CREATE TABLE `jsh_user_business`  (
   `delete_flag` varchar(1) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '0' COMMENT '删除标记，0未删除，1删除',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB COMMENT = '用户/角色/模块关系表';
+
+-- ----------------------------
+-- Records of jsh_user_business
+-- ----------------------------
+INSERT INTO `jsh_user_business` VALUES ('1', 'RoleFunctions', '1', '[210][225][211][241][33][199][242][38][41][200][201][239][202][40][232][233][197][44][203][204][205][206][212][246][198][207][259][208][209][226][227][248][228][229][59][235][237][244][22][21][23][220][247][25][24][217][218][26][194][195][31][13][1][14][243][15][234][16][18][236][245][258][261][32]', '[{\"funId\":13,\"btnStr\":\"1\"},{\"funId\":14,\"btnStr\":\"1\"},{\"funId\":243,\"btnStr\":\"1\"},{\"funId\":234,\"btnStr\":\"1\"},{\"funId\":16,\"btnStr\":\"1\"},{\"funId\":18,\"btnStr\":\"1\"},{\"funId\":236,\"btnStr\":\"1\"},{\"funId\":245,\"btnStr\":\"1\"},{\"funId\":22,\"btnStr\":\"1\"},{\"funId\":23,\"btnStr\":\"1,3\"},{\"funId\":220,\"btnStr\":\"1\"},{\"funId\":247,\"btnStr\":\"1\"},{\"funId\":25,\"btnStr\":\"1,3\"},{\"funId\":217,\"btnStr\":\"1,3\"},{\"funId\":218,\"btnStr\":\"1,3\"},{\"funId\":26,\"btnStr\":\"1\"},{\"funId\":194,\"btnStr\":\"1\"},{\"funId\":195,\"btnStr\":\"1\"},{\"funId\":31,\"btnStr\":\"1\"},{\"funId\":261,\"btnStr\":\"1,2,7,3\"},{\"funId\":241,\"btnStr\":\"1,2,7,3\"},{\"funId\":33,\"btnStr\":\"1,2,7,3\"},{\"funId\":199,\"btnStr\":\"1,2,7,3\"},{\"funId\":242,\"btnStr\":\"1,2,7,3\"},{\"funId\":41,\"btnStr\":\"1,2,7,3\"},{\"funId\":200,\"btnStr\":\"1,2,7,3\"},{\"funId\":210,\"btnStr\":\"1,2,7,3\"},{\"funId\":211,\"btnStr\":\"1,2,7,3\"},{\"funId\":197,\"btnStr\":\"1,7,2,3\"},{\"funId\":203,\"btnStr\":\"1,7,2,3\"},{\"funId\":204,\"btnStr\":\"1,7,2,3\"},{\"funId\":205,\"btnStr\":\"1,7,2,3\"},{\"funId\":206,\"btnStr\":\"1,2,7,3\"},{\"funId\":212,\"btnStr\":\"1,7,2,3\"},{\"funId\":201,\"btnStr\":\"1,2,7,3\"},{\"funId\":202,\"btnStr\":\"1,2,7,3\"},{\"funId\":40,\"btnStr\":\"1,2,7,3\"},{\"funId\":232,\"btnStr\":\"1,2,7,3\"},{\"funId\":233,\"btnStr\":\"1,2,7,3\"}]', null, '0');
+INSERT INTO `jsh_user_business` VALUES ('2', 'UserRole', '1', '[1]', null, null, '0');
+INSERT INTO `jsh_user_business` VALUES ('3', 'RoleFunctions', '2', '[210][225][211][261][32][241][33][199][242][38][41][200][201][239][202][40][232][233][197][44][203][204][205][206][212][246][198][207][259][208][209][226][227][248][228][229][59][235][237][244][22][21][23][220][247][25][24][217][218][26][194][195][31][13][14][243][15][234][236]', '[{\"funId\":13,\"btnStr\":\"1\"},{\"funId\":14,\"btnStr\":\"1\"},{\"funId\":243,\"btnStr\":\"1\"},{\"funId\":234,\"btnStr\":\"1\"},{\"funId\":236,\"btnStr\":\"1\"},{\"funId\":22,\"btnStr\":\"1\"},{\"funId\":23,\"btnStr\":\"1,3\"},{\"funId\":220,\"btnStr\":\"1\"},{\"funId\":247,\"btnStr\":\"1\"},{\"funId\":25,\"btnStr\":\"1,3\"},{\"funId\":217,\"btnStr\":\"1,3\"},{\"funId\":218,\"btnStr\":\"1,3\"},{\"funId\":26,\"btnStr\":\"1\"},{\"funId\":194,\"btnStr\":\"1\"},{\"funId\":195,\"btnStr\":\"1\"},{\"funId\":31,\"btnStr\":\"1\"},{\"funId\":261,\"btnStr\":\"1,2,7,3\"},{\"funId\":241,\"btnStr\":\"1,2,7,3\"},{\"funId\":33,\"btnStr\":\"1,2,7,3\"},{\"funId\":199,\"btnStr\":\"1,7,2,3\"},{\"funId\":242,\"btnStr\":\"1,2,7,3\"},{\"funId\":41,\"btnStr\":\"1,2,7,3\"},{\"funId\":200,\"btnStr\":\"1,2,7,3\"},{\"funId\":210,\"btnStr\":\"1,2,7,3\"},{\"funId\":211,\"btnStr\":\"1,2,7,3\"},{\"funId\":197,\"btnStr\":\"1,2,7,3\"},{\"funId\":203,\"btnStr\":\"1,7,2,3\"},{\"funId\":204,\"btnStr\":\"1,7,2,3\"},{\"funId\":205,\"btnStr\":\"1,2,7,3\"},{\"funId\":206,\"btnStr\":\"1,7,2,3\"},{\"funId\":212,\"btnStr\":\"1,2,7,3\"},{\"funId\":201,\"btnStr\":\"1,2,7,3\"},{\"funId\":202,\"btnStr\":\"1,2,7,3\"},{\"funId\":40,\"btnStr\":\"1,2,7,3\"},{\"funId\":232,\"btnStr\":\"1,2,7,3\"},{\"funId\":233,\"btnStr\":\"1,2,7,3\"}]', null, '0');

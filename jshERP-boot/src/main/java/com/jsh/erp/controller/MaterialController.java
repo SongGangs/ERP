@@ -365,6 +365,7 @@ public class MaterialController extends BaseController {
                     item.put("mfrs", material.getMfrs());
                     item.put("unit", material.getCommodityUnit() + ratioStr);
                     item.put("sku", material.getSku());
+                    item.put("expiryNum", material.getExpiryNum());
                     item.put("enableSerialNumber", material.getEnableSerialNumber());
                     item.put("enableBatchNumber", material.getEnableBatchNumber());
                     BigDecimal stock;

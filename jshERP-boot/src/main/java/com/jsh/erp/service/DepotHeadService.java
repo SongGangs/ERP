@@ -18,11 +18,12 @@ import com.jsh.erp.utils.StringUtil;
 import com.jsh.erp.utils.Tools;
 import jxl.Workbook;
 import jxl.write.WritableWorkbook;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -129,10 +130,23 @@ public class DepotHeadService {
             if (null != list) {
                 List<Long> idList = new ArrayList<>();
                 List<String> numberList = new ArrayList<>();
+                List<Long> depotIds = new ArrayList<>();
+                List<String> qgdApplyNumbers = new ArrayList<>();
                 for (DepotHeadVo4List dh : list) {
                     idList.add(dh.getId());
                     numberList.add(dh.getNumber());
+                    if ("采购订单".equals(dh.getSubType()) && StringUtil.isNotEmpty(dh.getLinkApply())) {
+                        qgdApplyNumbers.add(dh.getLinkApply());
+                    }
+                    if ("请购单".equals(dh.getSubType()) && Objects.nonNull(dh.getOrganId())){
+                        depotIds.add(dh.getOrganId());
+                    }
                 }
+                Map<String, DepotHead> qgdDepotHeadMap = getDepotHeadMap(qgdApplyNumbers);
+                if (MapUtils.isNotEmpty(qgdDepotHeadMap)) {
+                    depotIds = qgdDepotHeadMap.values().stream().map(DepotHead::getOrganId).filter(Objects::nonNull).collect(Collectors.toList());
+                }
+                Map<Long, String> depotNameMap = depotService.getMapByIds(depotIds);
                 //通过批量查询去构造map
                 Map<String,BigDecimal> finishDepositMap = getFinishDepositMapByNumberList(numberList);
                 Map<Long,Integer> financialBillNoMap = getFinancialBillNoMapByBillIdList(idList);
@@ -156,6 +170,15 @@ public class DepotHeadService {
                         dh.setChangeAmount(roleService.parseBillPriceByLimit(dh.getChangeAmount().abs(), billCategory, priceLimit, request));
                     } else {
                         dh.setChangeAmount(BigDecimal.ZERO);
+                    }
+                    if (MapUtils.isNotEmpty(qgdDepotHeadMap)) {
+                        Long qgdDepotId = qgdDepotHeadMap.get(dh.getLinkApply()).getOrganId();
+                        dh.setDepotId(qgdDepotId);
+                        dh.setDepotName(depotNameMap.get(qgdDepotId));
+                    } else if (MapUtils.isNotEmpty(depotNameMap)) {
+                        dh.setDepotId(dh.getOrganId());
+                        dh.setDepotName(depotNameMap.get(dh.getOrganId()));
+                        dh.setOrganId(null);
                     }
                     if(dh.getTotalPrice() != null) {
                         BigDecimal lastTotalPrice = BusinessConstants.SUB_TYPE_CHECK_ENTER.equals(dh.getSubType())||
@@ -986,6 +1009,22 @@ public class DepotHeadService {
                 Map<String,Integer> billSizeMap = getBillSizeMapByLinkNumberList(numberList);
                 Map<Long,String> materialsListMap = findMaterialsListMapByHeaderIdList(idList);
                 DepotHeadVo4List dh = list.get(0);
+                if ("请购单".equals(dh.getSubType()) && Objects.nonNull(dh.getOrganId())) {
+                    Depot depot = depotService.getDepot(dh.getOrganId());
+                    if (Objects.nonNull(depot)) {
+                        dh.setOrganId(null);
+                        dh.setDepotId(depot.getId());
+                        dh.setDepotName(depot.getName());
+                    }
+                }
+                if ("采购订单".equals(dh.getSubType()) && StringUtil.isNotEmpty(dh.getLinkApply())) {
+                    DepotHead depotHead = getDepotHead(dh.getLinkApply());
+                    if (Objects.nonNull(depotHead.getOrganId())){
+                        Depot depot = depotService.getDepot(depotHead.getOrganId());
+                        dh.setDepotId(depot.getId());
+                        dh.setDepotName(depot.getName());
+                    }
+                }
                 String billCategory = getBillCategory(dh.getSubType());
                 if(accountMap!=null && StringUtil.isNotEmpty(dh.getAccountIdList()) && StringUtil.isNotEmpty(dh.getAccountMoneyList())) {
                     String accountStr = accountService.getAccountStrByIdAndMoney(accountMap, dh.getAccountIdList(), dh.getAccountMoneyList());
