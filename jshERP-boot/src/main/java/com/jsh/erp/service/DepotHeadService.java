@@ -131,20 +131,12 @@ public class DepotHeadService {
                 List<Long> idList = new ArrayList<>();
                 List<String> numberList = new ArrayList<>();
                 List<Long> depotIds = new ArrayList<>();
-                List<String> qgdApplyNumbers = new ArrayList<>();
                 for (DepotHeadVo4List dh : list) {
                     idList.add(dh.getId());
                     numberList.add(dh.getNumber());
-                    if ("采购订单".equals(dh.getSubType()) && StringUtil.isNotEmpty(dh.getLinkApply())) {
-                        qgdApplyNumbers.add(dh.getLinkApply());
+                    if (Objects.nonNull(dh.getDepotId())) {
+                        depotIds.add(dh.getDepotId());
                     }
-                    if ("请购单".equals(dh.getSubType()) && Objects.nonNull(dh.getOrganId())){
-                        depotIds.add(dh.getOrganId());
-                    }
-                }
-                Map<String, DepotHead> qgdDepotHeadMap = getDepotHeadMap(qgdApplyNumbers);
-                if (MapUtils.isNotEmpty(qgdDepotHeadMap)) {
-                    depotIds = qgdDepotHeadMap.values().stream().map(DepotHead::getOrganId).filter(Objects::nonNull).collect(Collectors.toList());
                 }
                 Map<Long, String> depotNameMap = depotService.getMapByIds(depotIds);
                 //通过批量查询去构造map
@@ -171,15 +163,7 @@ public class DepotHeadService {
                     } else {
                         dh.setChangeAmount(BigDecimal.ZERO);
                     }
-                    if (MapUtils.isNotEmpty(qgdDepotHeadMap)) {
-                        Long qgdDepotId = qgdDepotHeadMap.get(dh.getLinkApply()).getOrganId();
-                        dh.setDepotId(qgdDepotId);
-                        dh.setDepotName(depotNameMap.get(qgdDepotId));
-                    } else if (MapUtils.isNotEmpty(depotNameMap)) {
-                        dh.setDepotId(dh.getOrganId());
-                        dh.setDepotName(depotNameMap.get(dh.getOrganId()));
-                        dh.setOrganId(null);
-                    }
+                    dh.setDepotName(depotNameMap.get(dh.getDepotId()));
                     if(dh.getTotalPrice() != null) {
                         BigDecimal lastTotalPrice = BusinessConstants.SUB_TYPE_CHECK_ENTER.equals(dh.getSubType())||
                                 BusinessConstants.SUB_TYPE_REPLAY.equals(dh.getSubType())?dh.getTotalPrice():dh.getTotalPrice().abs();
@@ -1009,19 +993,9 @@ public class DepotHeadService {
                 Map<String,Integer> billSizeMap = getBillSizeMapByLinkNumberList(numberList);
                 Map<Long,String> materialsListMap = findMaterialsListMapByHeaderIdList(idList);
                 DepotHeadVo4List dh = list.get(0);
-                if ("请购单".equals(dh.getSubType()) && Objects.nonNull(dh.getOrganId())) {
-                    Depot depot = depotService.getDepot(dh.getOrganId());
+                if (Objects.nonNull(dh.getDepotId())) {
+                    Depot depot = depotService.getDepot(dh.getDepotId());
                     if (Objects.nonNull(depot)) {
-                        dh.setOrganId(null);
-                        dh.setDepotId(depot.getId());
-                        dh.setDepotName(depot.getName());
-                    }
-                }
-                if ("采购订单".equals(dh.getSubType()) && StringUtil.isNotEmpty(dh.getLinkApply())) {
-                    DepotHead depotHead = getDepotHead(dh.getLinkApply());
-                    if (Objects.nonNull(depotHead.getOrganId())){
-                        Depot depot = depotService.getDepot(depotHead.getOrganId());
-                        dh.setDepotId(depot.getId());
                         dh.setDepotName(depot.getName());
                     }
                 }

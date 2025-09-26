@@ -500,7 +500,7 @@ public class DepotItemService {
                     } else if (depotItem.getProductionDate().after(currentDate)) {
                         throw new BusinessRunTimeException(ExceptionConstants.DEPOT_HEAD_BATCH_NUMBERE_EMPTY_CODE,
                                 String.format(ExceptionConstants.DEPOT_HEAD_BATCH_COMMON_MSG, barCode, "生产日期需早于今天"));
-                    } else if (depotItem.getExpirationDate().before(currentDate)) {
+                    } else if (depotItem.getExpirationDate().before(currentDate) && !"出库".equals(depotHead.getType())) {
                         throw new BusinessRunTimeException(ExceptionConstants.DEPOT_HEAD_BATCH_NUMBERE_EMPTY_CODE,
                                 String.format(ExceptionConstants.DEPOT_HEAD_BATCH_COMMON_MSG, barCode, "有效期需晚于今天"));
                     } else if (depotItem.getProductionDate().after(depotItem.getExpirationDate())) {

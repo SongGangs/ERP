@@ -18,8 +18,6 @@ public class DepotHeadVo4List extends DepotHead{
 
     private String organName;
 
-    private Long depotId;
-
     private String depotName;
 
     private String userName;

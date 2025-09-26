@@ -29,6 +29,8 @@ public class DepotHead {
 
     private Long organId;
 
+    private Long depotId;
+
     private Long creator;
 
     private Long accountId;
@@ -72,6 +74,8 @@ public class DepotHead {
     private String linkNumber;
 
     private String linkApply;
+
+    private Integer outType;
 
     private Long tenantId;
 
