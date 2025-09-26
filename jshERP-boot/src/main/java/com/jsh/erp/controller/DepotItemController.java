@@ -901,46 +901,46 @@ public class DepotItemController {
                 }
                 map.put("buyPriceList", buyPriceList);
                 JSONArray salePriceList = new JSONArray();
-                for (String month : monthList) {
-                    JSONObject obj = new JSONObject();
-                    BigDecimal outPrice = BigDecimal.ZERO;
-                    BigDecimal inPrice = BigDecimal.ZERO;
-                    for (InOutPriceVo item : inOrOutPriceList) {
-                        String billOperMonth = Tools.dateToStr(item.getOperTime(), "yyyy-MM");
-                        if (month.equals(billOperMonth)) {
-                            if ("出库".equals(item.getType()) && "销售".equals(item.getSubType())) {
-                                outPrice = outPrice.add(item.getDiscountLastMoney());
-                            }
-                            if ("入库".equals(item.getType()) && "销售退货".equals(item.getSubType())) {
-                                inPrice = inPrice.add(item.getDiscountLastMoney());
-                            }
-                        }
-                    }
-                    obj.put("x", month);
-                    obj.put("y", roleService.parseHomePriceByLimit(outPrice.subtract(inPrice), "sale", priceLimit, "***", request));
-                    salePriceList.add(obj);
-                }
+//                for (String month : monthList) {
+//                    JSONObject obj = new JSONObject();
+//                    BigDecimal outPrice = BigDecimal.ZERO;
+//                    BigDecimal inPrice = BigDecimal.ZERO;
+//                    for (InOutPriceVo item : inOrOutPriceList) {
+//                        String billOperMonth = Tools.dateToStr(item.getOperTime(), "yyyy-MM");
+//                        if (month.equals(billOperMonth)) {
+//                            if ("出库".equals(item.getType()) && "销售".equals(item.getSubType())) {
+//                                outPrice = outPrice.add(item.getDiscountLastMoney());
+//                            }
+//                            if ("入库".equals(item.getType()) && "销售退货".equals(item.getSubType())) {
+//                                inPrice = inPrice.add(item.getDiscountLastMoney());
+//                            }
+//                        }
+//                    }
+//                    obj.put("x", month);
+//                    obj.put("y", roleService.parseHomePriceByLimit(outPrice.subtract(inPrice), "sale", priceLimit, "***", request));
+//                    salePriceList.add(obj);
+//                }
                 map.put("salePriceList", salePriceList);
                 JSONArray retailPriceList = new JSONArray();
-                for (String month : monthList) {
-                    JSONObject obj = new JSONObject();
-                    BigDecimal outPrice = BigDecimal.ZERO;
-                    BigDecimal inPrice = BigDecimal.ZERO;
-                    for (InOutPriceVo item : inOrOutPriceList) {
-                        String billOperMonth = Tools.dateToStr(item.getOperTime(), "yyyy-MM");
-                        if (month.equals(billOperMonth)) {
-                            if ("出库".equals(item.getType()) && "零售".equals(item.getSubType())) {
-                                outPrice = outPrice.add(item.getTotalPrice().abs());
-                            }
-                            if ("入库".equals(item.getType()) && "零售退货".equals(item.getSubType())) {
-                                inPrice = inPrice.add(item.getTotalPrice().abs());
-                            }
-                        }
-                    }
-                    obj.put("x", month);
-                    obj.put("y", roleService.parseHomePriceByLimit(outPrice.subtract(inPrice), "retail", priceLimit, "***", request));
-                    retailPriceList.add(obj);
-                }
+//                for (String month : monthList) {
+//                    JSONObject obj = new JSONObject();
+//                    BigDecimal outPrice = BigDecimal.ZERO;
+//                    BigDecimal inPrice = BigDecimal.ZERO;
+//                    for (InOutPriceVo item : inOrOutPriceList) {
+//                        String billOperMonth = Tools.dateToStr(item.getOperTime(), "yyyy-MM");
+//                        if (month.equals(billOperMonth)) {
+//                            if ("出库".equals(item.getType()) && "零售".equals(item.getSubType())) {
+//                                outPrice = outPrice.add(item.getTotalPrice().abs());
+//                            }
+//                            if ("入库".equals(item.getType()) && "零售退货".equals(item.getSubType())) {
+//                                inPrice = inPrice.add(item.getTotalPrice().abs());
+//                            }
+//                        }
+//                    }
+//                    obj.put("x", month);
+//                    obj.put("y", roleService.parseHomePriceByLimit(outPrice.subtract(inPrice), "retail", priceLimit, "***", request));
+//                    retailPriceList.add(obj);
+//                }
                 map.put("retailPriceList", retailPriceList);
             }
             res.code = 200;

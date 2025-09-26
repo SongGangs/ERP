@@ -107,7 +107,7 @@ public class SupplierService {
                 String billType = "";
                 if (("供应商").equals(supplierType)) {
                     inOutType = "入库";
-                    subType = "采购";
+                    subType = "其它";
                     typeBack = "出库";
                     subTypeBack = "采购退货";
                     billType = "付款";

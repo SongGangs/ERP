@@ -412,6 +412,13 @@ CREATE TABLE `jsh_orga_user_rel`  (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB COMMENT = '机构用户关系表';
 
+-- ----------------------------
+-- Records of jsh_orga_user_rel
+-- ----------------------------
+INSERT INTO `jsh_orga_user_rel` VALUES (1, 2, 3, NULL, '0', '2025-09-24 17:30:41', 2, '2025-09-24 17:30:41', 2, 2);
+INSERT INTO `jsh_orga_user_rel` VALUES (2, 3, 4, NULL, '0', '2025-09-24 17:31:01', 2, '2025-09-24 17:31:01', 2, 2);
+INSERT INTO `jsh_orga_user_rel` VALUES (3, 1, 2, NULL, '0', '2025-09-24 17:32:21', 2, '2025-09-24 17:32:21', 2, 2);
+
 DROP TABLE IF EXISTS `jsh_organization`;
 CREATE TABLE `jsh_organization`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
@@ -426,6 +433,14 @@ CREATE TABLE `jsh_organization`  (
   `delete_flag` varchar(1) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '0' COMMENT '删除标记，0未删除，1删除',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB COMMENT = '机构表';
+
+-- ----------------------------
+-- Records of jsh_organization
+-- ----------------------------
+INSERT INTO `jsh_organization` VALUES (1, '001', '测试机构总部', NULL, NULL, NULL, '2025-09-24 17:29:27', '2025-09-24 17:29:27', 2, '0');
+-- 额外用户
+INSERT INTO `jsh_organization` VALUES (2, '081701', '南充1店', 1, NULL, NULL, '2025-09-24 17:29:41', '2025-09-24 17:29:51', 2, '0');
+INSERT INTO `jsh_organization` VALUES (3, '02801', '成都1店', 1, NULL, NULL, '2025-09-24 17:30:06', '2025-09-24 17:30:06', 2, '0');
 
 DROP TABLE IF EXISTS `jsh_person`;
 CREATE TABLE `jsh_person`  (
@@ -488,8 +503,9 @@ CREATE TABLE `jsh_role`  (
 -- ----------------------------
 -- Records of jsh_role
 -- ----------------------------
-INSERT INTO `jsh_role` VALUES ('1', '管理员', '全部数据', null, null, null, '', null, null, '0');
-INSERT INTO `jsh_role` VALUES ('2', '租户', '全部数据', null, null, '', '', null, null, '0');
+INSERT INTO `jsh_role` VALUES (1, '管理员', '全部数据', null, null, null, '', null, null, '0');
+INSERT INTO `jsh_role` VALUES (2, '租户', '全部数据', null, null, '', '', null, null, '0');
+INSERT INTO `jsh_role` VALUES (3, '店长', '本机构数据', '1,2,3,5,4,6', NULL, NULL, b'1', NULL, 2, '0');
 
 DROP TABLE IF EXISTS `jsh_sequence`;
 CREATE TABLE `jsh_sequence`  (
@@ -587,6 +603,11 @@ CREATE TABLE `jsh_system_config`  (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB COMMENT = '系统参数';
 
+-- ----------------------------
+-- Records of jsh_system_config
+-- ----------------------------
+INSERT INTO `jsh_system_config` VALUES (1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '1', '0', '0', '0', '0', NULL, '1', '1', '0', '0', '0', '1', '0', '1', '0', 2, '0');
+
 DROP TABLE IF EXISTS `jsh_tenant`;
 CREATE TABLE `jsh_tenant`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
@@ -601,6 +622,10 @@ CREATE TABLE `jsh_tenant`  (
   `delete_flag` varchar(1) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '0' COMMENT '删除标记，0未删除，1删除',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB COMMENT = '租户';
+-- ----------------------------
+-- Records of jsh_tenant
+-- ----------------------------
+INSERT INTO `jsh_tenant` VALUES (1, 2, 'testadmin', 1000000, '0', b'1', '2025-09-24 17:24:12', '2033-12-11 17:24:12', NULL, '0');
 
 DROP TABLE IF EXISTS `jsh_unit`;
 CREATE TABLE `jsh_unit`  (
@@ -645,6 +670,10 @@ CREATE TABLE `jsh_user`  (
 -- Records of jsh_user
 -- ----------------------------
 INSERT INTO `jsh_user` VALUES ('1', '管理员', 'admin', '054774d71b5cc6d9ea2a926d0927f75c', '0', null, null, null, null, '1', '0', '0', null, null, null, '0', '0');
+INSERT INTO `jsh_user` VALUES (2, '测试管理员', 'testadmin', 'e10adc3949ba59abbe56e057f20f883e', '0', NULL, NULL, NULL, NULL, 1, 0, 0, NULL, NULL, NULL, 2, '0');
+-- 额外用户
+INSERT INTO `jsh_user` VALUES (3, '南充1店店长', 'ncdz01', 'e10adc3949ba59abbe56e057f20f883e', '0', NULL, NULL, NULL, NULL, 1, 0, 0, NULL, NULL, NULL, 2, '0');
+INSERT INTO `jsh_user` VALUES (4, '成都1店店长', 'cddz01', 'e10adc3949ba59abbe56e057f20f883e', '0', NULL, NULL, NULL, NULL, 1, 0, 0, NULL, NULL, NULL, 2, '0');
 
 DROP TABLE IF EXISTS `jsh_user_business`;
 CREATE TABLE `jsh_user_business`  (
@@ -661,6 +690,14 @@ CREATE TABLE `jsh_user_business`  (
 -- ----------------------------
 -- Records of jsh_user_business
 -- ----------------------------
-INSERT INTO `jsh_user_business` VALUES ('1', 'RoleFunctions', '1', '[210][225][211][241][33][199][242][38][41][200][201][239][202][40][232][233][197][44][203][204][205][206][212][246][198][207][259][208][209][226][227][248][228][229][59][235][237][244][22][21][23][220][247][25][24][217][218][26][194][195][31][13][1][14][243][15][234][16][18][236][245][258][261][32]', '[{\"funId\":13,\"btnStr\":\"1\"},{\"funId\":14,\"btnStr\":\"1\"},{\"funId\":243,\"btnStr\":\"1\"},{\"funId\":234,\"btnStr\":\"1\"},{\"funId\":16,\"btnStr\":\"1\"},{\"funId\":18,\"btnStr\":\"1\"},{\"funId\":236,\"btnStr\":\"1\"},{\"funId\":245,\"btnStr\":\"1\"},{\"funId\":22,\"btnStr\":\"1\"},{\"funId\":23,\"btnStr\":\"1,3\"},{\"funId\":220,\"btnStr\":\"1\"},{\"funId\":247,\"btnStr\":\"1\"},{\"funId\":25,\"btnStr\":\"1,3\"},{\"funId\":217,\"btnStr\":\"1,3\"},{\"funId\":218,\"btnStr\":\"1,3\"},{\"funId\":26,\"btnStr\":\"1\"},{\"funId\":194,\"btnStr\":\"1\"},{\"funId\":195,\"btnStr\":\"1\"},{\"funId\":31,\"btnStr\":\"1\"},{\"funId\":261,\"btnStr\":\"1,2,7,3\"},{\"funId\":241,\"btnStr\":\"1,2,7,3\"},{\"funId\":33,\"btnStr\":\"1,2,7,3\"},{\"funId\":199,\"btnStr\":\"1,2,7,3\"},{\"funId\":242,\"btnStr\":\"1,2,7,3\"},{\"funId\":41,\"btnStr\":\"1,2,7,3\"},{\"funId\":200,\"btnStr\":\"1,2,7,3\"},{\"funId\":210,\"btnStr\":\"1,2,7,3\"},{\"funId\":211,\"btnStr\":\"1,2,7,3\"},{\"funId\":197,\"btnStr\":\"1,7,2,3\"},{\"funId\":203,\"btnStr\":\"1,7,2,3\"},{\"funId\":204,\"btnStr\":\"1,7,2,3\"},{\"funId\":205,\"btnStr\":\"1,7,2,3\"},{\"funId\":206,\"btnStr\":\"1,2,7,3\"},{\"funId\":212,\"btnStr\":\"1,7,2,3\"},{\"funId\":201,\"btnStr\":\"1,2,7,3\"},{\"funId\":202,\"btnStr\":\"1,2,7,3\"},{\"funId\":40,\"btnStr\":\"1,2,7,3\"},{\"funId\":232,\"btnStr\":\"1,2,7,3\"},{\"funId\":233,\"btnStr\":\"1,2,7,3\"}]', null, '0');
-INSERT INTO `jsh_user_business` VALUES ('2', 'UserRole', '1', '[1]', null, null, '0');
-INSERT INTO `jsh_user_business` VALUES ('3', 'RoleFunctions', '2', '[210][225][211][261][32][241][33][199][242][38][41][200][201][239][202][40][232][233][197][44][203][204][205][206][212][246][198][207][259][208][209][226][227][248][228][229][59][235][237][244][22][21][23][220][247][25][24][217][218][26][194][195][31][13][14][243][15][234][236]', '[{\"funId\":13,\"btnStr\":\"1\"},{\"funId\":14,\"btnStr\":\"1\"},{\"funId\":243,\"btnStr\":\"1\"},{\"funId\":234,\"btnStr\":\"1\"},{\"funId\":236,\"btnStr\":\"1\"},{\"funId\":22,\"btnStr\":\"1\"},{\"funId\":23,\"btnStr\":\"1,3\"},{\"funId\":220,\"btnStr\":\"1\"},{\"funId\":247,\"btnStr\":\"1\"},{\"funId\":25,\"btnStr\":\"1,3\"},{\"funId\":217,\"btnStr\":\"1,3\"},{\"funId\":218,\"btnStr\":\"1,3\"},{\"funId\":26,\"btnStr\":\"1\"},{\"funId\":194,\"btnStr\":\"1\"},{\"funId\":195,\"btnStr\":\"1\"},{\"funId\":31,\"btnStr\":\"1\"},{\"funId\":261,\"btnStr\":\"1,2,7,3\"},{\"funId\":241,\"btnStr\":\"1,2,7,3\"},{\"funId\":33,\"btnStr\":\"1,2,7,3\"},{\"funId\":199,\"btnStr\":\"1,7,2,3\"},{\"funId\":242,\"btnStr\":\"1,2,7,3\"},{\"funId\":41,\"btnStr\":\"1,2,7,3\"},{\"funId\":200,\"btnStr\":\"1,2,7,3\"},{\"funId\":210,\"btnStr\":\"1,2,7,3\"},{\"funId\":211,\"btnStr\":\"1,2,7,3\"},{\"funId\":197,\"btnStr\":\"1,2,7,3\"},{\"funId\":203,\"btnStr\":\"1,7,2,3\"},{\"funId\":204,\"btnStr\":\"1,7,2,3\"},{\"funId\":205,\"btnStr\":\"1,2,7,3\"},{\"funId\":206,\"btnStr\":\"1,7,2,3\"},{\"funId\":212,\"btnStr\":\"1,2,7,3\"},{\"funId\":201,\"btnStr\":\"1,2,7,3\"},{\"funId\":202,\"btnStr\":\"1,2,7,3\"},{\"funId\":40,\"btnStr\":\"1,2,7,3\"},{\"funId\":232,\"btnStr\":\"1,2,7,3\"},{\"funId\":233,\"btnStr\":\"1,2,7,3\"}]', null, '0');
+INSERT INTO `jsh_user_business` VALUES (1, 'RoleFunctions', '1', '[210][225][211][241][33][199][242][38][41][200][201][239][202][40][232][233][197][44][203][204][205][206][212][246][198][207][259][208][209][226][227][248][228][229][59][235][237][244][22][21][23][220][247][25][24][217][218][26][194][195][31][13][1][14][243][15][234][16][18][236][245][258][261][32]', '[{\"funId\":13,\"btnStr\":\"1\"},{\"funId\":14,\"btnStr\":\"1\"},{\"funId\":243,\"btnStr\":\"1\"},{\"funId\":234,\"btnStr\":\"1\"},{\"funId\":16,\"btnStr\":\"1\"},{\"funId\":18,\"btnStr\":\"1\"},{\"funId\":236,\"btnStr\":\"1\"},{\"funId\":245,\"btnStr\":\"1\"},{\"funId\":22,\"btnStr\":\"1\"},{\"funId\":23,\"btnStr\":\"1,3\"},{\"funId\":220,\"btnStr\":\"1\"},{\"funId\":247,\"btnStr\":\"1\"},{\"funId\":25,\"btnStr\":\"1,3\"},{\"funId\":217,\"btnStr\":\"1,3\"},{\"funId\":218,\"btnStr\":\"1,3\"},{\"funId\":26,\"btnStr\":\"1\"},{\"funId\":194,\"btnStr\":\"1\"},{\"funId\":195,\"btnStr\":\"1\"},{\"funId\":31,\"btnStr\":\"1\"},{\"funId\":261,\"btnStr\":\"1,2,7,3\"},{\"funId\":241,\"btnStr\":\"1,2,7,3\"},{\"funId\":33,\"btnStr\":\"1,2,7,3\"},{\"funId\":199,\"btnStr\":\"1,2,7,3\"},{\"funId\":242,\"btnStr\":\"1,2,7,3\"},{\"funId\":41,\"btnStr\":\"1,2,7,3\"},{\"funId\":200,\"btnStr\":\"1,2,7,3\"},{\"funId\":210,\"btnStr\":\"1,2,7,3\"},{\"funId\":211,\"btnStr\":\"1,2,7,3\"},{\"funId\":197,\"btnStr\":\"1,7,2,3\"},{\"funId\":203,\"btnStr\":\"1,7,2,3\"},{\"funId\":204,\"btnStr\":\"1,7,2,3\"},{\"funId\":205,\"btnStr\":\"1,7,2,3\"},{\"funId\":206,\"btnStr\":\"1,2,7,3\"},{\"funId\":212,\"btnStr\":\"1,7,2,3\"},{\"funId\":201,\"btnStr\":\"1,2,7,3\"},{\"funId\":202,\"btnStr\":\"1,2,7,3\"},{\"funId\":40,\"btnStr\":\"1,2,7,3\"},{\"funId\":232,\"btnStr\":\"1,2,7,3\"},{\"funId\":233,\"btnStr\":\"1,2,7,3\"}]', null, '0');
+INSERT INTO `jsh_user_business` VALUES (2, 'UserRole', '1', '[1]', null, null, '0');
+INSERT INTO `jsh_user_business` VALUES (3, 'RoleFunctions', '2', '[261][32][241][33][199][201][202][40][197][44][203][204][205][206][212][246][198][207][259][208][209][226][227][248][228][229][59][235][237][244][22][21][23][220][247][25][24][217][218][26][194][195][31][13][14][243][15][234][239][232][233]', '[{\"funId\":13,\"btnStr\":\"1\"},{\"funId\":14,\"btnStr\":\"1\"},{\"funId\":243,\"btnStr\":\"1\"},{\"funId\":234,\"btnStr\":\"1\"},{\"funId\":22,\"btnStr\":\"1\"},{\"funId\":23,\"btnStr\":\"1,3\"},{\"funId\":220,\"btnStr\":\"1\"},{\"funId\":247,\"btnStr\":\"1\"},{\"funId\":25,\"btnStr\":\"1,3\"},{\"funId\":217,\"btnStr\":\"1,3\"},{\"funId\":218,\"btnStr\":\"1,3\"},{\"funId\":26,\"btnStr\":\"1\"},{\"funId\":194,\"btnStr\":\"1\"},{\"funId\":195,\"btnStr\":\"1\"},{\"funId\":31,\"btnStr\":\"1\"},{\"funId\":261,\"btnStr\":\"1,2,7,3\"},{\"funId\":241,\"btnStr\":\"1,2,7,3\"},{\"funId\":33,\"btnStr\":\"1,2,7,3\"},{\"funId\":199,\"btnStr\":\"1,7,2,3\"},{\"funId\":197,\"btnStr\":\"1,2,7,3\"},{\"funId\":203,\"btnStr\":\"1,7,2,3\"},{\"funId\":204,\"btnStr\":\"1,7,2,3\"},{\"funId\":205,\"btnStr\":\"1,2,7,3\"},{\"funId\":206,\"btnStr\":\"1,7,2,3\"},{\"funId\":212,\"btnStr\":\"1,2,7,3\"},{\"funId\":201,\"btnStr\":\"1,2,7,3\"},{\"funId\":202,\"btnStr\":\"1,2,7,3\"},{\"funId\":40,\"btnStr\":\"1,2,7,3\"}]', NULL, '0');
+INSERT INTO `jsh_user_business` VALUES (4, 'UserRole', '2', '[2]', NULL, 2, '0');
+INSERT INTO `jsh_user_business` VALUES (5, 'RoleFunctions', '3', '[261][241][33][199][201][202][203][246][226][227][228][229][59][244][22][23][220][247]', '[{\"funId\":22,\"btnStr\":\"1\"},{\"funId\":23,\"btnStr\":\"1,3\"},{\"funId\":220,\"btnStr\":\"1\"},{\"funId\":247,\"btnStr\":\"1\"},{\"funId\":261,\"btnStr\":\"1\"},{\"funId\":33,\"btnStr\":\"1,2\"},{\"funId\":199,\"btnStr\":\"1\"},{\"funId\":203,\"btnStr\":\"1\"},{\"funId\":201,\"btnStr\":\"1,2\"},{\"funId\":202,\"btnStr\":\"1,2\"}]', 2, '0');
+-- 额外用户
+INSERT INTO `jsh_user_business` VALUES (6, 'UserRole', '3', '[3]', NULL, 2, '0');
+INSERT INTO `jsh_user_business` VALUES (7, 'UserRole', '4', '[3]', NULL, 2, '0');
+INSERT INTO `jsh_user_business` VALUES (8, 'UserDepot', '2', '[1][2]', NULL, 2, '0');
+INSERT INTO `jsh_user_business` VALUES (9, 'UserDepot', '4', '[2]', NULL, 2, '0');
+INSERT INTO `jsh_user_business` VALUES (10, 'UserDepot', '3', '[1]', NULL, 2, '0');
