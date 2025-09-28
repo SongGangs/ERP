@@ -69,10 +69,21 @@
           </a-col>
         </a-row>
         <a-row class="form-row" :gutter="24">
-          <a-col v-if="currentSelectDepotId" :lg="6" :md="12" :sm="24">
-            <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="仓库">
-              <a-input v-decorator="['depotId']" hidden/>
-              <a-input v-decorator="['depotName']" disabled/>
+          <a-col :lg="6" :md="12" :sm="24">
+            <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="仓库" data-title="仓库"
+                         data-intro="仓库必须选择，如果发现需要选择的仓库尚未录入，可以在下拉框中点击新增仓库进行录入">
+              <a-select placeholder="请选择仓库" v-decorator="[ 'depotId', validatorRules.depotId ]" :disabled="!rowCanEdit"
+                        :dropdownMatchSelectWidth="false" showSearch optionFilterProp="children">
+                <div slot="dropdownDepot" slot-scope="menu">
+                  <v-nodes :vnodes="menu" />
+                  <a-divider style="margin: 4px 0;" />
+                  <div v-if="quickBtn.depot" class="dropdown-btn" @mousedown="e => e.preventDefault()" @click="addDepot"><a-icon type="plus" /> 新增仓库</div>
+                  <div class="dropdown-btn" @mousedown="e => e.preventDefault()" @click="initModelDepot(0)"><a-icon type="reload" /> 刷新列表</div>
+                </div>
+                <a-select-option v-for="(item,index) in depotList" :key="index" :value="item.id">
+                  {{ item.depotName }}
+                </a-select-option>
+              </a-select>
             </a-form-item>
           </a-col>
         </a-row>
@@ -145,7 +156,7 @@
           <a-col :lg="6" :md="12" :sm="24">
             <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="结算账户" data-step="8" data-title="结算账户"
                          data-intro="如果在下拉框中选择多账户，则可以通过多个结算账户进行结算">
-              <a-select style="width:80%;" placeholder="请选择结算账户" v-decorator="[ 'accountId' ]"
+              <a-select style="width:80%;" placeholder="请选择结算账户" v-decorator="[ 'accountId', validatorRules.accountId ]"
                         :dropdownMatchSelectWidth="false" allowClear @select="selectAccount">
                 <div slot="dropdownRender" slot-scope="menu">
                   <v-nodes :vnodes="menu" />
@@ -312,6 +323,16 @@
             rules: [
               { required: true, message: '请选择供应商!' }
             ]
+          },
+          depotId:{
+            rules: [
+              { required: true, message: '请选择仓库!' }
+            ]
+          },
+          accountId:{
+            rules: [
+              { required: true, message: '请选择仓库!' }
+            ]
           }
         },
         url: {
@@ -354,10 +375,15 @@
             this.materialTable.columns[1].type = FormTypes.normal
           }
           if(this.model.linkApply) {
+            this.rowCanEdit = false
             this.changeFormTypes(this.materialTable.columns, 'preNumber', 1)
             this.changeFormTypes(this.materialTable.columns, 'finishNumber', 1)
           }
           this.model.operTime = this.model.operTimeStr
+          if(this.model.depotId == null && this.model.depotIdList) {
+            this.model.depotId = 0
+            this.depotIdList = this.model.depotIdList
+          }
           if(this.model.accountId == null && this.model.accountIdList) {
             this.model.accountId = 0
             this.manyAccountBtnStatus = true
@@ -368,7 +394,7 @@
           }
           this.fileList = this.model.fileName
           this.$nextTick(() => {
-            this.form.setFieldsValue(pick(this.model, 'depotId', 'depotName','organId', 'operTime', 'number', 'linkApply', 'linkNumber', 'remark',
+            this.form.setFieldsValue(pick(this.model, 'depotId','organId', 'operTime', 'number', 'linkApply', 'linkNumber', 'remark',
             'discount','discountMoney','discountLastMoney','accountId','changeAmount'))
           });
           // 加载子表数据
@@ -387,6 +413,7 @@
           this.copyAddInit(this.prefixNo)
         }
         this.initSystemConfig()
+        this.initModelDepot(0)
         this.initSupplier(0)
         this.initAccount(0)
         this.initPlatform()
@@ -473,8 +500,7 @@
                 this.$nextTick(() => {
                   this.form.setFieldsValue({
                     'linkApply': linkNumber,
-                    'depotId': res.data.depotId,
-                    'depotName': res.data.depotName
+                    'depotId': res.data.depotId
                   })
                 })
               } else {

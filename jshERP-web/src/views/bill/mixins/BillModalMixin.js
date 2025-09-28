@@ -105,20 +105,19 @@ export const BillModalMixin = {
         this.form.setFieldsValue({'operTime':getNowFormatDateTime(), 'discount': 0,
           'discountMoney': 0, 'discountLastMoney': 0, 'otherMoney': 0, 'changeAmount': 0, 'debt': 0})
       })
-      this.$nextTick(() => {
-        getAccount({}).then((res)=>{
-          if(res && res.code === 200) {
-            for (const item of res.data.accountList) {
-              if(item.isDefault){
-                this.form.setFieldsValue({'accountId': item.id})
+      if (this.prefixNo !== 'QGD' && this.prefixNo !== 'QTCK' && this.transferParam.accountId === undefined) {
+        this.$nextTick(() => {
+          getAccount({}).then((res)=>{
+            if(res && res.code === 200) {
+              for (const item of res.data.accountList) {
+                if(item.isDefault){
+                  this.form.setFieldsValue({'accountId': item.id})
+                }
               }
             }
-          }
+          })
         })
-      })
-      // if (amountNum === 'QTCK'){
-      //   this.initCustomer(1)
-      // }
+      }
       this.accountIdList = []
       this.accountMoneyList = []
       this.manyAccountBtnStatus = false
@@ -170,6 +169,12 @@ export const BillModalMixin = {
                 } else {
                   columns[i].type = FormTypes.input //显示
                 }
+              }
+            } else if (key === 'expirationDate') {
+              if (this.prefixNo === 'LSTH' || this.prefixNo === 'XSTH') {
+                columns[i].type = FormTypes.date //显示
+              } else {
+                columns[i].type = FormTypes.input //显示
               }
             } else if(key === 'expirationDate' || key === 'productionDate') {
               if(this.prefixNo === 'LSTH' || this.prefixNo === 'CGRK' || this.prefixNo === 'XSTH' || this.prefixNo === 'QTRK') {
@@ -538,12 +543,6 @@ export const BillModalMixin = {
                   }
                 })
               }
-              if (this.prefixNo === 'QTCK') {
-                target.setValues([{
-                  rowKey: row.id,
-                  values: { expirationDate: '', batchNumber: '', productionDate: '' }
-                }])
-              }
             }
           });
           break;
@@ -674,7 +673,7 @@ export const BillModalMixin = {
           break;
         case "productionDate":
           batchNumber = ""
-          let expirationDate
+          let expirationDate = ""
           if (row.productionDate) {
             batchNumber = row.productionDate.replaceAll('-', '')
             if (row.expiryNum) {
@@ -690,9 +689,6 @@ export const BillModalMixin = {
     },
     //转为商品对象
     parseInfoToObj(mInfo) {
-      if (this.priceLimit && this.prefixNo === 'QTRK') {
-        mInfo['billPrice'] = 0
-      }
       return {
         barCode: mInfo.mBarCode,
         name: mInfo.name,
@@ -706,7 +702,10 @@ export const BillModalMixin = {
         otherField3: mInfo.otherField3,
         unit: mInfo.commodityUnit,
         sku: mInfo.sku,
+        batchNumber: '',
+        productionDate: '',
         expiryNum: mInfo.expiryNum,
+        expirationDate: '',
         operNumber: 1,
         unitPrice: mInfo.billPrice,
         allPrice: mInfo.billPrice,

@@ -26,7 +26,7 @@
         <a-row class="form-row" :gutter="24">
           <a-col :lg="6" :md="12" :sm="24">
             <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="供应商">
-              <a-select placeholder="请选择供应商" v-decorator="[ 'organId' ]" :disabled="!rowCanEdit"
+              <a-select placeholder="请选择供应商" v-decorator="[ 'organId', validatorRules.organId ]" :disabled="!rowCanEdit"
                 :dropdownMatchSelectWidth="false" showSearch optionFilterProp="children">
                 <div slot="dropdownRender" slot-scope="menu">
                   <v-nodes :vnodes="menu" />
@@ -118,7 +118,7 @@
           <a-col :lg="6" :md="12" :sm="24">
             <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="金额" data-step="7" data-title="金额"
                          data-intro="针对单据明细中商品总金额进行优惠后的金额">
-              <a-input placeholder="请输入优惠后金额" v-decorator.trim="[ 'discountLastMoney' ]" :readOnly="true"/>
+              <a-input style="width:80%;" placeholder="请输入优惠后金额" v-decorator.trim="[ 'discountLastMoney' ]" :readOnly="true"/>
             </a-form-item>
           </a-col>
           <a-col :lg="6" :md="12" :sm="24">
@@ -140,11 +140,31 @@
           </a-col>
         </a-row>
         <a-row class="form-row" :gutter="24">
-          <a-col v-if="depositStatus" :lg="6" :md="12" :sm="24">
-            <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="扣除订金">
-              <a-input v-decorator.trim="[ 'deposit' ]" @change="onChangeDeposit"/>
+          <a-col :lg="6" :md="12" :sm="24">
+            <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="结算账户" data-step="9" data-title="结算账户"
+                         data-intro="如果在下拉框中选择多账户，则可以通过多个结算账户进行结算">
+              <a-select style="width:80%;" placeholder="请选择结算账户" v-decorator="[ 'accountId', validatorRules.accountId ]"
+                        :dropdownMatchSelectWidth="false" allowClear @select="selectAccount">
+                <div slot="dropdownRender" slot-scope="menu">
+                  <v-nodes :vnodes="menu" />
+                  <a-divider style="margin: 4px 0;" />
+                  <div v-if="quickBtn.account" class="dropdown-btn" @mousedown="e => e.preventDefault()" @click="addAccount"><a-icon type="plus" /> 新增</div>
+                  <div class="dropdown-btn" @mousedown="e => e.preventDefault()" @click="initAccount(0)"><a-icon type="reload" /> 刷新</div>
+                </div>
+                <a-select-option v-for="(item,index) in accountList" :key="index" :value="item.id">
+                  {{ item.name }}
+                </a-select-option>
+              </a-select>
+              <a-tooltip title="多账户明细">
+                <a-button type="default" icon="folder" style="margin-left: 8px;" size="small" v-show="manyAccountBtnStatus" @click="handleManyAccount"/>
+              </a-tooltip>
             </a-form-item>
           </a-col>
+<!--          <a-col v-if="depositStatus" :lg="6" :md="12" :sm="24">-->
+<!--            <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="扣除订金">-->
+<!--              <a-input v-decorator.trim="[ 'deposit' ]" @change="onChangeDeposit"/>-->
+<!--            </a-form-item>-->
+<!--          </a-col>-->
         </a-row>
         <a-row class="form-row" :gutter="24">
           <a-col :lg="6" :md="12" :sm="24">
@@ -177,7 +197,7 @@
   import { FormTypes } from '@/utils/JEditableTableUtil'
   import { JEditableTableMixin } from '@/mixins/JEditableTableMixin'
   import { BillModalMixin } from '../mixins/BillModalMixin'
-  import { getMpListShort } from "@/utils/util"
+  import { changeListFmtMinus, getMpListShort } from '@/utils/util'
   import JUpload from '@/components/jeecg/JUpload'
   import JDate from '@/components/jeecg/JDate'
   import Vue from 'vue'
@@ -283,6 +303,16 @@
             rules: [
               { required: true, message: '请选择类型!' }
             ]
+          },
+          organId:{
+            rules: [
+              { required: true, message: '请选择供应商!' }
+            ]
+          },
+          accountId:{
+            rules: [
+              { required: true, message: '请选择结算账户!' }
+            ]
           }
         },
         url: {
@@ -319,6 +349,14 @@
           }
           this.model.operTime = this.model.operTimeStr
           this.model.debt = (this.model.discountLastMoney + this.model.otherMoney - this.model.deposit - this.model.changeAmount).toFixed(2)
+          if(this.model.accountId == null) {
+            this.model.accountId = 0
+            this.manyAccountBtnStatus = true
+            this.accountIdList = this.model.accountIdList
+            this.accountMoneyList = this.model.accountMoneyList
+          } else {
+            this.manyAccountBtnStatus = false
+          }
           this.fileList = this.model.fileName
           this.$nextTick(() => {
             this.form.setFieldsValue(pick(this.model,'organId', 'operTime', 'number', 'linkNumber', 'remark',
@@ -342,6 +380,7 @@
         this.initSystemConfig()
         this.initSupplier(0)
         this.initDepot()
+        this.initAccount(0)
         this.initPlatform()
         this.initQuickBtn()
         this.handleChangeOtherField()
@@ -358,6 +397,12 @@
         }
         billMain.totalPrice = 0-totalPrice
         billMain.changeAmount = 0-billMain.changeAmount
+        if(billMain.accountId === 0) {
+          billMain.accountId = ''
+        }
+        this.accountMoneyList = changeListFmtMinus(this.accountMoneyList)
+        billMain.accountIdList = this.accountIdList.length>0 ? JSON.stringify(this.accountIdList) : ""
+        billMain.accountMoneyList = this.accountMoneyList.length>0 ? JSON.stringify(this.accountMoneyList) : ""
         if(this.fileList && this.fileList.length > 0) {
           billMain.fileName = this.fileList
         } else {

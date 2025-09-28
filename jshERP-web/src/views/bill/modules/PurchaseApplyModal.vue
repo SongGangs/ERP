@@ -180,6 +180,9 @@
           dataSource: [],
           columns: [
             { title: '', key: 'hiddenKey', width: '1%', type: FormTypes.hidden },
+            { title: '数量', key: 'operNumber', width: '6%', type: FormTypes.inputNumber, statistics: true,
+              validateRules: [{ required: true, message: '${title}不能为空' }]
+            },
             { title: '条码', key: 'barCode', width: '12%', type: FormTypes.popupJsh, kind: 'material', multi: true,
               validateRules: [{ required: true, message: '${title}不能为空' }]
             },
@@ -194,9 +197,6 @@
             { title: '扩展3', key: 'otherField3', width: '4%', type: FormTypes.normal },
             { title: '单位', key: 'unit', width: '6%', type: FormTypes.normal },
             { title: '多属性', key: 'sku', width: '10%', type: FormTypes.normal },
-            { title: '数量', key: 'operNumber', width: '6%', type: FormTypes.inputNumber, statistics: true,
-              validateRules: [{ required: true, message: '${title}不能为空' }]
-            },
             { title: '备注', key: 'remark', width: '8%', type: FormTypes.input},
           ]
         },
@@ -279,7 +279,6 @@
         let detailArr = allValues.tablesValue[0].values
         billMain.type = '其它'
         billMain.subType = '请购单'
-        billMain.organId = this.model.depotId
         for(let item of detailArr){
           totalPrice += item.allPrice-0
           item.depotId = this.model.depotId

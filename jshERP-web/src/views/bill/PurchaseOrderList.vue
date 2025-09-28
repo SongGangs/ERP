@@ -153,8 +153,8 @@
             @change="handleTableChange">
             <span slot="action" slot-scope="text, record">
               <a @click="myHandleDetail(record, '采购订单', prefixNo)">查看</a>
-              <a-divider v-if="quickBtn.purchaseIn.indexOf(1)>-1 && btnEnableList.indexOf(1)>-1 && (record.status === '1' || record.status === '3')" type="vertical" />
-              <a v-if="quickBtn.purchaseIn.indexOf(1)>-1 && btnEnableList.indexOf(1)>-1 && (record.status === '1' || record.status === '3')" @click="doTransferBill('转采购入库', quickBtn.purchaseIn, record)" style="color: red;">入库</a>
+              <a-divider v-if="quickBtn.purchaseIn.indexOf(1)>-1 && (record.status === '1' || record.status === '3')" type="vertical" />
+              <a v-if="quickBtn.purchaseIn.indexOf(1)>-1 && (record.status === '1' || record.status === '3')" @click="doTransferBill('转采购入库', quickBtn.purchaseIn, record)" style="color: red;">入库</a>
               <a-divider v-if="btnEnableList.indexOf(1)>-1 && record.status === '0'" type="vertical" />
               <a v-if="btnEnableList.indexOf(1)>-1 && record.status === '0'" @click="myHandleEdit(record)">编辑</a>
               <a-divider v-if="btnEnableList.indexOf(1)>-1" type="vertical" />
