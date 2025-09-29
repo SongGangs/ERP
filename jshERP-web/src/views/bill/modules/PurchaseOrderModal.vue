@@ -74,7 +74,7 @@
                          data-intro="仓库必须选择，如果发现需要选择的仓库尚未录入，可以在下拉框中点击新增仓库进行录入">
               <a-select placeholder="请选择仓库" v-decorator="[ 'depotId', validatorRules.depotId ]" :disabled="!rowCanEdit"
                         :dropdownMatchSelectWidth="false" showSearch optionFilterProp="children">
-                <div slot="dropdownDepot" slot-scope="menu">
+                <div slot="dropdownRender" slot-scope="menu">
                   <v-nodes :vnodes="menu" />
                   <a-divider style="margin: 4px 0;" />
                   <div v-if="quickBtn.depot" class="dropdown-btn" @mousedown="e => e.preventDefault()" @click="addDepot"><a-icon type="plus" /> 新增仓库</div>
@@ -197,6 +197,7 @@
     <import-item-modal ref="importItemModalForm" @ok="importItemModalFormOk"></import-item-modal>
     <vendor-modal ref="vendorModalForm" @ok="vendorModalFormOk"></vendor-modal>
     <account-modal ref="accountModalForm" @ok="accountModalFormOk"></account-modal>
+    <depot-modal ref="depotModalForm" @ok="depotModalOk"></depot-modal>
     <link-bill-list ref="linkBillList" @ok="linkBillListOk"></link-bill-list>
     <history-bill-list ref="historyBillListModalForm"></history-bill-list>
     <workflow-iframe ref="modalWorkflow" @ok="workflowModalFormOk"></workflow-iframe>
@@ -223,10 +224,12 @@
   import JUpload from '@/components/jeecg/JUpload'
   import JDate from '@/components/jeecg/JDate'
   import Vue from 'vue'
+  import DepotModal from '@views/system/modules/DepotModal.vue'
   export default {
     name: "PurchaseOrderModal",
     mixins: [JEditableTableMixin,BillModalMixin],
     components: {
+      DepotModal,
       ManyAccountModal,
       ImportItemModal,
       LinkBillList,

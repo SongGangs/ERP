@@ -428,6 +428,9 @@ export const BillModalMixin = {
     depotModalFormOk() {
       this.initDepot()
     },
+    depotModalOk() {
+      this.initModelDepot(1)
+    },
     accountModalFormOk() {
       this.initAccount(1)
     },
@@ -475,6 +478,13 @@ export const BillModalMixin = {
           }
           break;
         case "barCode":
+          if (value === ""){
+            target.setValues([{rowKey: row.id, values: {name: "", standard: null, unit:"",
+                stock: 0, expiryNum: null, operNumber: 0, unitPrice: 0, allPrice: 0, taxMoney: 0, taxLastMoney: 0}}])
+            target.recalcAllStatisticsColumns()
+            that.autoChangePrice(target)
+            return
+          }
           param = {
             barCode: value,
             organId: this.form.getFieldValue('organId'),
@@ -573,6 +583,14 @@ export const BillModalMixin = {
               if(rowId.length<=19) {
                 depotItemId = rowId-0
               }
+            }
+            if (value === ""){
+              target.setValues([{rowKey: row.id, values: {expirationDate: "", expiryNum: null,
+                  productionDate: "", operNumber: 0, unitPrice: 0,
+                  allPrice: 0, taxMoney: 0, taxLastMoney: 0}}])
+              target.recalcAllStatisticsColumns()
+              that.autoChangePrice(target)
+              return
             }
             getBatchNumberList({name:'', depotItemId: depotItemId, depotId: row.depotId, barCode: row.barCode, batchNumber: batchNumber}).then((res) => {
               if (res && res.code === 200) {

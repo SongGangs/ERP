@@ -521,16 +521,16 @@
               'accountId': accountId,
               'remark': remark
             })
-            getCurrentSystemConfig().then((res) => {
-              if (res.code === 200 && res.data) {
-                let flag = res.data.zeroChangeAmountFlag==='1'?true:false
-                if(flag) {
-                  //切换收付款的金额为0
-                  let oldChangeAmount = this.form.getFieldValue('changeAmount')-0
-                  this.form.setFieldsValue({'changeAmount':0, 'debt':oldChangeAmount})
-                }
-              }
-            })
+            // getCurrentSystemConfig().then((res) => {
+            //   if (res.code === 200 && res.data) {
+            //     let flag = res.data.zeroChangeAmountFlag==='1'?true:false
+            //     if(flag) {
+            //       //切换收付款的金额为0
+            //       let oldChangeAmount = this.form.getFieldValue('changeAmount')-0
+            //       this.form.setFieldsValue({'changeAmount':0, 'debt':oldChangeAmount})
+            //     }
+            //   }
+            // })
           })
           //判断后进行仓库的切换
           if(depotId) {

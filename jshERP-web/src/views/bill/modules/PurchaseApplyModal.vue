@@ -30,7 +30,7 @@
                          data-intro="仓库必须选择，如果发现需要选择的仓库尚未录入，可以在下拉框中点击新增仓库进行录入">
               <a-select placeholder="请选择仓库" v-decorator="[ 'depotId', validatorRules.depotId ]"
                         :dropdownMatchSelectWidth="false" showSearch optionFilterProp="children">
-                <div slot="dropdownDepot" slot-scope="menu">
+                <div slot="dropdownRender" slot-scope="menu">
                   <v-nodes :vnodes="menu" />
                   <a-divider style="margin: 4px 0;" />
                   <div v-if="quickBtn.depot" class="dropdown-btn" @mousedown="e => e.preventDefault()" @click="addDepot"><a-icon type="plus" /> 新增仓库</div>
@@ -111,6 +111,7 @@
     <import-item-modal ref="importItemModalForm" @ok="importItemModalFormOk"></import-item-modal>
     <history-bill-list ref="historyBillListModalForm"></history-bill-list>
     <workflow-iframe ref="modalWorkflow" @ok="workflowModalFormOk"></workflow-iframe>
+    <depot-modal ref="depotModalForm" @ok="depotModalOk"></depot-modal>
     <bill-print-iframe ref="modalPrint"></bill-print-iframe>
     <bill-print-pro-iframe ref="modalPrintPro"></bill-print-pro-iframe>
   </j-modal>
@@ -195,6 +196,7 @@
             { title: '扩展1', key: 'otherField1', width: '4%', type: FormTypes.normal },
             { title: '扩展2', key: 'otherField2', width: '4%', type: FormTypes.normal },
             { title: '扩展3', key: 'otherField3', width: '4%', type: FormTypes.normal },
+            { title: '库存', key: 'stock', width: '4%', type: FormTypes.normal },
             { title: '单位', key: 'unit', width: '6%', type: FormTypes.normal },
             { title: '多属性', key: 'sku', width: '10%', type: FormTypes.normal },
             { title: '备注', key: 'remark', width: '8%', type: FormTypes.input},

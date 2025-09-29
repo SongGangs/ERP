@@ -13,20 +13,17 @@
                 </a-form-item>
               </a-col>
               <a-col :md="6" :sm="24">
-                <a-form-item label="商品信息" :labelCol="labelCol" :wrapperCol="wrapperCol">
-                  <a-input placeholder="请输入条码、名称、助记码、规格、型号等信息" v-model="queryParam.materialParam"></a-input>
+                <a-form-item label="仓库名称" :labelCol="labelCol" :wrapperCol="wrapperCol">
+                  <a-select placeholder="请选择仓库" showSearch allow-clear optionFilterProp="children" v-model="queryParam.depotId">
+                    <a-select-option v-for="(depot,index) in depotList" :key="index" :value="depot.id">
+                      {{ depot.depotName }}
+                    </a-select-option>
+                  </a-select>
                 </a-form-item>
               </a-col>
               <a-col :md="6" :sm="24">
-                <a-form-item label="单据日期" :labelCol="labelCol" :wrapperCol="wrapperCol">
-                  <a-range-picker
-                    style="width:100%"
-                    v-model="queryParam.createTimeRange"
-                    format="YYYY-MM-DD"
-                    :placeholder="['开始时间', '结束时间']"
-                    @change="onDateChange"
-                    @ok="onDateOk"
-                  />
+                <a-form-item label="商品信息" :labelCol="labelCol" :wrapperCol="wrapperCol">
+                  <a-input placeholder="请输入条码、名称、助记码、规格、型号等信息" v-model="queryParam.materialParam"></a-input>
                 </a-form-item>
               </a-col>
               <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
@@ -49,6 +46,18 @@
                         {{ item.supplier }}
                       </a-select-option>
                     </a-select>
+                  </a-form-item>
+                </a-col>
+                <a-col :md="6" :sm="24">
+                  <a-form-item label="单据日期" :labelCol="labelCol" :wrapperCol="wrapperCol">
+                    <a-range-picker
+                      style="width:100%"
+                      v-model="queryParam.createTimeRange"
+                      format="YYYY-MM-DD"
+                      :placeholder="['开始时间', '结束时间']"
+                      @change="onDateChange"
+                      @ok="onDateOk"
+                    />
                   </a-form-item>
                 </a-col>
                 <a-col :md="6" :sm="24">
@@ -301,6 +310,7 @@
     },
     created() {
       this.initSystemConfig()
+      this.getDepotData()
       this.initSupplier()
       this.initUser()
       this.initQuickBtn()
