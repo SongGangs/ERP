@@ -698,6 +698,3 @@ INSERT INTO `jsh_user_business` VALUES (5, 'RoleFunctions', '3', '[261][241][33]
 -- 额外用户
 INSERT INTO `jsh_user_business` VALUES (6, 'UserRole', '3', '[3]', NULL, 2, '0');
 INSERT INTO `jsh_user_business` VALUES (7, 'UserRole', '4', '[3]', NULL, 2, '0');
-INSERT INTO `jsh_user_business` VALUES (8, 'UserDepot', '2', '[1][2]', NULL, 2, '0');
-INSERT INTO `jsh_user_business` VALUES (9, 'UserDepot', '4', '[2]', NULL, 2, '0');
-INSERT INTO `jsh_user_business` VALUES (10, 'UserDepot', '3', '[1]', NULL, 2, '0');
