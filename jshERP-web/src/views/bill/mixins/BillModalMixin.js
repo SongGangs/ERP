@@ -105,7 +105,7 @@ export const BillModalMixin = {
         this.form.setFieldsValue({'operTime':getNowFormatDateTime(), 'discount': 0,
           'discountMoney': 0, 'discountLastMoney': 0, 'otherMoney': 0, 'changeAmount': 0, 'debt': 0})
       })
-      if (this.prefixNo !== 'QGD' && this.prefixNo !== 'QTCK' && this.transferParam.accountId === undefined) {
+      if (this.prefixNo !== 'QGD' && this.prefixNo !== 'QTCK' && this.prefixNo !== 'QTRK' && this.transferParam.accountId === undefined) {
         this.$nextTick(() => {
           getAccount({}).then((res)=>{
             if(res && res.code === 200) {
