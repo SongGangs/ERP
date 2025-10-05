@@ -9,6 +9,7 @@ import com.jsh.erp.datasource.vo.AccountVo4InOutList;
 import com.jsh.erp.datasource.vo.AccountVo4List;
 import com.jsh.erp.service.AccountService;
 import com.jsh.erp.service.SystemConfigService;
+import com.jsh.erp.service.UserBusinessService;
 import com.jsh.erp.utils.BaseResponseInfo;
 import com.jsh.erp.utils.Constants;
 import com.jsh.erp.utils.ErpInfo;
@@ -43,6 +44,9 @@ public class AccountController extends BaseController {
 
     @Resource
     private SystemConfigService systemConfigService;
+
+    @Resource
+    private UserBusinessService userBusinessService;
 
     @GetMapping(value = "/info")
     @ApiOperation(value = "根据id获取信息")
@@ -216,6 +220,78 @@ public class AccountController extends BaseController {
             res.code = 200;
             res.data = map;
         } catch(Exception e){
+            logger.error(e.getMessage(), e);
+            res.code = 500;
+            res.data = "获取数据失败";
+        }
+        return res;
+    }
+
+
+    /**
+     * 用户对应账户显示
+     * @param type
+     * @param keyId
+     * @param request
+     * @return
+     */
+    @GetMapping(value = "/findUserAccount")
+    @ApiOperation(value = "用户对应账户显示")
+    public JSONArray findUserDepot(@RequestParam("UBType") String type, @RequestParam("UBKeyId") String keyId,
+                                   HttpServletRequest request) throws Exception{
+        JSONArray arr = new JSONArray();
+        try {
+            //获取权限信息
+            String ubValue = userBusinessService.getUBValueByTypeAndKeyId(type, keyId);
+            List<Account> dataList = accountService.getAccount();
+            //开始拼接json数据
+            JSONObject outer = new JSONObject();
+            outer.put("id", 0);
+            outer.put("key", 0);
+            outer.put("value", 0);
+            outer.put("title", "账户列表");
+            outer.put("attributes", "账户列表");
+            //存放数据json数组
+            JSONArray dataArray = new JSONArray();
+            if (null != dataList) {
+                for (Account account : dataList) {
+                    JSONObject item = new JSONObject();
+                    item.put("id", account.getId());
+                    item.put("key", account.getId());
+                    item.put("value", account.getId());
+                    item.put("title", account.getName());
+                    item.put("attributes", account.getName());
+                    if (ubValue.contains("[" + account.getId().toString() + "]")) {
+                        item.put("checked", true);
+                    }
+                    dataArray.add(item);
+                }
+            }
+            outer.put("children", dataArray);
+            arr.add(outer);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
+        return arr;
+    }
+
+    /**
+     * 获取当前用户拥有权限的仓库列表
+     * @param request
+     * @return
+     * @throws Exception
+     */
+    @GetMapping(value = "/findAccountByCurrentUser")
+    @ApiOperation(value = "获取当前用户拥有权限的账户列表")
+    public BaseResponseInfo findAccountByCurrentUser(HttpServletRequest request) throws Exception{
+        BaseResponseInfo res = new BaseResponseInfo();
+        try {
+            Map<String, Object> map = new HashMap<String, Object>();
+            List<Account> accountList = accountService.findAccountByCurrentUser();
+            map.put("accountList", accountList);
+            res.code = 200;
+            res.data = map;
+        } catch (Exception e) {
             logger.error(e.getMessage(), e);
             res.code = 500;
             res.data = "获取数据失败";

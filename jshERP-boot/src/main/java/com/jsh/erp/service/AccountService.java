@@ -1,5 +1,6 @@
 package com.jsh.erp.service;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.jsh.erp.base.PageDomain;
 import com.jsh.erp.base.TableSupport;
@@ -14,6 +15,7 @@ import com.jsh.erp.exception.JshException;
 import com.jsh.erp.utils.PageUtils;
 import com.jsh.erp.utils.StringUtil;
 import com.jsh.erp.utils.Tools;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class AccountService {
@@ -57,6 +60,8 @@ public class AccountService {
     private UserService userService;
     @Resource
     private SystemConfigService systemConfigService;
+    @Resource
+    private UserBusinessService userBusinessService;
 
     public Account getAccount(long id) throws Exception{
         return accountMapper.selectByPrimaryKey(id);
@@ -172,6 +177,27 @@ public class AccountService {
         int result=0;
         try{
             result = accountMapper.insertSelective(account);
+            //新增仓库时给当前用户自动授权
+            Long userId = userService.getUserId(request);
+            Long accountId = getIdByName(account.getName());
+            String ubKey = "[" + accountId + "]";
+            String type = "UserAccount";
+            List<UserBusiness> ubList = userBusinessService.getBasicData(userId.toString(), type);
+            if (CollectionUtils.isEmpty(ubList)) {
+                JSONObject ubObj = new JSONObject();
+                ubObj.put("type", type);
+                ubObj.put("keyId", userId);
+                ubObj.put("value", ubKey);
+                userBusinessService.insertUserBusiness(ubObj, request);
+            } else {
+                UserBusiness ubInfo = ubList.get(0);
+                JSONObject ubObj = new JSONObject();
+                ubObj.put("id", ubInfo.getId());
+                ubObj.put("type", ubInfo.getType());
+                ubObj.put("keyId", ubInfo.getKeyId());
+                ubObj.put("value", ubInfo.getValue() + ubKey);
+                userBusinessService.updateUserBusiness(ubObj, request);
+            }
             logService.insertLog("账户",
                     new StringBuffer(BusinessConstants.LOG_OPERATION_TYPE_ADD).append(account.getName()).toString(), request);
         }catch(Exception e){
@@ -276,6 +302,45 @@ public class AccountService {
             JshException.readFail(logger, e);
         }
         return list==null?0:list.size();
+    }
+
+    public List<Account> findAccountByCurrentUser() throws Exception {
+        List<Account> accounts = getAccount();
+        if (CollectionUtils.isEmpty(accounts)) {
+            return Collections.emptyList();
+        }
+        String type = "UserAccount";
+        Long userId = userService.getCurrentUser().getId();
+        List<UserBusiness> userBusinesses = userBusinessService.getBasicData(userId.toString(), type);
+        if (CollectionUtils.isEmpty(userBusinesses)) {
+            return Collections.emptyList();
+        }
+        String accountStr = userBusinesses.get(0).getValue();
+        if (StringUtil.isEmpty(accountStr)) {
+            return Collections.emptyList();
+        }
+        List<Long> accountIds = Arrays.stream(accountStr.split("\\D+"))
+                .filter(StringUtil::isNotEmpty)
+                .mapToLong(Integer::parseInt)
+                .boxed()
+                .collect(Collectors.toList());
+        return accounts.stream().filter(a -> accountIds.contains(a.getId())).collect(Collectors.toList());
+    }
+
+    /**
+     * 根据名称获取id
+     *
+     * @param name
+     */
+    public Long getIdByName(String name) {
+        Long id = 0L;
+        AccountExample example = new AccountExample();
+        example.createCriteria().andNameEqualTo(name).andDeleteFlagNotEqualTo(BusinessConstants.DELETE_FLAG_DELETED);
+        List<Account> list = accountMapper.selectByExample(example);
+        if (CollectionUtils.isNotEmpty(list)) {
+            id = list.get(0).getId();
+        }
+        return id;
     }
 
     public List<Account> findBySelect()throws Exception {
