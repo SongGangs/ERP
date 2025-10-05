@@ -35,7 +35,7 @@ const getPersonByNumType = (params)=>getAction("/person/getPersonByNumType",para
 const addAccount = (params)=>postAction("/account/add",params);
 const editAccount = (params)=>putAction("/account/update",params);
 const checkAccount = (params)=>getAction("/account/checkIsNameExist",params);
-const getAccount = (params)=>getAction("/account/getAccount",params);
+const getAccount = (params)=>getAction("/account/findAccountByCurrentUser",params);
 //收支项目
 const addInOutItem = (params)=>postAction("/inOutItem/add",params);
 const editInOutItem = (params)=>putAction("/inOutItem/update",params);

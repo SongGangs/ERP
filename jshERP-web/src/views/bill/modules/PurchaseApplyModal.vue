@@ -182,7 +182,11 @@
           columns: [
             { title: '', key: 'hiddenKey', width: '1%', type: FormTypes.hidden },
             { title: '数量', key: 'operNumber', width: '6%', type: FormTypes.inputNumber, statistics: true,
-              validateRules: [{ required: true, message: '${title}不能为空' }]
+              validateRules: [{ required: true, message: '${title}不能为空' },
+                {
+                  pattern: /^(0*[1-9]\d*(\.\d+)?|0*\.0*[1-9]\d*)$/,
+                  message: '${title}必须大于0'
+                }]
             },
             { title: '条码', key: 'barCode', width: '12%', type: FormTypes.popupJsh, kind: 'material', multi: true,
               validateRules: [{ required: true, message: '${title}不能为空' }]

@@ -608,6 +608,9 @@ export const BillModalMixin = {
                   } else {
                     operNumber = totalNum
                   }
+                  if (this.prefixNo === 'QTCK' ||this.prefixNo === 'DBCK') {
+                    operNumber = 0
+                  }
                   taxRate = row.taxRate-0 //税率
                   unitPrice = info.unitPrice-0 //单价
                   allPrice = (unitPrice*operNumber).toFixed(2)-0
@@ -707,6 +710,10 @@ export const BillModalMixin = {
     },
     //转为商品对象
     parseInfoToObj(mInfo) {
+      let billPrice = 0
+      if (this.prefixNo !== 'QTRK') {
+        billPrice = mInfo.billPrice
+      }
       return {
         barCode: mInfo.mBarCode,
         name: mInfo.name,
@@ -725,11 +732,11 @@ export const BillModalMixin = {
         expiryNum: mInfo.expiryNum,
         expirationDate: '',
         operNumber: 1,
-        unitPrice: mInfo.billPrice,
-        allPrice: mInfo.billPrice,
+        unitPrice: billPrice,
+        allPrice: billPrice,
         taxRate: 0,
         taxMoney: 0,
-        taxLastMoney: mInfo.billPrice
+        taxLastMoney: billPrice
       }
     },
     //使得型号、颜色、扩展信息、sku等为隐藏
@@ -806,7 +813,7 @@ export const BillModalMixin = {
     },
     hiddenPriceColumns() {
       let prefixNo = this.prefixNo
-      if (prefixNo === 'CGRK' || prefixNo === 'CGDD' || prefixNo === 'CGTH' || prefixNo === 'QTCK') {
+      if (prefixNo === 'CGRK' || prefixNo === 'CGDD' || prefixNo === 'CGTH' || prefixNo === 'QTCK' || prefixNo === 'DBCK') {
         if (this.priceLimit) {
           let priceColumns = ['unitPrice', 'allPrice', 'taxRate', 'taxMoney', 'taxLastMoney']
           priceColumns.forEach(item => {

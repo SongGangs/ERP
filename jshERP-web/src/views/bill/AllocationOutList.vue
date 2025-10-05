@@ -90,7 +90,7 @@
               <a-checkbox-group @change="onColChange" v-model="settingDataIndex" :defaultValue="settingDataIndex">
                 <a-row style="width: 500px">
                   <template v-for="(item,index) in defColumns">
-                    <template>
+                    <template v-if="!priceLimit || !['totalPrice'].includes(item.dataIndex)">
                       <a-col :span="8">
                         <a-checkbox :value="item.dataIndex">
                           <j-ellipsis :value="item.title" :length="10"></j-ellipsis>

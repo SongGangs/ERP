@@ -214,6 +214,7 @@
           remark: ""
         },
         prefixNo: 'QGD',
+        depotList: [],
         labelCol: {
           span: 5
         },

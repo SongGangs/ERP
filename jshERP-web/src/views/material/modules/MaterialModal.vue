@@ -672,7 +672,7 @@
           this.$message.warning('抱歉，多属性商品不能勾选多单位，请切换为单个单位！');
           return;
         }
-        if (formData.enableBatchNumber === '1' && (formData.expiryNum === null || formData.expiryNum <= 0)) {
+        if (formData.enableBatchNumber === '1' && (formData.expiryNum === null || formData.expiryNum <= 0 || formData.expiryNum === undefined)) {
           this.$message.warning('抱歉，批号商品必须填写保质期天数！')
           return;
         }

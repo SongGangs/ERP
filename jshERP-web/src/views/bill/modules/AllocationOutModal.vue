@@ -133,6 +133,7 @@
         operTimeStr: '',
         prefixNo: 'DBCK',
         fileList:[],
+        priceLimit: false,
         model: {},
         labelCol: {
           xs: { span: 24 },
@@ -173,7 +174,11 @@
             { title: '有效期至', key: 'expirationDate',width: '7%', type: FormTypes.input, readonly: true },
             { title: '多属性', key: 'sku', width: '9%', type: FormTypes.normal },
             { title: '数量', key: 'operNumber', width: '5%', type: FormTypes.inputNumber, statistics: true,
-              validateRules: [{ required: true, message: '${title}不能为空' }]
+              validateRules: [{ required: true, message: '${title}不能为空' },
+                {
+                  pattern: /^(0*[1-9]\d*(\.\d+)?|0*\.0*[1-9]\d*)$/,
+                  message: '${title}必须大于0'
+                }]
             },
             { title: '单价', key: 'unitPrice', width: '5%', type: FormTypes.inputNumber},
             { title: '金额', key: 'allPrice', width: '5%', type: FormTypes.inputNumber, statistics: true },
@@ -209,7 +214,10 @@
     },
     methods: {
       //调用完edit()方法之后会自动调用此方法
-      editAfter() {
+      editAfter(record) {
+        if (record){
+          this.priceLimit = record.priceLimit
+        }
         this.billStatus = '0'
         this.currentSelectDepotId = ''
         this.changeColumnHide()

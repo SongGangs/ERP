@@ -690,7 +690,7 @@ export const BillListMixin = {
       })
     },
     async getCurrentPriceLimit(prefixNo) {
-      if (prefixNo === 'CGRK' || prefixNo === 'CGDD' || prefixNo === 'CGTH' || prefixNo === 'QTCK' || prefixNo === 'QTRK') {
+      if (prefixNo === 'CGRK' || prefixNo === 'CGDD' || prefixNo === 'CGTH' || prefixNo === 'QTCK' || prefixNo === 'QTRK' || prefixNo === 'DBCK') {
         await getAction('/user/getCurrentPriceLimit', {}).then(res => {
           if (res && res.code === 200) {
             this.priceLimit = res.data.priceLimit.includes(4)

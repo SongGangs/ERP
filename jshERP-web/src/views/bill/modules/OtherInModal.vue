@@ -276,7 +276,11 @@
             { title: '原数量', key: 'preNumber', width: '4%', type: FormTypes.normal },
             { title: '已入库', key: 'finishNumber', width: '4%', type: FormTypes.normal },
             { title: '数量', key: 'operNumber', width: '4%', type: FormTypes.inputNumber, statistics: true,
-              validateRules: [{ required: true, message: '${title}不能为空' }]
+              validateRules: [{ required: true, message: '${title}不能为空' },
+                {
+                  pattern: /^(0*[1-9]\d*(\.\d+)?|0*\.0*[1-9]\d*)$/,
+                  message: '${title}必须大于0'
+                }]
             },
             { title: '单价', key: 'unitPrice', width: '4%', type: FormTypes.inputNumber},
             { title: '金额', key: 'allPrice', width: '4%', type: FormTypes.inputNumber, statistics: true },

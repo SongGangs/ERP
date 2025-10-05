@@ -49,6 +49,8 @@
             <span slot="action" slot-scope="text, record">
               <a v-if="btnEnableList.indexOf(1)>-1 && depotFlag === '1' " @click="btnSetDepot(record)">分配仓库</a>
               <a-divider v-if="btnEnableList.indexOf(1)>-1 && depotFlag === '1'" type="vertical" />
+              <a v-if="btnEnableList.indexOf(1)>-1" @click="btnSetAccount(record)">分配账户</a>
+              <a-divider v-if="btnEnableList.indexOf(1)>-1" type="vertical" />
               <a v-if="btnEnableList.indexOf(1)>-1 && customerFlag === '1'" @click="btnSetCustomer(record)">分配客户</a>
               <a-divider v-if="btnEnableList.indexOf(1)>-1 && customerFlag === '1'" type="vertical" />
               <a @click="handleEdit(record)">编辑</a>
@@ -71,6 +73,7 @@
         <!-- table区域-end -->
         <user-modal ref="modalForm" @ok="modalFormOk"></user-modal>
         <user-depot-modal ref="userDepotModal" @ok="modalFormOk"></user-depot-modal>
+        <user-account-modal ref="userAccountModal" @ok="modalFormOk"></user-account-modal>
         <user-customer-modal ref="userCustomerModal" @ok="modalFormOk"></user-customer-modal>
       </a-card>
     </a-col>
@@ -81,6 +84,7 @@
   import UserModal from './modules/UserModal'
   import UserDepotModal from './modules/UserDepotModal'
   import UserCustomerModal from './modules/UserCustomerModal'
+  import UserAccountModal from './modules/UserAccountModal'
   import {postAction} from '@/api/manage';
   import {getCurrentSystemConfig} from '@/api/api'
   import {JeecgListMixin} from '@/mixins/JeecgListMixin'
@@ -91,6 +95,7 @@
     components: {
       UserModal,
       UserDepotModal,
+      UserAccountModal,
       UserCustomerModal,
       JInput
     },
@@ -189,6 +194,11 @@
         this.$refs.userDepotModal.edit(record);
         this.$refs.userDepotModal.title = "分配仓库给：" + record.username
         this.$refs.userDepotModal.disableSubmit = false;
+      },
+      btnSetAccount(record) {
+        this.$refs.userAccountModal.edit(record);
+        this.$refs.userAccountModal.title = "分配账户给：" + record.username
+        this.$refs.userAccountModal.disableSubmit = false;
       },
       btnSetCustomer(record) {
         this.$refs.userCustomerModal.edit(record);

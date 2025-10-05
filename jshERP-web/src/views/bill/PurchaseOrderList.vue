@@ -242,6 +242,7 @@
           remark: ""
         },
         prefixNo: 'CGDD',
+        depotList: [],
         labelCol: {
           span: 5
         },
