@@ -539,7 +539,7 @@ public class DepotItemService {
                         //在新增模式进行状态赋值
                         BigDecimal preNumber = rowObj.getBigDecimal("preNumber");
                         BigDecimal finishNumber = rowObj.getBigDecimal("finishNumber");
-                        if(depotItem.getOperNumber().add(finishNumber).compareTo(preNumber)>0) {
+                        if (!"采购订单".equals(depotHead.getSubType()) && depotItem.getOperNumber().add(finishNumber).compareTo(preNumber) > 0) {
                             if(!systemConfigService.getOverLinkBillFlag()) {
                                 throw new BusinessRunTimeException(ExceptionConstants.DEPOT_HEAD_NUMBER_NEED_EDIT_FAILED_CODE,
                                         String.format(ExceptionConstants.DEPOT_HEAD_NUMBER_NEED_EDIT_FAILED_MSG, barCode));
@@ -557,7 +557,7 @@ public class DepotItemService {
                             //除去此单据之外的已入库|已出库
                             BigDecimal realFinishNumber = getRealFinishNumber(currentSubType, depotItem.getMaterialExtendId(), depotItem.getLinkId(), preHeaderId, headerId, unitInfo, unit);
                             if(preNumber!=null) {
-                                if (depotItem.getOperNumber().add(realFinishNumber).compareTo(preNumber) > 0) {
+                                if (!"采购订单".equals(depotHead.getSubType()) && depotItem.getOperNumber().add(realFinishNumber).compareTo(preNumber) > 0) {
                                     if (!systemConfigService.getOverLinkBillFlag()) {
                                         throw new BusinessRunTimeException(ExceptionConstants.DEPOT_HEAD_NUMBER_NEED_EDIT_FAILED_CODE,
                                                 String.format(ExceptionConstants.DEPOT_HEAD_NUMBER_NEED_EDIT_FAILED_MSG, barCode));
