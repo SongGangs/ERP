@@ -54,7 +54,6 @@
 </template>
 
 <script>
-  import { getAction } from '@/api/manage'
   import {getBatchNumberList} from '@/api/api'
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
 
@@ -91,7 +90,7 @@
           {dataIndex: 'productionDateStr', title: '生产日期', width: 80},
           {dataIndex: 'expiryNum', title: '保质期', width: 60},
           {dataIndex: 'expirationDateStr', title: '有效期至', width: 80},
-          {dataIndex: 'unitPrice', title: '单价', width: 60},
+          // {dataIndex: 'unitPrice', title: '单价', width: 60},
           {dataIndex: 'totalNum', title: '库存', width: 60}
         ],
         scrollTrigger: {},

@@ -152,7 +152,7 @@
           </a-col>
           <a-col :lg="6" :md="12" :sm="24"></a-col>
         </a-row>
-        <a-row class="form-row" :gutter="24" :hidden="priceLimit">
+        <a-row class="form-row" :gutter="24">
           <a-col :lg="6" :md="12" :sm="24">
             <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="结算账户" data-step="8" data-title="结算账户"
                          data-intro="如果在下拉框中选择多账户，则可以通过多个结算账户进行结算">
@@ -173,7 +173,7 @@
               </a-tooltip>
             </a-form-item>
           </a-col>
-          <a-col :lg="6" :md="12" :sm="24">
+          <a-col :lg="6" :md="12" :sm="24" :hidden="priceLimit">
             <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="支付订金" data-step="9" data-title="支付订金"
                          data-intro="填写订金之后，在采购入库单会自动计算扣除订金">
               <a-input placeholder="请输入支付订金" v-decorator.trim="[ 'changeAmount', validatorRules.price ]" @change="onChangeChangeAmount"/>
@@ -284,6 +284,7 @@
             { title: '条码', key: 'barCode', width: '12%', type: FormTypes.popupJsh, kind: 'material', multi: true,
               validateRules: [{ required: true, message: '${title}不能为空' }]
             },
+            { title: '是否采购', key: 'isPurchase', width: '5%', type: FormTypes.normal },
             { title: '名称', key: 'name', width: '10%', type: FormTypes.normal },
             { title: '规格', key: 'standard', width: '9%', type: FormTypes.normal },
             { title: '型号', key: 'model', width: '9%', type: FormTypes.normal },
@@ -299,7 +300,10 @@
             { title: '原数量', key: 'preNumber', width: '4%', type: FormTypes.normal },
             { title: '已采购', key: 'finishNumber', width: '4%', type: FormTypes.normal },
             { title: '数量', key: 'operNumber', width: '5%', type: FormTypes.inputNumber, statistics: true,
-              validateRules: [{ required: true, message: '${title}不能为空' }]
+              validateRules: [{ required: true, message: '${title}不能为空' }, {
+                pattern: /^(0|[1-9]\d*)$/,
+                message: '${title}必须是大于等于0的整数'
+              }]
             },
             { title: '单价', key: 'unitPrice', width: '5%', type: FormTypes.inputNumber },
             { title: '金额', key: 'allPrice', width: '5%', type: FormTypes.inputNumber, statistics: true },
@@ -479,8 +483,11 @@
           let discountLastMoney = 0
           for(let j=0; j<selectBillDetailRows.length; j++) {
             let info = selectBillDetailRows[j];
+            let operNumber = 0
             if (info.preNumber) {
-              info.operNumber = info.preNumber - info.finishNumber
+              info.operNumber = 0
+              info.isPurchase = "否"
+              operNumber = info.preNumber - info.finishNumber
               info.unitPrice = info.purchaseDecimal
               info.allPrice = (info.operNumber * info.unitPrice).toFixed(2) - 0;
               info.taxRate = 0
@@ -489,7 +496,7 @@
               discountLastMoney += info.allPrice
             }
             info.linkId = info.id
-            if(info.operNumber>0) {
+            if(operNumber>0) {
               listEx.push(info)
               this.changeColumnShow(info)
             }

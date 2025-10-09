@@ -139,7 +139,7 @@
             </a-form-item>
           </a-col>
         </a-row>
-        <a-row class="form-row" :gutter="24" :hidden="priceLimit">
+        <a-row class="form-row" :gutter="24">
           <a-col :lg="6" :md="12" :sm="24">
             <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="结算账户" data-step="9" data-title="结算账户"
                          data-intro="如果在下拉框中选择多账户，则可以通过多个结算账户进行结算">
@@ -160,17 +160,17 @@
               </a-tooltip>
             </a-form-item>
           </a-col>
-          <a-col v-if="depositStatus" :lg="6" :md="12" :sm="24">
+          <a-col v-if="depositStatus" :lg="6" :md="12" :sm="24" :hidden="priceLimit">
             <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="扣除订金">
               <a-input v-decorator.trim="[ 'deposit' ]" @change="onChangeDeposit"/>
             </a-form-item>
           </a-col>
-          <a-col :lg="6" :md="12" :sm="24">
+          <a-col :lg="6" :md="12" :sm="24" :hidden="priceLimit">
             <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="本次付款">
               <a-input placeholder="请输入本次付款" v-decorator.trim="[ 'changeAmount', validatorRules.changeAmount ]" @change="onChangeChangeAmount"/>
             </a-form-item>
           </a-col>
-          <a-col :lg="6" :md="12" :sm="24">
+          <a-col :lg="6" :md="12" :sm="24" :hidden="priceLimit">
             <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="本次欠款" data-step="10" data-title="本次欠款"
                          data-intro="欠款产生的费用，后续可以在付款单进行支付">
               <a-input placeholder="请输入本次欠款" v-decorator.trim="[ 'debt', validatorRules.price ]" :readOnly="true"/>
@@ -300,7 +300,11 @@
             { title: '原数量', key: 'preNumber', width: '4%', type: FormTypes.normal },
             { title: '已入库', key: 'finishNumber', width: '4%', type: FormTypes.normal },
             { title: '数量', key: 'operNumber', width: '3%', type: FormTypes.inputNumber, statistics: true,
-              validateRules: [{ required: true, message: '${title}不能为空' }]
+              validateRules: [{ required: true, message: '${title}不能为空' },
+                {
+                  pattern: /^(0|[1-9]\d*)$/,
+                  message: '${title}必须是大于等于0的整数'
+                }]
             },
             { title: '单价', key: 'unitPrice', width: '3%', type: FormTypes.inputNumber},
             { title: '金额', key: 'allPrice', width: '4%', type: FormTypes.inputNumber, statistics: true },

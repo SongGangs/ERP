@@ -142,6 +142,9 @@ export const BillModalMixin = {
             let info = tab.dataSource[i]
             info.isEdit = this.model.id?1:0
             this.changeColumnShow(info)
+            if (this.prefixNo === 'CGDD'){
+              tab.dataSource[i].isPurchase = info.operNumber > 0 ? '是' : '否'
+            }
           }
           typeof success === 'function' ? success(res) : ''
         }
@@ -637,7 +640,8 @@ export const BillModalMixin = {
           allPrice = (unitPrice*operNumber).toFixed(2)-0
           taxMoney =((taxRate*0.01)*allPrice).toFixed(2)-0
           taxLastMoney = (allPrice + taxMoney).toFixed(2)-0
-          target.setValues([{rowKey: row.id, values: {allPrice: allPrice, taxMoney: taxMoney, taxLastMoney: taxLastMoney}}])
+          let isPurchase = operNumber > 0 ? '是' : '否'
+          target.setValues([{rowKey: row.id, values: {allPrice: allPrice, taxMoney: taxMoney, taxLastMoney: taxLastMoney, isPurchase: isPurchase}}])
           target.recalcAllStatisticsColumns()
           that.autoChangePrice(target)
           break;

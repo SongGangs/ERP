@@ -122,7 +122,7 @@
             </a-form-item>
           </a-col>
         </a-row>
-        <a-row class="form-row" :gutter="24" :hidden="priceLimit">
+        <a-row class="form-row" :gutter="24">
           <a-col :lg="6" :md="12" :sm="24">
             <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="结算账户">
               <a-select style="width:80%;" placeholder="请选择结算账户" v-decorator="[ 'accountId', validatorRules.accountId ]"
@@ -142,12 +142,12 @@
               </a-tooltip>
             </a-form-item>
           </a-col>
-          <a-col :lg="6" :md="12" :sm="24">
+          <a-col :lg="6" :md="12" :sm="24" :hidden="priceLimit">
             <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="本次退款">
               <a-input placeholder="请输入本次退款" v-decorator.trim="[ 'changeAmount' ]" @change="onChangeChangeAmount"/>
             </a-form-item>
           </a-col>
-          <a-col :lg="6" :md="12" :sm="24">
+          <a-col :lg="6" :md="12" :sm="24" :hidden="priceLimit">
             <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="本次欠款">
               <a-input placeholder="请输入本次欠款" v-decorator.trim="[ 'debt' ]" :readOnly="true"/>
             </a-form-item>
@@ -269,7 +269,11 @@
             { title: '原数量', key: 'preNumber', width: '5%', type: FormTypes.normal },
             { title: '已退货', key: 'finishNumber', width: '5%', type: FormTypes.normal },
             { title: '数量', key: 'operNumber', width: '5%', type: FormTypes.inputNumber, statistics: true,
-              validateRules: [{ required: true, message: '${title}不能为空' }]
+              validateRules: [{ required: true, message: '${title}不能为空' },
+                {
+                  pattern: /^(0|[1-9]\d*)$/,
+                  message: '${title}必须是大于等于0的整数'
+                }]
             },
             { title: '单价', key: 'unitPrice', width: '5%', type: FormTypes.inputNumber},
             { title: '金额', key: 'allPrice', width: '5%', type: FormTypes.inputNumber, statistics: true },
