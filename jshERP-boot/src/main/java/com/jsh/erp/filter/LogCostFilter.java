@@ -14,7 +14,7 @@ import java.io.IOException;
 @WebFilter(filterName = "LogCostFilter", urlPatterns = {"/*"},
         initParams = {@WebInitParam(name = "filterPath",
                       value = "/erp-boot/platformConfig/getPlatform#/erp-boot/v2/api-docs#/erp-boot/webjars#" +
-                              "/erp-boot/systemConfig/static#/erp-boot/api/plugin/wechat/weChat/share#" +
+                              "/erp-boot/swagger-resources#/erp-boot/systemConfig/static#/erp-boot/api/plugin/wechat/weChat/share#" +
                               "/erp-boot/api/plugin/general-ledger/pdf/voucher#/erp-boot/api/plugin/tenant-statistics/tenantClean")})
 public class LogCostFilter implements Filter {
 

@@ -1,17 +1,18 @@
 package com.jsh.erp.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Adm on 2015/12/14.
+ * 正则表达式工具类
+ * <p>MySQL 匹配正则表达式构建工具</p>
  *
  * @author yubiao
- *         <p/>
- *         mysql匹配正则表达式
  */
+@Slf4j
 public class RegExpTools {
     /**
      * @param search 模糊匹配字符串数组
@@ -125,30 +126,5 @@ public class RegExpTools {
         public String toString() {
             return builder.toString();
         }
-
-        public static void main(String[] args) {
-            List<String> values = new ArrayList<String>();
-
-            values.add("310");
-            values.add(String.valueOf(2));
-            values.add(String.valueOf(3));
-
-            RegExp exp = new RegExp();
-
-            exp.any();
-            exp.quote("fullKbNum").colon()
-                    .quote()
-                    .value("[a-zA-Z0-9]*").or(values).value("[a-zA-Z0-9]*")
-                    .quote();
-            exp.or();
-            exp.quote("gbId[a-f0-9-]{36}").colon()
-                    .quote()
-                    .value("[0-9]*").or(values).value("[0-9]*")
-                    .quote();
-            exp.any();
-
-            System.out.println(exp);
-        }
-
     }
 }

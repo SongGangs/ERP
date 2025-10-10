@@ -36,7 +36,6 @@ public class Swagger2Config {
                 .title("木里ERP Restful Api")
                 .description("木里ERP接口描述")
                 .termsOfServiceUrl("http://127.0.0.1")
-                .contact(new Contact("jishenghua", "", ""))
                 .version("3.0")
                 .build();
     }

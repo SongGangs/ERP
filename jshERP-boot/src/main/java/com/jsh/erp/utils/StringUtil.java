@@ -1,6 +1,8 @@
 package com.jsh.erp.utils;
 
-import org.springframework.util.StringUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
@@ -9,10 +11,15 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
+ * 字符串工具类
+ * <p>提供字符串、日期、UUID、集合转换等常用工具方法</p>
+ *
  * @author jishenghua qq752718920  2018-10-7 15:26:27
  */
+@Slf4j
 public class StringUtil {
 
     private StringUtil() {
@@ -189,39 +196,40 @@ public class StringUtil {
     }
 
     public static List<UUID> listToUUID(List<String> listStrs) {
-        if (listStrs != null && listStrs.size() > 0) {
-            List<UUID> uuidList = new ArrayList<UUID>();
-            for (String str : listStrs) {
-                uuidList.add(UUID.fromString(str));
-            }
-            return uuidList;
-        } else {
+        if (CollectionUtils.isEmpty(listStrs)) {
             return null;
         }
+        return listStrs.stream()
+                .map(UUID::fromString)
+                .collect(Collectors.toList());
     }
 
     public static List<UUID> arrayToUUIDList(String[] uuids) {
-        if (uuids != null && uuids.length > 0) {
-            List<UUID> uuidList = new ArrayList<UUID>();
-            for (String str : uuids) {
-                uuidList.add(UUID.fromString(str));
-            }
-            return uuidList;
-        } else {
+        if (ArrayUtils.isEmpty(uuids)) {
             return null;
         }
+        return Arrays.stream(uuids)
+                .map(UUID::fromString)
+                .collect(Collectors.toList());
     }
 
-    //是否是JSON
+    /**
+     * 判断字符串是否包含指定的任意字符
+     *
+     * @param str 待检查字符串
+     * @param flag 目标字符数组
+     * @return 是否包含
+     */
     public static boolean containsAny(String str, String... flag) {
-        if (str != null) {
-            if (flag == null || flag.length == 0) {
-                flag = "[-{-}-]-,".split("-");
-            }
-            for (String s : flag) {
-                if (str.contains(s)) {
-                    return true;
-                }
+        if (str == null) {
+            return false;
+        }
+        if (ArrayUtils.isEmpty(flag)) {
+            flag = "[-{-}-]-,".split("-");
+        }
+        for (String s : flag) {
+            if (str.contains(s)) {
+                return true;
             }
         }
         return false;
@@ -237,24 +245,24 @@ public class StringUtil {
     }
 
     public static String[] listToStringArray(List<String> list) {
-        if (list != null && !list.isEmpty()) {
-            return list.toArray(new String[list.size()]);
+        if (CollectionUtils.isEmpty(list)) {
+            return new String[0];
         }
-        return new String[0];
+        return list.toArray(new String[0]);
     }
 
     public static Long[] listToLongArray(List<Long> list) {
-        if (list != null && !list.isEmpty()) {
-            return list.toArray(new Long[list.size()]);
+        if (CollectionUtils.isEmpty(list)) {
+            return new Long[0];
         }
-        return new Long[0];
+        return list.toArray(new Long[0]);
     }
 
     public static List<String> stringToListArray(String[] strings) {
-        if (strings != null && strings.length > 0) {
-            return Arrays.asList(strings);
+        if (ArrayUtils.isEmpty(strings)) {
+            return new ArrayList<>();
         }
-        return new ArrayList<String>();
+        return Arrays.asList(strings);
     }
 
     public static BigDecimal getArrSum(String[] strings) {
@@ -269,60 +277,62 @@ public class StringUtil {
      * String字符串转成List<Long>数据格式
      * String str = "1,2,3,4,5,6" -> List<Long> listLong [1,2,3,4,5,6];
      *
-     * @param strArr
-     * @return
+     * @param strArr 逗号分隔的字符串
+     * @return Long 列表
      */
     public static List<Long> strToLongList(String strArr) {
-        List<Long> idList=new ArrayList<Long>();
-        String[] d=strArr.split(",");
-        for (int i = 0, size = d.length; i < size; i++) {
-            try {
-                if (d[i] != null) {
-                    idList.add(Long.parseLong(d[i]));
-                }
-            } catch (Exception e) {
-            }
+        if (isEmpty(strArr)) {
+            return new ArrayList<>();
         }
-        return idList;
+        return Arrays.stream(strArr.split(","))
+                .filter(Objects::nonNull)
+                .map(String::trim)
+                .filter(StringUtil::isNotEmpty)
+                .map(s -> {
+                    try {
+                        return Long.parseLong(s);
+                    } catch (NumberFormatException e) {
+                        log.warn("Failed to parse Long from string: {}", s);
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     /**
      * String字符串转成List<BigDecimal>数据格式
      * String str = "1,2,3,4,5,6" -> List<BigDecimal> listBigDecimal [1,2,3,4,5,6];
      *
-     * @param strArr
-     * @return
+     * @param strArr 逗号分隔的字符串
+     * @return BigDecimal 列表
      */
     public static List<BigDecimal> strToBigDecimalList(String strArr) {
-        List<BigDecimal> idList=new ArrayList<>();
-        String[] d=strArr.split(",");
-        for (int i = 0, size = d.length; i < size; i++) {
-            if(d[i]!=null) {
-                idList.add(new BigDecimal(d[i]));
-            }
+        if (isEmpty(strArr)) {
+            return new ArrayList<>();
         }
-        return idList;
+        return Arrays.stream(strArr.split(","))
+                .filter(Objects::nonNull)
+                .map(String::trim)
+                .filter(StringUtil::isNotEmpty)
+                .map(BigDecimal::new)
+                .collect(Collectors.toList());
     }
 
     /**
      * String字符串转成List<String>数据格式
-     * String str = "1,2,3,4,5,6" -> List<Long> listLong [1,2,3,4,5,6];
+     * String str = "1,2,3,4,5,6" -> List<String> listString ["1","2","3","4","5","6"];
      *
-     * @param strArr
-     * @return
+     * @param strArr 逗号分隔的字符串
+     * @return String 列表
      */
     public static List<String> strToStringList(String strArr) {
-        if(StringUtils.isEmpty(strArr)){
+        if (isEmpty(strArr)) {
             return null;
         }
-        List<String> idList=new ArrayList<String>();
-        String[] d=strArr.split(",");
-        for (int i = 0, size = d.length; i < size; i++) {
-            if(d[i]!=null) {
-                idList.add(d[i].toString());
-            }
-        }
-        return idList;
+        return Arrays.stream(strArr.split(","))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     public static List<String> searchCondition(String search) {

@@ -1,5 +1,6 @@
 package com.jsh.erp.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -11,9 +12,11 @@ import java.io.IOException;
 
 /**
  * 客户端工具类
- * 
+ * <p>提供 HTTP 请求、响应、会话的工具方法</p>
+ *
  * @author ji-sheng-hua
  */
+@Slf4j
 public class ServletUtils
 {
     /**
@@ -101,7 +104,7 @@ public class ServletUtils
 
     /**
      * 将字符串渲染到客户端
-     * 
+     *
      * @param response 渲染对象
      * @param string 待渲染的字符串
      * @return null
@@ -116,7 +119,7 @@ public class ServletUtils
         }
         catch (IOException e)
         {
-            e.printStackTrace();
+            log.error("Failed to render string to response: {}", e.getMessage(), e);
         }
         return null;
     }

@@ -1,5 +1,6 @@
 package com.jsh.erp.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -18,9 +19,11 @@ import java.util.regex.Pattern;
 
 /**
  * 工具类
+ * <p>提供常用的日期、字符串、加密、IP 等工具方法</p>
  *
  * @author jishenghua  qq:7-5-2-7-1-8-9-2-0
  */
+@Slf4j
 public class Tools {
     /**
      * 获得32位唯一序列号
@@ -306,11 +309,10 @@ public class Tools {
     }
 
     /**
-     * 字符转码
+     * 字符转码 (URL 编码)
      *
-     * @param aValue
-     * @return
-     * @see 转码后的字符串
+     * @param aValue 待编码字符串
+     * @return 编码后的字符串
      */
     public static String encodeValue(String aValue) {
         if (aValue.trim().length() == 0) {
@@ -320,17 +322,16 @@ public class Tools {
         try {
             valueAfterTransCode = URLEncoder.encode(aValue, "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            e.getMessage();
+            log.error("Failed to encode value: {}", e.getMessage(), e);
         }
         return valueAfterTransCode;
     }
 
     /**
-     * 字符转码
+     * 字符转码 (URL 解码)
      *
-     * @param aValue
-     * @return
-     * @see 转码后的字符串
+     * @param aValue 待解码字符串
+     * @return 解码后的字符串
      */
     public static String decodeValue(String aValue) {
         if (aValue.trim().length() == 0) {
@@ -340,7 +341,7 @@ public class Tools {
         try {
             valueAfterTransCode = URLDecoder.decode(aValue, "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            e.getMessage();
+            log.error("Failed to decode value: {}", e.getMessage(), e);
         }
         return valueAfterTransCode;
     }
@@ -664,12 +665,5 @@ public class Tools {
             valSb.append(charStr.charAt(index));
         }
         return valSb.toString();
-    }
-
-    public static void main(String[] args) {
-        Date date = new Date();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String dateString = formatter.format(date);
-        System.out.println(dateString);
     }
 }

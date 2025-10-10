@@ -322,7 +322,7 @@ public class SystemConfigService {
             logger.error("Caught an ClientException, which means the client encountered "
                     + "a serious internal problem while trying to communicate with OSS, "
                     + "such as not being able to access the network.");
-            System.out.println("Error Message:" + ce.getMessage());
+            logger.error("Error Message: {}", ce.getMessage(), ce);
         } finally {
             if (ossClient != null) {
                 ossClient.shutdown();

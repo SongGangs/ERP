@@ -1,13 +1,14 @@
 package com.jsh.erp.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import java.io.*;
 import java.util.*;
 
 /**
- *
  * 文件处理工具类
- *
+ * <p>提供文件和目录的创建、删除、读取等操作</p>
  */
+@Slf4j
 public class FileUtils {
 
 	/**
@@ -138,7 +139,7 @@ public class FileUtils {
 					fileFolder.mkdirs();
 				f.createNewFile();
 			} catch (IOException ie) {
-				System.out.println("文件" + fileName + "创建失败：" + ie.getMessage());
+				log.error("文件 {} 创建失败：{}", fileName, ie.getMessage(), ie);
 				throw new RuntimeException("FILE_CREATE_ERROR");
 			}
 		}
