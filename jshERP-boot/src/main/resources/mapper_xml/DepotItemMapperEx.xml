@@ -1024,6 +1024,39 @@
          di.basic_number*(case dh.type when '入库' then 1 when '出库' then -1 end) as basic_number
         from jsh_depot_head dh
         left join jsh_depot_item di on dh.id=di.header_id
+        <if test="name != null">
+            <bind name="bindName" value="'%'+name+'%'"/>
+            and di.batch_number like #{bindName}
+        </if>
+        <if test="depotId != null">
+            and di.depot_id= #{depotId}
+        </if>
+        <if test="batchNumber != null">
+            and di.batch_number= #{batchNumber}
+        </if>
+        left join jsh_material m on m.id=di.material_id and ifnull(m.delete_flag, '0') != '1'
+        left join jsh_material_extend me on me.material_id=m.id and ifnull(me.delete_flag,'0') !='1'
+        where me.bar_code= #{barCode}
+        <if test="number != null">
+            and dh.number!= #{number}
+        </if>
+        <if test="forceFlag">
+            and dh.status = '1'
+        </if>
+        <if test="inOutManageFlag">
+            and (dh.sub_type!='采购' and dh.sub_type!='采购退货' and dh.sub_type!='销售' and dh.sub_type!='销售退货')
+        </if>
+        and m.enable_batch_number =1
+        and di.delete_flag!=1
+
+        union all
+
+        select di.batch_number id, me.bar_code, m.name, m.standard, m.model, m.unit_id,m.expiry_num,
+        me.commodity_unit, di.batch_number,di.production_date,di.expiration_date,
+        di.all_price / di.basic_number as unit_price,
+        di.basic_number*(case dh.type when '入库' then -1 when '出库' then 1 end) as basic_number
+        from jsh_depot_head dh
+        left join jsh_depot_item di on dh.id=di.header_id
         left join jsh_material m on m.id=di.material_id and ifnull(m.delete_flag, '0') != '1'
         left join jsh_material_extend me on me.material_id=m.id and ifnull(me.delete_flag,'0') !='1'
         where me.bar_code= #{barCode}
@@ -1032,7 +1065,7 @@
             and di.batch_number like #{bindName}
         </if>
         <if test="depotId != null">
-            and di.depot_id= #{depotId}
+            and di.another_depot_id= #{depotId}
         </if>
         <if test="batchNumber != null">
             and di.batch_number= #{batchNumber}
@@ -1047,7 +1080,8 @@
             and (dh.sub_type!='采购' and dh.sub_type!='采购退货' and dh.sub_type!='销售' and dh.sub_type!='销售退货')
         </if>
         and m.enable_batch_number =1
-        and di.delete_flag!=1) tb
+        and di.delete_flag!=1
+        ) tb
         group by id, bar_code, name, standard, model, unit_id,
         commodity_unit, batch_number, production_date, expiration_date
         order by expiration_date asc

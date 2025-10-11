@@ -452,7 +452,8 @@ public class DepotItemService {
                 } else {
                     //入库或出库
                     if (BusinessConstants.DEPOTHEAD_TYPE_IN.equals(depotHead.getType()) ||
-                            BusinessConstants.DEPOTHEAD_TYPE_OUT.equals(depotHead.getType())) {
+                            BusinessConstants.DEPOTHEAD_TYPE_OUT.equals(depotHead.getType()) ||
+                            BusinessConstants.SUB_TYPE_TRANSFER.equals(depotHead.getSubType())) {
                         //序列号不能为空
                         if (BusinessConstants.ENABLE_SERIAL_NUMBER_ENABLED.equals(material.getEnableSerialNumber())) {
                             //如果开启出入库管理，并且类型等于采购、采购退货、销售、销售退货，则跳过
@@ -475,7 +476,8 @@ public class DepotItemService {
                 // 批号、生产日期、有效期不能为空
                 if (BusinessConstants.ENABLE_BATCH_NUMBER_ENABLED.equals(material.getEnableBatchNumber()) &&
                         (BusinessConstants.DEPOTHEAD_TYPE_IN.equals(depotHead.getType()) ||
-                                BusinessConstants.DEPOTHEAD_TYPE_OUT.equals(depotHead.getType()))) {
+                                BusinessConstants.DEPOTHEAD_TYPE_OUT.equals(depotHead.getType()) ||
+                                BusinessConstants.SUB_TYPE_TRANSFER.equals(depotHead.getSubType()))) {
                     //如果开启出入库管理，并且类型等于采购、采购退货、销售、销售退货，则跳过
                     if (systemConfigService.getInOutManageFlag() &&
                             (BusinessConstants.SUB_TYPE_PURCHASE.equals(depotHead.getSubType())
@@ -557,7 +559,7 @@ public class DepotItemService {
                             //除去此单据之外的已入库|已出库
                             BigDecimal realFinishNumber = getRealFinishNumber(currentSubType, depotItem.getMaterialExtendId(), depotItem.getLinkId(), preHeaderId, headerId, unitInfo, unit);
                             if(preNumber!=null) {
-                                if (!"采购订单".equals(depotHead.getSubType()) && depotItem.getOperNumber().add(realFinishNumber).compareTo(preNumber) > 0) {
+                                if (!BusinessConstants.SUB_TYPE_PURCHASE_ORDER.equals(depotHead.getSubType()) && depotItem.getOperNumber().add(realFinishNumber).compareTo(preNumber) > 0) {
                                     if (!systemConfigService.getOverLinkBillFlag()) {
                                         throw new BusinessRunTimeException(ExceptionConstants.DEPOT_HEAD_NUMBER_NEED_EDIT_FAILED_CODE,
                                                 String.format(ExceptionConstants.DEPOT_HEAD_NUMBER_NEED_EDIT_FAILED_MSG, barCode));
@@ -643,7 +645,7 @@ public class DepotItemService {
                     depotItem.setRemark(rowObj.getString("remark"));
                 }
                 //出库时判断库存是否充足
-                if(BusinessConstants.DEPOTHEAD_TYPE_OUT.equals(depotHead.getType())){
+                if(BusinessConstants.DEPOTHEAD_TYPE_OUT.equals(depotHead.getType()) || BusinessConstants.SUB_TYPE_TRANSFER.equals(depotHead.getSubType())){
                     String stockMsg = material.getName() + "-" + barCode;
                     BigDecimal stock = getCurrentStockByParam(depotItem.getDepotId(),depotItem.getMaterialId());
                     if(StringUtil.isNotEmpty(depotItem.getSku())) {
