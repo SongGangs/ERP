@@ -588,7 +588,7 @@ export const BillModalMixin = {
               }
             }
             if (value === ""){
-              target.setValues([{rowKey: row.id, values: {expirationDate: "", expiryNum: null,
+              target.setValues([{rowKey: row.id, values: {expirationDate: "", expiryNum: null, batchStock: 0,
                   productionDate: "", operNumber: 0, unitPrice: 0,
                   allPrice: 0, taxMoney: 0, taxLastMoney: 0}}])
               target.recalcAllStatisticsColumns()
@@ -620,10 +620,10 @@ export const BillModalMixin = {
                   taxMoney =((taxRate*0.01)*allPrice).toFixed(2)-0
                   taxLastMoney = (allPrice + taxMoney).toFixed(2)-0
                   target.setValues([{rowKey: row.id, values: {expirationDate: info.expirationDateStr,expiryNum: info.expiryNum,
-                      productionDate: info.productionDateStr, operNumber: operNumber, unitPrice: unitPrice,
+                      batchStock: totalNum, productionDate: info.productionDateStr, operNumber: operNumber, unitPrice: unitPrice,
                       allPrice: allPrice, taxMoney: taxMoney, taxLastMoney: taxLastMoney}}])
                 } else {
-                  target.setValues([{rowKey: row.id, values: {expirationDate: "", expiryNum: null,
+                  target.setValues([{rowKey: row.id, values: {expirationDate: "", expiryNum: null, batchStock: 0,
                       productionDate: "", operNumber: 0, unitPrice: 0,
                       allPrice: 0, taxMoney: 0, taxLastMoney: 0}}])
                 }
@@ -731,6 +731,7 @@ export const BillModalMixin = {
         otherField3: mInfo.otherField3,
         unit: mInfo.commodityUnit,
         sku: mInfo.sku,
+        batchStock: 0,
         batchNumber: '',
         productionDate: '',
         expiryNum: mInfo.expiryNum,

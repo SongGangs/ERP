@@ -43,15 +43,6 @@
             <template v-if="toggleSearchStatus">
               <a-row :gutter="24">
                 <a-col :md="6" :sm="24">
-                  <a-form-item label="客户" :labelCol="labelCol" :wrapperCol="wrapperCol">
-                    <a-select placeholder="请选择客户" showSearch allow-clear optionFilterProp="children" v-model="queryParam.organId">
-                      <a-select-option v-for="(item,index) in cusList" :key="index" :value="item.id">
-                        {{ item.supplier }}
-                      </a-select-option>
-                    </a-select>
-                  </a-form-item>
-                </a-col>
-                <a-col :md="6" :sm="24">
                   <a-form-item label="仓库名称" :labelCol="labelCol" :wrapperCol="wrapperCol">
                     <a-select placeholder="请选择仓库" showSearch allow-clear optionFilterProp="children" v-model="queryParam.depotId">
                       <a-select-option v-for="(depot,index) in depotList" :key="index" :value="depot.id">

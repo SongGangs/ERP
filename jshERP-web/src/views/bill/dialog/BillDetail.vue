@@ -978,12 +978,6 @@
               </a-form-item>
             </a-col>
             <a-col :span="6">
-              <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="客户">
-                <a-input v-decorator="['id']" hidden/>
-                {{model.organName}}
-              </a-form-item>
-            </a-col>
-            <a-col :span="6">
               <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="单据日期">
                 {{model.operTimeStr}}
               </a-form-item>
@@ -1597,6 +1591,11 @@
           { title: '库存', dataIndex: 'stock'},
           { title: '调入仓库', dataIndex: 'anotherDepotName'},
           { title: '单位', dataIndex: 'unit'},
+          { title: '序列号', dataIndex: 'snList', width:300},
+          { title: '批号', dataIndex: 'batchNumber'},
+          { title: '生产日期', dataIndex: 'productionDate'},
+          { title: '保质期', dataIndex: 'expiryNum'},
+          { title: '有效期至', dataIndex: 'expirationDate'},
           { title: '多属性', dataIndex: 'sku'},
           { title: '数量', dataIndex: 'operNumber'},
           { title: '单价', dataIndex: 'unitPrice'},
@@ -2151,12 +2150,22 @@
       //调拨出库
       allocationOutExportExcel() {
         let list = []
-        let head = '仓库名称,条码,名称,规格,型号,颜色,' + this.otherFieldTitle + ',库存,调入仓库,单位,多属性,数量,单价,金额,备注'
+        let hiddenPrice = false
+        let head = '仓库名称,条码,名称,规格,型号,颜色,' + this.otherFieldTitle + ',库存,调入仓库,单位,序列号,批号,生产日期,保质期,有效期至,多属性,数量,单价,金额,备注'
+        if (this.priceLimit) {
+          hiddenPrice = true
+          head = '仓库名称,条码,名称,规格,型号,颜色,' + this.otherFieldTitle + ',库存,调入仓库,单位,序列号,批号,生产日期,保质期,有效期至,多属性,数量,备注'
+        }
         for (let i = 0; i < this.dataSource.length; i++) {
           let item = []
           let ds = this.dataSource[i]
-          item.push(ds.depotName, ds.barCode, ds.name, ds.standard, ds.model, ds.color, ds.otherField1, ds.otherField2, ds.otherField3, ds.stock, ds.anotherDepotName, ds.unit,
-            ds.sku, ds.operNumber, ds.unitPrice, ds.allPrice, ds.remark)
+          if (hiddenPrice) {
+            item.push(ds.depotName, ds.barCode, ds.name, ds.standard, ds.model, ds.color, ds.otherField1, ds.otherField2, ds.otherField3, ds.stock, ds.anotherDepotName, ds.unit,
+              ds.snList, ds.batchNumber, ds.productionDate, ds.expiryNum, ds.expirationDate, ds.sku, ds.operNumber, ds.remark)
+          }else {
+            item.push(ds.depotName, ds.barCode, ds.name, ds.standard, ds.model, ds.color, ds.otherField1, ds.otherField2, ds.otherField3, ds.stock, ds.anotherDepotName, ds.unit,
+              ds.snList, ds.batchNumber, ds.productionDate, ds.expiryNum, ds.expirationDate, ds.sku, ds.operNumber, ds.unitPrice, ds.allPrice, ds.remark)
+          }
           list.push(item)
         }
         let tip = '单据日期：' + this.model.operTimeStr + ' ' + '单据编号：' + this.model.number

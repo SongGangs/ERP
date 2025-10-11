@@ -17,7 +17,7 @@
           v-decorator="['password',{initialValue:'', rules: validatorRules.password.rules}]"
           size="large"
           type="password"
-          autocomplete="false"
+          autocomplete="new-password"
           placeholder="请输入密码">
           <a-icon slot="prefix" type="lock" :style="{ color: 'rgba(0,0,0,.25)' }"/>
         </a-input-password>

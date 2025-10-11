@@ -35,23 +35,6 @@
             </a-form-item>
           </a-col>
           <a-col :lg="6" :md="12" :sm="24">
-            <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="客户">
-              <a-select placeholder="请选择客户" v-decorator="[ 'organId' ]" :disabled="!rowCanEdit"
-                        :dropdownMatchSelectWidth="false" showSearch optionFilterProp="children">
-    <!--                :dropdownMatchSelectWidth="false" showSearch optionFilterProp="children" @change="handleOrganChange">-->
-                <div slot="dropdownRender" slot-scope="menu">
-                  <v-nodes :vnodes="menu" />
-                  <a-divider style="margin: 4px 0;" />
-                  <div v-if="quickBtn.customer" class="dropdown-btn" @mousedown="e => e.preventDefault()" @click="addCustomer"><a-icon type="plus" /> 新增客户</div>
-                  <div class="dropdown-btn" @mousedown="e => e.preventDefault()" @click="initCustomer(0)"><a-icon type="reload" /> 刷新列表</div>
-                </div>
-                <a-select-option v-for="(item,index) in cusList" :key="index" :value="item.id">
-                  {{ item.supplier }}
-                </a-select-option>
-              </a-select>
-            </a-form-item>
-          </a-col>
-          <a-col :lg="6" :md="12" :sm="24">
             <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="单据日期">
               <j-date v-decorator="['operTime', validatorRules.operTime]" :show-time="true"/>
             </a-form-item>
@@ -213,16 +196,17 @@
             { title: '扩展1', key: 'otherField1', width: '4%', type: FormTypes.normal },
             { title: '扩展2', key: 'otherField2', width: '4%', type: FormTypes.normal },
             { title: '扩展3', key: 'otherField3', width: '4%', type: FormTypes.normal },
-            { title: '库存', key: 'stock', width: '5%', type: FormTypes.normal },
+            { title: '商品库存', key: 'stock', width: '5%', type: FormTypes.normal },
             { title: '单位', key: 'unit', width: '4%', type: FormTypes.normal },
             { title: '序列号', key: 'snList', width: '12%', type: FormTypes.popupJsh, kind: 'sn', multi: true },
             { title: '批号', key: 'batchNumber', width: '7%', type: FormTypes.popupJsh, kind: 'batch', multi: false },
             { title: '生产日期', key: 'productionDate',width: '7%', type: FormTypes.input, readonly: true },
-            { title: '保质期', key: 'expiryNum',width: '4%', type: FormTypes.normal },
+            { title: '保质期', key: 'expiryNum',width: '4%', type: FormTypes.inputNumber, readonly: true },
             { title: '有效期至', key: 'expirationDate',width: '7%', type: FormTypes.input, readonly: true },
             { title: '多属性', key: 'sku', width: '9%', type: FormTypes.normal },
             { title: '原数量', key: 'preNumber', width: '4%', type: FormTypes.normal },
             { title: '已入库', key: 'finishNumber', width: '4%', type: FormTypes.normal },
+            { title: '批次库存', key: 'batchStock', width: '5%', type: FormTypes.inputNumber, readonly: true },
             { title: '数量', key: 'operNumber', width: '5%', type: FormTypes.inputNumber, statistics: true,
               validateRules: [{ required: true, message: '${title}不能为空' },
                 {
@@ -230,7 +214,7 @@
                   message: '${title}必须大于0'
                 }]
             },
-            { title: '单价', key: 'unitPrice', width: '4%', type: FormTypes.normal},
+            { title: '单价', key: 'unitPrice', width: '4%', type: FormTypes.inputNumber, readonly: true },
             { title: '金额', key: 'allPrice', width: '4%', type: FormTypes.inputNumber, statistics: true },
             { title: '备注', key: 'remark', width: '5%', type: FormTypes.input },
             { title: '关联id', key: 'linkId', width: '5%', type: FormTypes.hidden },
@@ -238,11 +222,6 @@
         },
         confirmLoading: false,
         validatorRules:{
-          organId:{
-            rules: [
-              { required: true, message: '请选择客户！' }
-            ]
-          },
           operTime:{
             rules: [
               { required: true, message: '请输入单据日期!' }
