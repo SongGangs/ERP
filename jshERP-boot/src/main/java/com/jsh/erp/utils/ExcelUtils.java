@@ -7,6 +7,8 @@ import java.util.*;
 
 import jxl.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import jxl.format.*;
 import jxl.write.Label;
@@ -18,7 +20,16 @@ import jxl.write.WritableWorkbook;
 import javax.servlet.http.HttpServletResponse;
 
 @Slf4j
+@Component
 public class ExcelUtils {
+
+	private static String fileExportPath;
+
+	// 在setter方法上使用 @Value
+	@Value("${file.export.path}")
+	public void setFileExportPath(String path) { // 方法不能是static的
+		ExcelUtils.fileExportPath = path; // 将参数值赋给静态变量
+	}
 
 	public static InputStream getPathByFileName(String template, String tmpFileName) {
 		File tmpFile = new File(template, tmpFileName);
@@ -114,7 +125,7 @@ public class ExcelUtils {
 
 	public static File exportObjectsOneSheet(String fileName, String tip,
 											 String[] names, String title, List<Object[]> objects) throws Exception {
-		File excelFile = new File("/opt/"+ fileName);
+		File excelFile = new File(fileExportPath + fileName);
 		WritableWorkbook wtwb = Workbook.createWorkbook(excelFile);
 		WritableSheet sheet = wtwb.createSheet(title, 0);
 		sheet.getSettings().setDefaultColumnWidth(12);

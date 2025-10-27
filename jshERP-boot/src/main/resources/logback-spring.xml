@@ -27,6 +27,11 @@
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="TIME_FILE"/>
     </root>
+    <!-- SQL解析日志 - 完全禁用 -->
+    <logger name="com.jsh.erp.config.CustomTenantLineInnerInterceptor" additivity="false" level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="TIME_FILE"/>
+    </logger>
     <logger name="com.jsh" additivity="false" level="DEBUG">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="TIME_FILE"/>
