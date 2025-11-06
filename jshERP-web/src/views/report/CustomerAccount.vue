@@ -65,7 +65,7 @@
             bordered
             ref="table"
             size="middle"
-            rowKey="id"
+            :rowKey="getRowKey"
             :columns="columns"
             :dataSource="dataSource"
             :components="handleDrag(columns)"
@@ -212,6 +212,10 @@
       this.initColumnsSetting()
     },
     methods: {
+      getRowKey(record, index) {
+        // 如果有 id 则使用 id，否则使用 index 确保唯一性
+        return record.id ? record.id : `row_${index}`;
+      },
       getQueryParams() {
         let param = Object.assign({}, this.queryParam, this.isorter);
         param.field = this.getQueryField();
@@ -248,7 +252,7 @@
             this.tableAddTotalRow(this.columns, this.dataSource)
             this.firstTotal = '期初应收：' + res.data.firstMoney + "，"
             this.lastTotal = '期末应收：' + res.data.lastMoney
-          } else if(res.code===510){
+          } else if(res.code===500){
             this.$message.warning(res.data)
           } else {
             this.$message.warning(res.data.message)

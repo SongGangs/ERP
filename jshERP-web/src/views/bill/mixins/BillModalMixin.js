@@ -105,7 +105,7 @@ export const BillModalMixin = {
         this.form.setFieldsValue({'operTime':getNowFormatDateTime(), 'discount': 0,
           'discountMoney': 0, 'discountLastMoney': 0, 'otherMoney': 0, 'changeAmount': 0, 'debt': 0})
       })
-      if (this.prefixNo !== 'QGD' && this.prefixNo !== 'QTCK' && this.prefixNo !== 'QTRK' && this.transferParam.accountId === undefined) {
+      if (this.prefixNo !== 'QGD' && this.transferParam.accountId === undefined) {
         this.$nextTick(() => {
           getAccount({}).then((res)=>{
             if(res && res.code === 200) {
@@ -482,7 +482,7 @@ export const BillModalMixin = {
           break;
         case "barCode":
           if (value === ""){
-            target.setValues([{rowKey: row.id, values: {name: "", standard: null, unit:"",
+            target.setValues([{rowKey: row.id, values: {name: "", standard: null, categoryName: null, unit:"",
                 stock: 0, expiryNum: null, operNumber: 0, unitPrice: 0, allPrice: 0, taxMoney: 0, taxLastMoney: 0}}])
             target.recalcAllStatisticsColumns()
             that.autoChangePrice(target)
@@ -723,9 +723,10 @@ export const BillModalMixin = {
         name: mInfo.name,
         standard: mInfo.standard,
         model: mInfo.model,
-        color: mInfo.color,
-        brand: mInfo.brand,
-        mfrs: mInfo.mfrs,
+        // color: mInfo.color,
+        // brand: mInfo.brand,
+        // mfrs: mInfo.mfrs,
+        categoryName: mInfo.categoryName,
         otherField1: mInfo.otherField1,
         otherField2: mInfo.otherField2,
         otherField3: mInfo.otherField3,
@@ -750,6 +751,7 @@ export const BillModalMixin = {
       this.changeFormTypes(this.materialTable.columns, 'color', 0)
       this.changeFormTypes(this.materialTable.columns, 'brand', 0)
       this.changeFormTypes(this.materialTable.columns, 'mfrs', 0)
+      this.changeFormTypes(this.materialTable.columns, 'categoryName', 0)
       this.changeFormTypes(this.materialTable.columns, 'otherField1', 0)
       this.changeFormTypes(this.materialTable.columns, 'otherField2', 0)
       this.changeFormTypes(this.materialTable.columns, 'otherField3', 0)
@@ -760,6 +762,9 @@ export const BillModalMixin = {
       this.hiddenPriceColumns()
       if(info.model) {
         this.changeFormTypes(this.materialTable.columns, 'model', 1)
+      }
+      if(info.categoryName) {
+        this.changeFormTypes(this.materialTable.columns, 'categoryName', 1)
       }
       if(info.color) {
         this.changeFormTypes(this.materialTable.columns, 'color', 1)

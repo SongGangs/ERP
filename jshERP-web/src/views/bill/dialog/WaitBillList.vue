@@ -162,7 +162,7 @@
           { title: '条码', dataIndex: 'barCode',width:120},
           { title: '名称', dataIndex: 'name',width:100, ellipsis:true},
           { title: '规格', dataIndex: 'standard',width:120, ellipsis:true},
-          { title: '型号', dataIndex: 'model',width:120, ellipsis:true},
+          { title: '类别', dataIndex: 'categoryName', width: 120, ellipsis:true},
           { title: '单位', dataIndex: 'unit',width:50},
           { title: '数量', dataIndex: 'operNumber',width:50},
           { title: '备注', dataIndex: 'remark',width:100, ellipsis:true},
@@ -266,7 +266,7 @@
               this.dataSourceDetail = listEx
               this.ipagination.total = res.data.total;
             }
-            if(res.code===510){
+            if(res.code===500){
               this.$message.warning(res.data)
             }
             this.loading = false;

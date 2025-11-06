@@ -75,7 +75,7 @@
             bordered
             ref="table"
             size="middle"
-            rowKey="id"
+            :rowKey="getRowKey"
             :columns="columns"
             :dataSource="dataSource"
             :components="handleDrag(columns)"
@@ -198,7 +198,7 @@
         priceLimit: false,
         pageName: 'materialStock',
         // 默认索引
-        defDataIndex:['rowIndex','action','mBarCode','name','standard','model','color','categoryName', 'position','unitName',
+        defDataIndex:['rowIndex','action','mBarCode','name','standard','model','categoryName', 'unitName',
           'purchaseDecimal','initialStock','currentStock','currentStockPrice','currentWeight'],
         // 默认列
         defColumns: [
@@ -241,6 +241,10 @@
       this.initColumnsSetting()
     },
     methods: {
+      getRowKey(record, index) {
+        // 如果有 id 则使用 id，否则使用 index 确保唯一性
+        return record.id ? record.id : `row_${index}`;
+      },
       moment,
       getQueryParams() {
         let param = Object.assign({}, this.queryParam, this.isorter);
@@ -301,7 +305,7 @@
             this.currentStock = res.data.currentStock.toFixed(2)
             this.currentStockPrice = res.data.currentStockPrice.toFixed(2)
             this.currentWeight = res.data.currentWeight.toFixed(2)
-          } else if(res.code===510){
+          } else if(res.code===500){
             this.$message.warning(res.data)
           } else {
             this.$message.warning(res.data.message)

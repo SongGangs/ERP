@@ -90,7 +90,7 @@
             bordered
             ref="table"
             size="middle"
-            rowKey="id"
+            rowKey="barCode"
             :columns="columns"
             :dataSource="dataSource"
             :components="handleDrag(columns)"
@@ -263,7 +263,7 @@
             this.ipagination.total = res.data.total;
             this.tableAddTotalRow(this.columns, this.dataSource)
             this.realityPriceTotal = res.data.realityPriceTotal
-          } else if(res.code===510){
+          } else if(res.code===500){
             this.$message.warning(res.data)
           } else {
             this.$message.warning(res.data.message)

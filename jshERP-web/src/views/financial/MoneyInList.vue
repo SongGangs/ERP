@@ -244,7 +244,7 @@
             this.dataSource = res.data.rows
             this.ipagination.total = res.data.total
             this.initGetNeedCount('customer')
-          } else if(res.code===510){
+          } else if(res.code===500){
             this.$message.warning(res.data)
           } else {
             this.$message.warning(res.data.message)

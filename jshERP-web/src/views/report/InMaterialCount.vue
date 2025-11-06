@@ -89,7 +89,7 @@
             bordered
             ref="table"
             size="middle"
-            rowKey="id"
+            :rowKey="getRowKey"
             :columns="columns"
             :dataSource="dataSource"
             :components="handleDrag(columns)"
@@ -229,6 +229,10 @@
     },
     methods: {
       moment,
+      getRowKey(record, index) {
+        // 如果有 id 则使用 id，否则使用 index 确保唯一性
+        return record.id ? record.id : `row_${index}`;
+      },
       getQueryParams() {
         let param = Object.assign({}, this.queryParam, this.isorter);
         param.field = this.getQueryField();
@@ -256,7 +260,7 @@
             this.numSumTotalStr = res.data.numSumTotal.toFixed(2)
             this.priceSumTotalStr = res.data.priceSumTotal.toFixed(2)
             this.tableAddTotalRow(this.columns, this.dataSource)
-          } else if(res.code===510){
+          } else if(res.code===500){
             this.$message.warning(res.data)
           } else {
             this.$message.warning(res.data.message)

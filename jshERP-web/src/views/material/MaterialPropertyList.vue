@@ -92,7 +92,7 @@
             this.dataSource = res.data.rows
             this.ipagination.total = res.data.total
             Vue.ls.set('materialPropertyList', res.data.rows, 7 * 24 * 60 * 60 * 1000);
-          } else if(res.code===510){
+          } else if(res.code===500){
             this.$message.warning(res.data)
           } else {
             this.$message.warning(res.data.message)

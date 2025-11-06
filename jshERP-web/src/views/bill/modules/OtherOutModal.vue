@@ -98,6 +98,28 @@
         </a-row>
         <a-row class="form-row" :gutter="24">
           <a-col :lg="6" :md="12" :sm="24">
+            <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="结算账户" data-step="9" data-title="结算账户"
+                         data-intro="如果在下拉框中选择多账户，则可以通过多个结算账户进行结算">
+              <a-select style="width:80%;" placeholder="请选择结算账户" v-decorator="[ 'accountId', validatorRules.accountId ]"
+                        :dropdownMatchSelectWidth="false" allowClear @select="selectAccount">
+                <div slot="dropdownRender" slot-scope="menu">
+                  <v-nodes :vnodes="menu" />
+                  <a-divider style="margin: 4px 0;" />
+                  <div v-if="quickBtn.account" class="dropdown-btn" @mousedown="e => e.preventDefault()" @click="addAccount"><a-icon type="plus" /> 新增</div>
+                  <div class="dropdown-btn" @mousedown="e => e.preventDefault()" @click="initAccount(0)"><a-icon type="reload" /> 刷新</div>
+                </div>
+                <a-select-option v-for="(item,index) in accountList" :key="index" :value="item.id">
+                  {{ item.name }}
+                </a-select-option>
+              </a-select>
+              <a-tooltip title="多账户明细">
+                <a-button type="default" icon="folder" style="margin-left: 8px;" size="small" v-show="manyAccountBtnStatus" @click="handleManyAccount"/>
+              </a-tooltip>
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row class="form-row" :gutter="24">
+          <a-col :lg="6" :md="12" :sm="24">
             <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="附件">
               <j-upload v-model="fileList" bizPath="bill"></j-upload>
             </a-form-item>
@@ -127,7 +149,7 @@
   import { FormTypes } from '@/utils/JEditableTableUtil'
   import { JEditableTableMixin } from '@/mixins/JEditableTableMixin'
   import { BillModalMixin } from '../mixins/BillModalMixin'
-  import { getMpListShort } from "@/utils/util"
+  import { changeListFmtMinus, getMpListShort } from '@/utils/util'
   import JUpload from '@/components/jeecg/JUpload'
   import JDate from '@/components/jeecg/JDate'
   import Vue from 'vue'
@@ -188,11 +210,8 @@
               validateRules: [{ required: true, message: '${title}不能为空' }]
             },
             { title: '名称', key: 'name', width: '10%', type: FormTypes.normal },
-            { title: '规格', key: 'standard', width: '9%', type: FormTypes.normal },
-            { title: '型号', key: 'model', width: '9%', type: FormTypes.normal },
-            { title: '颜色', key: 'color', width: '5%', type: FormTypes.normal },
-            { title: '品牌', key: 'brand', width: '6%', type: FormTypes.normal },
-            { title: '制造商', key: 'mfrs', width: '6%', type: FormTypes.normal },
+            { title: '规格', key: 'standard', width: '7%', type: FormTypes.normal },
+            { title: '类别', key: 'categoryName', width: '5%', type: FormTypes.normal },
             { title: '扩展1', key: 'otherField1', width: '4%', type: FormTypes.normal },
             { title: '扩展2', key: 'otherField2', width: '4%', type: FormTypes.normal },
             { title: '扩展3', key: 'otherField3', width: '4%', type: FormTypes.normal },
@@ -241,6 +260,11 @@
             rules: [
               { required: true, message: '请选择出库类型!' }
             ]
+          },
+          accountId:{
+            rules: [
+              { required: true, message: '请选择结算账户!' }
+            ]
           }
         },
         url: {
@@ -278,6 +302,14 @@
             this.materialTable.columns[1].type = FormTypes.normal
           }
           this.model.operTime = this.model.operTimeStr
+          if(this.model.accountId == null) {
+            this.model.accountId = 0
+            this.manyAccountBtnStatus = true
+            this.accountIdList = this.model.accountIdList
+            this.accountMoneyList = this.model.accountMoneyList
+          } else {
+            this.manyAccountBtnStatus = false
+          }
           this.fileList = this.model.fileName
           this.$nextTick(() => {
             this.form.setFieldsValue(pick(this.model,'outType', 'organId', 'operTime', 'number', 'linkNumber', 'remark',
@@ -301,6 +333,7 @@
         this.initSystemConfig()
         this.initCustomer(0)
         this.initDepot()
+        this.initAccount(0)
         this.initPlatform()
         this.initQuickBtn()
         this.handleChangeOtherField()
@@ -316,6 +349,12 @@
           totalPrice += item.allPrice-0
         }
         billMain.totalPrice = totalPrice
+        if(billMain.accountId === 0) {
+          billMain.accountId = ''
+        }
+        this.accountMoneyList = changeListFmtMinus(this.accountMoneyList)
+        billMain.accountIdList = this.accountIdList.length>0 ? JSON.stringify(this.accountIdList) : ""
+        billMain.accountMoneyList = this.accountMoneyList.length>0 ? JSON.stringify(this.accountMoneyList) : ""
         if(this.fileList && this.fileList.length > 0) {
           billMain.fileName = this.fileList
         } else {

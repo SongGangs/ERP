@@ -399,7 +399,7 @@
               this.dataSourceDetail = listEx
               this.ipagination.total = res.data.total;
             }
-            if(res.code===510){
+            if(res.code===500){
               this.$message.warning(res.data)
             }
             this.loading = false;

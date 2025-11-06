@@ -82,7 +82,7 @@
         getAction(this.url.cusList).then((res) => {
           if (res.code===200) {
             this.dataSource = res.data.rows
-          } else if(res.code===510){
+          } else if(res.code===500){
             this.$message.warning(res.data)
           } else {
             this.$message.warning(res.data.message)

@@ -48,7 +48,7 @@
             bordered
             ref="table"
             size="middle"
-            rowKey="id"
+            :rowKey="getRowKey"
             :columns="columns"
             :dataSource="dataSource"
             :components="handleDrag(columns)"
@@ -183,6 +183,10 @@
       this.handleChangeOtherField(0)
     },
     methods: {
+      getRowKey(record, index) {
+        // 如果有 id 则使用 id，否则使用 index 确保唯一性
+        return record.id ? record.id : `row_${index}`;
+      },
       getQueryParams() {
         let param = Object.assign({}, this.queryParam, this.isorter);
         param.field = this.getQueryField();

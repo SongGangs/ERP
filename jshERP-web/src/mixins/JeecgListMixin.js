@@ -5,10 +5,11 @@
  */
 import { filterObj, getMpListShort, getNowFormatStr } from '@/utils/util'
 import { deleteAction, getAction, postAction, downFile, downFilePost, getFileAccessHttpUrl } from '@/api/manage'
-import Vue from 'vue'
+import Vue, { h } from 'vue'
 import VueDraggableResizable from 'vue-draggable-resizable'
 import { ACCESS_TOKEN } from "@/store/mutation-types"
 import {mixinDevice} from '@/utils/mixin.js'
+import { isMobileDevice } from 'ant-design-vue/lib/vc-menu/util'
 
 export const JeecgListMixin = {
   mixins: [mixinDevice],
@@ -57,7 +58,7 @@ export const JeecgListMixin = {
       /* table选中records*/
       selectionRows: [],
       /* 查询折叠 */
-      toggleSearchStatus:false,
+      toggleSearchStatus: !isMobileDevice(),
       /* 高级查询条件生效状态 */
       superQueryFlag:false,
       /* 高级查询条件 */
@@ -103,7 +104,7 @@ export const JeecgListMixin = {
           this.dataSource = res.data.rows
           this.ipagination.total = res.data.total
           this.tableAddTotalRow(this.columns, this.dataSource)
-        } else if(res.code===510){
+        } else if(res.code===500){
           this.$message.warning(res.data)
         } else {
           this.$message.warning(res.data.message)
@@ -167,7 +168,7 @@ export const JeecgListMixin = {
       this.queryParam = {}
       this.loadData(1);
     },
-    batchSetStatus: function (status) {
+    batchSetStatus: function (status, type) {
       if(!this.url.batchSetStatusUrl){
         this.$message.error("请设置url.batchSetStatusUrl属性!")
         return
@@ -177,13 +178,29 @@ export const JeecgListMixin = {
         return;
       } else {
         var ids = "";
+        let totalAmount = 0;
         for (var a = 0; a < this.selectedRowKeys.length; a++) {
           ids += this.selectedRowKeys[a] + ",";
+          if (type === 'ItemOutList') {
+            totalAmount += this.selectionRows[a].totalPrice
+          }
         }
         var that = this;
+        let content = '是否操作选中数据？ '
+        if (type === 'ItemOutList') {
+          content = () => h('div', [
+            h('div', '是否操作选中数据？'),
+            h('span', {
+              style: {
+                color: '#ff4d4f',
+                fontWeight: 'bold'
+              }
+            }, `总付款金额 ${totalAmount} 元`)
+          ])
+        }
         this.$confirm({
           title: "确认操作",
-          content: "是否操作选中数据?",
+          content: content,
           onOk: function () {
             that.loading = true;
             postAction(that.url.batchSetStatusUrl, {status: status, ids: ids}).then((res) => {

@@ -202,6 +202,7 @@
             scopedSlots: { customRender: 'action' },
           },
           { title: '往来单位', dataIndex: 'organName',width:140, ellipsis:true},
+          { title: '支出项目', dataIndex: 'itemNames',width:160},
           { title: '单据编号', dataIndex: 'billNo',width:160},
           { title: '单据日期 ', dataIndex: 'billTimeStr',width:160},
           { title: '操作员', dataIndex: 'userName',width:100, ellipsis:true},

@@ -201,6 +201,7 @@
           remark: ""
         },
         prefixNo: 'DBCK',
+        depotList: [],
         labelCol: {
           span: 5
         },

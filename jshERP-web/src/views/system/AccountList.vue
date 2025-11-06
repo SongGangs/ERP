@@ -92,6 +92,7 @@
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
   import JDate from '@/components/jeecg/JDate'
   import { postAction } from '@api/manage'
+  import Vue from 'vue'
   export default {
     name: "AccountList",
     mixins:[JeecgListMixin],

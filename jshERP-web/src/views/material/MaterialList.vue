@@ -287,7 +287,7 @@
         // 实际列
         columns:[],
         // 默认索引
-        defDataIndex:['action','mBarCode','name','standard','model','color','categoryName','unit', 'stock',
+        defDataIndex:['action','mBarCode','name','standard','categoryName','unit', 'stock',
           'purchaseDecimal','enabled'],
         // 默认列
         defColumns: [

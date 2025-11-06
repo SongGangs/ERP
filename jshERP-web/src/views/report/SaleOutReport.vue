@@ -90,7 +90,7 @@
             bordered
             ref="table"
             size="middle"
-            rowKey="id"
+            :rowKey="getRowKey"
             :columns="columns"
             :dataSource="dataSource"
             :components="handleDrag(columns)"
@@ -235,6 +235,10 @@
     },
     methods: {
       moment,
+      getRowKey(record, index) {
+        // 如果有 id 则使用 id，否则使用 index 确保唯一性
+        return record.id ? record.id : `row_${index}`;
+      },
       create(){
       },
       getQueryParams() {
@@ -265,7 +269,7 @@
             this.ipagination.total = res.data.total;
             this.tableAddTotalRow(this.columns, this.dataSource)
             this.realityPriceTotal = res.data.realityPriceTotal
-          } else if(res.code===510){
+          } else if(res.code===500){
             this.$message.warning(res.data)
           } else {
             this.$message.warning(res.data.message)

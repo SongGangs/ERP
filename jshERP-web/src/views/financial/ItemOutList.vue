@@ -105,8 +105,8 @@
         <div class="table-operator"  style="margin-top: 5px">
           <a-button v-if="btnEnableList.indexOf(1)>-1" @click="myHandleAdd" type="primary" icon="plus">新增</a-button>
           <a-button v-if="btnEnableList.indexOf(1)>-1" icon="delete" @click="batchDel">删除</a-button>
-          <a-button v-if="checkFlag && btnEnableList.indexOf(2)>-1" icon="check" @click="batchSetStatus(1)">付款</a-button>
-          <a-button v-if="checkFlag && btnEnableList.indexOf(7)>-1" icon="stop" @click="batchSetStatus(0)">取消付款</a-button>
+          <a-button v-if="checkFlag && btnEnableList.indexOf(2)>-1" icon="check" @click="batchSetStatus(1, 'ItemOutList')">付款</a-button>
+          <a-button v-if="checkFlag && btnEnableList.indexOf(7)>-1" icon="stop" @click="batchSetStatus(0, 'ItemOutList')">取消付款</a-button>
           <a-button v-if="isShowExcel && btnEnableList.indexOf(3)>-1" icon="download" @click="handleExport">导出</a-button>
           <a-tooltip placement="left" title="支出单主要处理一些进货支出以外的支出如水电支出、房租支出等。" slot="action">
             <a-icon v-if="btnEnableList.indexOf(1)>-1" type="question-circle" style="font-size:20px;float:right;" />
@@ -202,6 +202,7 @@
             scopedSlots: { customRender: 'action' },
           },
           { title: '往来单位', dataIndex: 'organName',width:140, ellipsis:true},
+          { title: '支出项目', dataIndex: 'itemNames',width:160},
           { title: '单据编号', dataIndex: 'billNo',width:160},
           { title: '单据日期 ', dataIndex: 'billTimeStr',width:160},
           { title: '操作员', dataIndex: 'userName',width:100, ellipsis:true},

@@ -73,7 +73,7 @@
             bordered
             ref="table"
             size="middle"
-            rowKey="id"
+            rowKey="barCode"
             :columns="columns"
             :dataSource="dataSource"
             :components="handleDrag(columns)"

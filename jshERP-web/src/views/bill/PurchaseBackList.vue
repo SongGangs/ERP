@@ -89,8 +89,8 @@
                       <a-select-option value="0">未审核</a-select-option>
                       <a-select-option value="9" v-if="!checkFlag">审核中</a-select-option>
                       <a-select-option value="1">已审核</a-select-option>
-                      <a-select-option value="3">部分出库</a-select-option>
-                      <a-select-option value="2">完成出库</a-select-option>
+<!--                      <a-select-option value="3">部分出库</a-select-option>-->
+<!--                      <a-select-option value="2">完成出库</a-select-option>-->
                     </a-select>
                   </a-form-item>
                 </a-col>
