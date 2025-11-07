@@ -38,7 +38,7 @@
             bordered
             ref="table"
             size="middle"
-            rowKey="id"
+            :rowKey="getRowKey"
             :columns="columns"
             :dataSource="dataSource"
             :components="handleDrag(columns)"
@@ -73,7 +73,9 @@
               </a-popover>
             </span>
             <span slot="action" slot-scope="text, record">
-              <a @click="showAccountInOutList(record)">{{record.id?'流水':''}}</a>
+              <a @click="showAccountInOutList(record)">{{ record.id ? '流水' : '' }}</a>
+              <a-divider v-if="record.id" type="vertical" />
+              <a @click="showAccountStatisticModel(record)">{{ record.id ? '统计' : '' }}</a>
             </span>
           </a-table>
           <a-row :gutter="24" style="margin-top: 8px;text-align:right;">
@@ -96,12 +98,14 @@
         </section>
         <!-- table区域-end -->
         <account-in-out-list ref="accountInOutList" @ok="modalFormOk"></account-in-out-list>
+        <account-statistic-model ref="accountStatisticModel" @ok="modalFormOk"></account-statistic-model>
       </a-card>
     </a-col>
   </a-row>
 </template>
 <script>
   import AccountInOutList from './modules/AccountInOutList'
+  import AccountStatisticModel from './modules/AccountStatisticModel'
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
   import JEllipsis from '@/components/jeecg/JEllipsis'
   import {getAction} from '@/api/manage'
@@ -110,6 +114,7 @@
     mixins:[JeecgListMixin],
     components: {
       AccountInOutList,
+      AccountStatisticModel,
       JEllipsis
     },
     data () {
@@ -164,6 +169,10 @@
       this.initColumnsSetting()
     },
     methods: {
+      getRowKey(record, index) {
+        // 如果有 id 则使用 id，否则使用 index 确保唯一性
+        return record.id ? record.id : `row_${index}`;
+      },
       getQueryParams() {
         let param = Object.assign({}, this.queryParam, this.isorter);
         param.field = this.getQueryField();
@@ -189,6 +198,10 @@
         this.$refs.accountInOutList.show(record);
         this.$refs.accountInOutList.title = "查看账户流水-" + record.name;
         this.$refs.accountInOutList.disableSubmit = false;
+      },
+      showAccountStatisticModel(record) {
+        this.$refs.accountStatisticModel.show(record);
+        this.$refs.accountStatisticModel.title = "查看账户统计-" + record.name;
       },
       exportExcel() {
         let list = []

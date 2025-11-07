@@ -1703,9 +1703,6 @@
           if(ds[i].mfrs) {
             needAddkeywords.push('mfrs')
           }
-          if(ds[i].categoryName) {
-            needAddkeywords.push('categoryName')
-          }
           if(ds[i].otherField1) {
             needAddkeywords.push('otherField1')
           }
@@ -1988,11 +1985,11 @@
       //零售出库|零售退货入库
       retailExportExcel() {
         let list = []
-        let head = '仓库名称,条码,名称,规格,型号,颜色,' + this.otherFieldTitle + ',库存,单位,序列号,批号,有效期,多属性,数量,单价,金额,备注'
+        let head = '仓库名称,条码,名称,规格,类别,库存,单位,序列号,批号,有效期,多属性,数量,单价,金额,备注'
         for (let i = 0; i < this.dataSource.length; i++) {
           let item = []
           let ds = this.dataSource[i]
-          item.push(ds.depotName, ds.barCode, ds.name, ds.standard, ds.model, ds.color, ds.otherField1, ds.otherField2, ds.otherField3, ds.stock, ds.unit,
+          item.push(ds.depotName, ds.barCode, ds.name, ds.standard, ds.categoryName, ds.stock, ds.unit,
             ds.snList, ds.batchNumber, ds.expirationDate, ds.sku, ds.operNumber, ds.unitPrice, ds.allPrice, ds.remark)
           list.push(item)
         }
@@ -2003,11 +2000,11 @@
       //请购单
       applyExportExcel() {
         let list = []
-        let head = '条码,名称,规格,型号,颜色,' + this.otherFieldTitle + ',单位,多属性,原数量,已采购,数量,备注'
+        let head = '条码,名称,规格,类别,单位,多属性,原数量,已采购,数量,备注'
         for (let i = 0; i < this.dataSource.length; i++) {
           let item = []
           let ds = this.dataSource[i]
-          item.push(ds.barCode, ds.name, ds.standard, ds.model, ds.color, ds.otherField1, ds.otherField2, ds.otherField3, ds.unit, ds.sku,
+          item.push(ds.barCode, ds.name, ds.standard, ds.categoryName, ds.unit, ds.sku,
             ds.preNumber, ds.finishNumber, ds.operNumber, ds.remark)
           list.push(item)
         }
@@ -2026,18 +2023,18 @@
           finishType = '已出库'
           organType = '客户：'
         }
-        let head = '条码,名称,规格,型号,颜色,' + this.otherFieldTitle + ',库存,单位,多属性,数量,' + finishType + ',单价,金额,税率(%),税额,价税合计,备注'
+        let head = '条码,名称,规格,类别,库存,单位,多属性,数量,' + finishType + ',单价,金额,税率(%),税额,价税合计,备注'
         if (this.priceLimit) {
-          head = '条码,名称,规格,型号,颜色,' + this.otherFieldTitle + ',库存,单位,多属性,数量,' + finishType + '备注'
+          head = '条码,名称,规格,类别,库存,单位,多属性,数量,' + finishType + '备注'
         }
         for (let i = 0; i < this.dataSource.length; i++) {
           let item = []
           let ds = this.dataSource[i]
           if (this.priceLimit) {
-            item.push(ds.barCode, ds.name, ds.standard, ds.model, ds.color, ds.otherField1, ds.otherField2, ds.otherField3, ds.stock, ds.unit, ds.sku,
+            item.push(ds.barCode, ds.name, ds.standard, ds.categoryName, ds.stock, ds.unit, ds.sku,
               ds.operNumber, ds.finishNumber, ds.remark)
           } else {
-            item.push(ds.barCode, ds.name, ds.standard, ds.model, ds.color, ds.otherField1, ds.otherField2, ds.otherField3, ds.stock, ds.unit, ds.sku,
+            item.push(ds.barCode, ds.name, ds.standard, ds.categoryName, ds.stock, ds.unit, ds.sku,
               ds.operNumber, ds.finishNumber, ds.unitPrice, ds.allPrice, ds.taxRate, ds.taxMoney, ds.taxLastMoney, ds.remark)
           }
           list.push(item)
@@ -2055,18 +2052,18 @@
         } else if(this.billType === '销售出库' || this.billType === '销售退货入库') {
           organType = '客户：'
         }
-        let head = '仓库名称,条码,名称,规格,型号,颜色,' + this.otherFieldTitle + ',库存,单位,序列号,批号,生产日期,保质期,有效期至,多属性,数量,单价,金额,税率(%),税额,价税合计,重量,备注'
+        let head = '仓库名称,条码,名称,规格,类别,库存,单位,序列号,批号,生产日期,保质期,有效期至,多属性,数量,单价,金额,税率(%),税额,价税合计,重量,备注'
         if (this.priceLimit) {
-          head = '仓库名称,条码,名称,规格,型号,颜色,' + this.otherFieldTitle + ',库存,单位,序列号,批号,生产日期,保质期,有效期至,多属性,数量,重量,备注'
+          head = '仓库名称,条码,名称,规格,类别,库存,单位,序列号,批号,生产日期,保质期,有效期至,多属性,数量,重量,备注'
         }
         for (let i = 0; i < this.dataSource.length; i++) {
           let item = []
           let ds = this.dataSource[i]
           if (this.priceLimit) {
-            item.push(ds.depotName, ds.barCode, ds.name, ds.standard, ds.model, ds.color, ds.otherField1, ds.otherField2, ds.otherField3, ds.stock, ds.unit,
+            item.push(ds.depotName, ds.barCode, ds.name, ds.standard, ds.categoryName, ds.stock, ds.unit,
               ds.snList, ds.batchNumber, ds.productionDate, ds.expiryNum, ds.expirationDate, ds.sku, ds.operNumber, ds.weight, ds.remark)
           } else {
-            item.push(ds.depotName, ds.barCode, ds.name, ds.standard, ds.model, ds.color, ds.otherField1, ds.otherField2, ds.otherField3, ds.stock, ds.unit,
+            item.push(ds.depotName, ds.barCode, ds.name, ds.standard, ds.categoryName, ds.stock, ds.unit,
               ds.snList, ds.batchNumber, ds.productionDate, ds.expiryNum, ds.expirationDate, ds.sku, ds.operNumber, ds.unitPrice, ds.allPrice, ds.taxRate, ds.taxMoney, ds.taxLastMoney, ds.weight, ds.remark)
           }
           list.push(item)
@@ -2082,24 +2079,24 @@
         let list = []
         let organType = ''
         let hiddenPrice = false
-        let head = '仓库名称,条码,名称,规格,型号,颜色,' + this.otherFieldTitle + ',库存,单位,序列号,批号,生产日期,保质期,有效期至,多属性,数量,单价,金额,备注'
+        let head = '仓库名称,条码,名称,规格,类别,库存,单位,序列号,批号,生产日期,保质期,有效期至,多属性,数量,单价,金额,备注'
         if(this.billType === '其它入库') {
           organType = '供应商：'
         } else if(this.billType === '其它出库') {
           organType = '客户：'
           if (this.priceLimit) {
             hiddenPrice = true
-            head = '仓库名称,条码,名称,规格,型号,颜色,' + this.otherFieldTitle + ',库存,单位,序列号,批号,生产日期,保质期,有效期至,多属性,数量,备注'
+            head = '仓库名称,条码,名称,规格,类别,库存,单位,序列号,批号,生产日期,保质期,有效期至,多属性,数量,备注'
           }
         }
         for (let i = 0; i < this.dataSource.length; i++) {
           let item = []
           let ds = this.dataSource[i]
           if (hiddenPrice) {
-            item.push(ds.depotName, ds.barCode, ds.name, ds.standard, ds.model, ds.color, ds.otherField1, ds.otherField2, ds.otherField3, ds.stock, ds.unit,
+            item.push(ds.depotName, ds.barCode, ds.name, ds.standard, ds.categoryName, ds.stock, ds.unit,
               ds.snList, ds.batchNumber, ds.productionDate, ds.expiryNum, ds.expirationDate, ds.sku, ds.operNumber, ds.remark)
           } else {
-            item.push(ds.depotName, ds.barCode, ds.name, ds.standard, ds.model, ds.color, ds.otherField1, ds.otherField2, ds.otherField3, ds.stock, ds.unit,
+            item.push(ds.depotName, ds.barCode, ds.name, ds.standard, ds.categoryName, ds.stock, ds.unit,
               ds.snList, ds.batchNumber, ds.productionDate, ds.expiryNum, ds.expirationDate, ds.sku, ds.operNumber, ds.unitPrice, ds.allPrice, ds.remark)
           }
           list.push(item)
@@ -2112,19 +2109,19 @@
       allocationOutExportExcel() {
         let list = []
         let hiddenPrice = false
-        let head = '仓库名称,条码,名称,规格,型号,颜色,' + this.otherFieldTitle + ',库存,调入仓库,单位,序列号,批号,生产日期,保质期,有效期至,多属性,数量,单价,金额,备注'
+        let head = '仓库名称,条码,名称,规格,类别,库存,调入仓库,单位,序列号,批号,生产日期,保质期,有效期至,多属性,数量,单价,金额,备注'
         if (this.priceLimit) {
           hiddenPrice = true
-          head = '仓库名称,条码,名称,规格,型号,颜色,' + this.otherFieldTitle + ',库存,调入仓库,单位,序列号,批号,生产日期,保质期,有效期至,多属性,数量,备注'
+          head = '仓库名称,条码,名称,规格,类别,库存,调入仓库,单位,序列号,批号,生产日期,保质期,有效期至,多属性,数量,备注'
         }
         for (let i = 0; i < this.dataSource.length; i++) {
           let item = []
           let ds = this.dataSource[i]
           if (hiddenPrice) {
-            item.push(ds.depotName, ds.barCode, ds.name, ds.standard, ds.model, ds.color, ds.otherField1, ds.otherField2, ds.otherField3, ds.stock, ds.anotherDepotName, ds.unit,
+            item.push(ds.depotName, ds.barCode, ds.name, ds.standard, ds.categoryName, ds.stock, ds.anotherDepotName, ds.unit,
               ds.snList, ds.batchNumber, ds.productionDate, ds.expiryNum, ds.expirationDate, ds.sku, ds.operNumber, ds.remark)
           }else {
-            item.push(ds.depotName, ds.barCode, ds.name, ds.standard, ds.model, ds.color, ds.otherField1, ds.otherField2, ds.otherField3, ds.stock, ds.anotherDepotName, ds.unit,
+            item.push(ds.depotName, ds.barCode, ds.name, ds.standard, ds.categoryName, ds.stock, ds.anotherDepotName, ds.unit,
               ds.snList, ds.batchNumber, ds.productionDate, ds.expiryNum, ds.expirationDate, ds.sku, ds.operNumber, ds.unitPrice, ds.allPrice, ds.remark)
           }
           list.push(item)
@@ -2135,11 +2132,11 @@
       //组装单|拆卸单
       assembleExportExcel() {
         let list = []
-        let head = ['商品类型,仓库名称,条码,名称,规格,型号,颜色,' + this.otherFieldTitle + ',库存,单位,多属性,数量,单价,金额,备注']
+        let head = ['商品类型,仓库名称,条码,名称,规格,类别,库存,单位,多属性,数量,单价,金额,备注']
         for (let i = 0; i < this.dataSource.length; i++) {
           let item = []
           let ds = this.dataSource[i]
-          item.push(ds.mType, ds.depotName, ds.barCode, ds.name, ds.standard, ds.model, ds.color, ds.otherField1, ds.otherField2, ds.otherField3, ds.stock, ds.unit,
+          item.push(ds.mType, ds.depotName, ds.barCode, ds.name, ds.standard, ds.categoryName, ds.stock, ds.unit,
             ds.sku, ds.operNumber, ds.unitPrice, ds.allPrice, ds.remark)
           list.push(item)
         }

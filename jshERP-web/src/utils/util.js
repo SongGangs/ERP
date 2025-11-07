@@ -422,6 +422,13 @@ export function getNowFormatMonth() {
 }
 
 /**
+ * js获取当前月份第一天， 格式“yyyy-MM-dd”
+ */
+export function getFirstDayOfCurrentMonth() {
+  return getNowFormatMonth() + "-01";
+}
+
+/**
  * js获取当前日期， 格式“yyyy-MM-dd”
  */
 export function getFormatDate() {
