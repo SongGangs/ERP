@@ -1421,4 +1421,22 @@
         and dh.pay_type = '预付款'
         and ifnull(dh.delete_flag,'0') !='1'
     </select>
+
+    <select id="getDepotHeadStatistic" resultType="com.jsh.erp.datasource.vo.dto.DepotHeadStatisticDto">
+        SELECT type as typeName, sub_type as subTypeName, out_type as outType, status, abs(SUM(total_price)) as amount
+        FROM jsh_depot_head
+        WHERE type IN ( "入库", "出库", "其它" )
+          AND sub_type IN ( "采购订单", "其它" )
+          AND ifnull(delete_flag,'0') != '1'
+        <if test="accountId != null">
+            and account_id = #{accountId}
+        </if>
+        <if test="beginTime != null">
+            and oper_time >= #{beginTime}
+        </if>
+        <if test="endTime != null">
+            and oper_time &lt;= #{endTime}
+        </if>
+        GROUP BY type, sub_type, out_type, status
+    </select>
 </mapper>

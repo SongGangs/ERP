@@ -66,4 +66,6 @@ public class DepotItemVo4WithInfoEx extends DepotItem{
     private String brand;
 
     private Integer expiryNum;
+
+    private String categoryName;
 }

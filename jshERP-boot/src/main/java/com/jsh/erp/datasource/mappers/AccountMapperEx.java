@@ -5,9 +5,11 @@ import com.jsh.erp.datasource.entities.AccountVo4Sum;
 import com.jsh.erp.datasource.entities.DepotHead;
 import com.jsh.erp.datasource.vo.AccountVo4InOutList;
 import com.jsh.erp.datasource.vo.AccountVo4List;
+import com.jsh.erp.datasource.vo.dto.AccountStatisticDto;
 import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -78,4 +80,10 @@ public interface AccountMapperEx {
 
     int batchDeleteAccountByIds(@Param("updateTime") Date updateTime, @Param("updater") Long updater, @Param("ids") String ids[]);
 
+    /**
+     * 获取账户收支子类别统计信息
+     */
+    List<AccountStatisticDto> getInOutStatistic(@Param("accountId") Long accountId,
+                                                @Param("beginTime") LocalDate beginDate,
+                                                @Param("endTime") LocalDate endDate);
 }

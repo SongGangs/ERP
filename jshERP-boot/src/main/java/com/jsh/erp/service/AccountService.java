@@ -1,6 +1,5 @@
 package com.jsh.erp.service;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.jsh.erp.base.PageDomain;
 import com.jsh.erp.base.TableSupport;
@@ -10,11 +9,16 @@ import com.jsh.erp.datasource.entities.*;
 import com.jsh.erp.datasource.mappers.*;
 import com.jsh.erp.datasource.vo.AccountVo4InOutList;
 import com.jsh.erp.datasource.vo.AccountVo4List;
+import com.jsh.erp.datasource.vo.dto.DepotHeadStatisticDto;
+import com.jsh.erp.datasource.vo.enums.HeadStatusEnum;
+import com.jsh.erp.datasource.vo.dto.AccountStatisticDto;
+import com.jsh.erp.datasource.vo.enums.OutTypeEnum;
+import com.jsh.erp.datasource.vo.req.AccountStatisticReq;
+import com.jsh.erp.datasource.vo.resp.AccountStatisticItemResp;
+import com.jsh.erp.datasource.vo.resp.AccountStatisticResp;
 import com.jsh.erp.exception.BusinessRunTimeException;
 import com.jsh.erp.exception.JshException;
-import com.jsh.erp.utils.PageUtils;
-import com.jsh.erp.utils.StringUtil;
-import com.jsh.erp.utils.Tools;
+import com.jsh.erp.utils.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +33,8 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.jsh.erp.constants.BusinessConstants.*;
 
 @Service
 public class AccountService {
@@ -63,7 +69,7 @@ public class AccountService {
     @Resource
     private UserBusinessService userBusinessService;
 
-    public Account getAccount(long id) throws Exception{
+    public Account getAccount(long id) {
         return accountMapper.selectByPrimaryKey(id);
     }
 
@@ -80,7 +86,7 @@ public class AccountService {
         return list;
     }
 
-    public List<Account> getAccount() throws Exception{
+    public List<Account> getAccount() {
         List<Account> list=null;
         try{
             AccountExample example = new AccountExample();
@@ -644,5 +650,69 @@ public class AccountService {
             JshException.writeFail(logger, e);
         }
         return result;
+    }
+
+    public AccountStatisticResp statistic(AccountStatisticReq req) {
+        Account account = getAccount(req.getAccountId());
+        AssertUtils.assertNotNull(account, "账户不存在");
+
+        List<AccountStatisticDto> inOutStats = accountMapperEx.getInOutStatistic(req.getAccountId(),
+                req.getBeginDate(), req.getEndDate());
+        Map<String, BigDecimal> inItemMap = inOutStats.stream()
+                .filter(t -> "收入".equals(t.getTypeName()))
+                .collect(Collectors.toMap(AccountStatisticDto::getItemName, AccountStatisticDto::getAmount, BigDecimal::add));
+        Map<String, BigDecimal> outItemMap = inOutStats.stream()
+                .filter(t -> "支出".equals(t.getTypeName()))
+                .collect(Collectors.toMap(AccountStatisticDto::getItemName, AccountStatisticDto::getAmount, BigDecimal::add));
+        Map<String, BigDecimal> paidOutItemMap = inOutStats.stream()
+                .filter(t -> "支出".equals(t.getTypeName()))
+                .filter(t -> HeadStatusEnum.AUDITED.isType(t.getStatus()))
+                .collect(Collectors.toMap(AccountStatisticDto::getItemName, AccountStatisticDto::getAmount, BigDecimal::add));
+
+        List<DepotHeadStatisticDto> depotHeadStats = depotHeadMapperEx.getDepotHeadStatistic(req.getAccountId(),
+                req.getBeginDate(), req.getEndDate());
+        Map<String, BigDecimal> purchaseItemMap = depotHeadStats.stream()
+                .filter(t -> SUB_TYPE_PURCHASE_ORDER.equals(t.getSubTypeName()))
+                .collect(Collectors.toMap(DepotHeadStatisticDto::getSubTypeName, DepotHeadStatisticDto::getAmount, BigDecimal::add));
+        Map<String, BigDecimal> outStoreItemMap = depotHeadStats.stream()
+                .filter(t -> DEPOTHEAD_TYPE_OUT.equals(t.getTypeName()))
+                .filter(t -> SUB_TYPE_OTHER.equals(t.getSubTypeName()))
+                .collect(Collectors.toMap(t -> EnumUtils.getDesc(t.getOutType(), OutTypeEnum.class), DepotHeadStatisticDto::getAmount, BigDecimal::add));
+        Map<String, BigDecimal> paidOtherInStoreItemMap = depotHeadStats.stream()
+                .filter(t -> DEPOTHEAD_TYPE_IN.equals(t.getTypeName()))
+                .filter(t -> SUB_TYPE_OTHER.equals(t.getSubTypeName()))
+                .filter(t -> HeadStatusEnum.AUDITED.isType(t.getStatus()))
+                .collect(Collectors.toMap(t -> "已付款单", DepotHeadStatisticDto::getAmount, BigDecimal::add));
+        Map<String, BigDecimal> unPaidOtherInStoreItemMap = depotHeadStats.stream()
+                .filter(t -> DEPOTHEAD_TYPE_IN.equals(t.getTypeName()))
+                .filter(t -> SUB_TYPE_OTHER.equals(t.getSubTypeName()))
+                .filter(t -> HeadStatusEnum.UNAUDITED.isType(t.getStatus()))
+                .collect(Collectors.toMap(t -> "未付款单", DepotHeadStatisticDto::getAmount, BigDecimal::add));
+
+        // 现金流水结余 = 收入单-支出单(已付款)-付款单-采购订单
+        BigDecimal cashBalance = sumAmount(inItemMap).subtract(sumAmount(paidOutItemMap))
+                .subtract(sumAmount(paidOtherInStoreItemMap)).subtract(sumAmount(unPaidOtherInStoreItemMap))
+                .subtract(sumAmount(purchaseItemMap));
+        // 利润 = 收入单-支出单-出库
+        BigDecimal profit = sumAmount(inItemMap).subtract(sumAmount(outItemMap))
+                .subtract(sumAmount(paidOtherInStoreItemMap)).subtract(sumAmount(outStoreItemMap));
+
+        return AccountStatisticResp.builder()
+                .accountId(account.getId())
+                .accountName(account.getName())
+                .income(AccountStatisticItemResp.from(inItemMap))
+                .out(AccountStatisticItemResp.from(outItemMap))
+                .paidOut(AccountStatisticItemResp.from(paidOutItemMap))
+                .purchase(AccountStatisticItemResp.from(purchaseItemMap))
+                .outStore(AccountStatisticItemResp.from(outStoreItemMap))
+                .paidOtherInStore(AccountStatisticItemResp.from(paidOtherInStoreItemMap))
+                .unPaidOtherInStore(AccountStatisticItemResp.from(unPaidOtherInStoreItemMap))
+                .cashBalance(cashBalance)
+                .profit(profit)
+                .build();
+    }
+
+    private BigDecimal sumAmount(Map<String, BigDecimal> itemMap) {
+        return itemMap.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

@@ -7,6 +7,7 @@ import com.jsh.erp.base.TableDataInfo;
 import com.jsh.erp.datasource.entities.Account;
 import com.jsh.erp.datasource.vo.AccountVo4InOutList;
 import com.jsh.erp.datasource.vo.AccountVo4List;
+import com.jsh.erp.datasource.vo.req.AccountStatisticReq;
 import com.jsh.erp.service.AccountService;
 import com.jsh.erp.service.SystemConfigService;
 import com.jsh.erp.service.UserBusinessService;
@@ -18,6 +19,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -376,5 +378,11 @@ public class AccountController extends BaseController {
         } else {
             return returnJson(objectMap, ErpInfo.ERROR.name, ErpInfo.ERROR.code);
         }
+    }
+
+    @GetMapping(value = "/statistic")
+    @ApiOperation(value = "账户统计")
+    public BaseResponseInfo statistic(@Validated AccountStatisticReq req) {
+        return BaseResponseInfo.success(accountService.statistic(req));
     }
 }

@@ -507,4 +507,23 @@
         </foreach>
         )
     </update>
+
+    <select id="getInOutStatistic" resultType="com.jsh.erp.datasource.vo.dto.AccountStatisticDto">
+        SELECT ah.type as typeName, IFNULL(MIN(ioi.`name`),ah.type) as itemName, ah.status, abs(sum(ai.each_amount)) as amount
+        FROM jsh_account_head ah
+        JOIN jsh_account_item ai ON ai.header_id = ah.id AND ifnull(ai.delete_flag,'0') !='1'
+        LEFT JOIN jsh_in_out_item ioi ON ioi.id = ai.in_out_item_id
+        WHERE ah.type IN ( '支出', '收入' )
+        and ifnull(ah.delete_flag,'0') != '1'
+        <if test="accountId != null">
+            and ah.account_id = #{accountId}
+        </if>
+        <if test="beginTime != null">
+            and ah.bill_time >= #{beginTime}
+        </if>
+        <if test="endTime != null">
+            and ah.bill_time &lt;= #{endTime}
+        </if>
+        GROUP BY ah.type, ioi.id, ah.status
+    </select>
 </mapper>

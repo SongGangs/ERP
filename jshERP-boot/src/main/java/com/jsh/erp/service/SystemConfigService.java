@@ -74,7 +74,7 @@ public class SystemConfigService {
         return result;
     }
 
-    public List<SystemConfig> getSystemConfig()throws Exception {
+    public List<SystemConfig> getSystemConfig() {
         SystemConfigExample example = new SystemConfigExample();
         example.createCriteria().andDeleteFlagNotEqualTo(BusinessConstants.DELETE_FLAG_DELETED);
         List<SystemConfig> list=null;
@@ -556,7 +556,7 @@ public class SystemConfigService {
      * @return
      * @throws Exception
      */
-    public boolean getForceApprovalFlag() throws Exception {
+    public boolean getForceApprovalFlag() {
         boolean forceApprovalFlag = false;
         List<SystemConfig> list = getSystemConfig();
         if(list.size()>0) {

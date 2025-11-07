@@ -10,9 +10,10 @@
     </resultMap>
 
     <select id="selectByConditionAccountHead" parameterType="com.jsh.erp.datasource.entities.AccountHeadExample" resultMap="ResultMapEx">
-        select distinct ah.*, s.supplier OrganName, p.Name HandsPersonName, u.username userName, a.Name AccountName
+        select ah.*,GROUP_CONCAT(DISTINCT ioi.name) as itemNames, s.supplier OrganName, p.Name HandsPersonName, u.username userName, a.Name AccountName
         from jsh_account_head ah
         left join jsh_account_item ai on ah.id=ai.header_id and ifnull(ai.delete_flag,'0') !='1'
+        left join jsh_in_out_item ioi on ioi.id=ai.in_out_item_id
         left join jsh_depot_head dh on dh.id=ai.bill_id and ifnull(dh.delete_flag,'0') !='1'
         left join jsh_supplier s on ah.organ_id=s.id and ifnull(s.delete_Flag,'0') !='1'
         left join jsh_user u on ah.creator=u.id and ifnull(u.delete_flag,'0') !='1'
@@ -71,6 +72,7 @@
             and ai.in_out_item_id=#{inOutItemId}
         </if>
         and ifnull(ah.delete_flag,'0') !='1'
+        group by ah.id, s.supplier, p.Name, u.username, a.Name
         order by ah.id desc
     </select>
 
