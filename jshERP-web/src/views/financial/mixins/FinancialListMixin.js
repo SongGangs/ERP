@@ -11,6 +11,7 @@ export const FinancialListMixin = {
       checkFlag: true,
       /* 单据Excel是否开启 */
       isShowExcel: false,
+      setTimeFlag: null,
       billExcelUrl: '',
       prefixNo: '',
       waitTotal: 0,
@@ -125,7 +126,7 @@ export const FinancialListMixin = {
     },
     initSupplier() {
       let that = this;
-      findBySelectSup({}).then((res)=>{
+      findBySelectSup({limit:1}).then((res)=>{
         if(res) {
           that.supList = res;
         }
@@ -133,7 +134,7 @@ export const FinancialListMixin = {
     },
     initCustomer() {
       let that = this;
-      findBySelectCus({}).then((res)=>{
+      findBySelectCus({limit:1}).then((res)=>{
         if(res) {
           that.cusList = res;
         }
@@ -141,7 +142,7 @@ export const FinancialListMixin = {
     },
     initOrgan() {
       let that = this;
-      findBySelectOrgan({}).then((res)=>{
+      findBySelectOrgan({limit:1}).then((res)=>{
         if(res) {
           that.organList = res;
         }
@@ -149,7 +150,7 @@ export const FinancialListMixin = {
     },
     initRetail() {
       let that = this;
-      findBySelectRetail({}).then((res)=>{
+      findBySelectRetail({limit:1}).then((res)=>{
         if(res) {
           that.retailList = res;
         }
@@ -190,6 +191,58 @@ export const FinancialListMixin = {
           this.waitTotal = res.data.needCount
         }
       })
+    },
+    handleSearchSupplier(value) {
+      let that = this
+      if(this.setTimeFlag != null){
+        clearTimeout(this.setTimeFlag);
+      }
+      this.setTimeFlag = setTimeout(()=>{
+        findBySelectSup({key: value, limit:1}).then((res) => {
+          if(res) {
+            that.supList = res;
+          }
+        })
+      },500)
+    },
+    handleSearchCustomer(value) {
+      let that = this
+      if(this.setTimeFlag != null){
+        clearTimeout(this.setTimeFlag);
+      }
+      this.setTimeFlag = setTimeout(()=>{
+        findBySelectCus({key: value, limit:1}).then((res) => {
+          if(res) {
+            that.cusList = res;
+          }
+        })
+      },500)
+    },
+    handleSearchOrgan(value) {
+      let that = this
+      if(this.setTimeFlag != null){
+        clearTimeout(this.setTimeFlag);
+      }
+      this.setTimeFlag = setTimeout(()=>{
+        findBySelectOrgan({key: value, limit:1}).then((res) => {
+          if(res) {
+            that.organList = res;
+          }
+        })
+      },500)
+    },
+    handleSearchRetail(value) {
+      let that = this
+      if(this.setTimeFlag != null){
+        clearTimeout(this.setTimeFlag);
+      }
+      this.setTimeFlag = setTimeout(()=>{
+        findBySelectRetail({key: value, limit:1}).then((res) => {
+          if(res) {
+            that.retailList = res;
+          }
+        })
+      },500)
     },
     onDateChange: function (value, dateString) {
       this.queryParam.beginTime=dateString[0]

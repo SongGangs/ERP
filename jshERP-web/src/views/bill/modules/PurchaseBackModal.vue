@@ -27,7 +27,7 @@
           <a-col :lg="6" :md="12" :sm="24">
             <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="供应商">
               <a-select placeholder="请选择供应商" v-decorator="[ 'organId', validatorRules.organId ]" :disabled="!rowCanEdit"
-                :dropdownMatchSelectWidth="false" showSearch optionFilterProp="children">
+                :dropdownMatchSelectWidth="false" showSearch optionFilterProp="children" @search="handleSearchSupplier">
                 <div slot="dropdownRender" slot-scope="menu">
                   <v-nodes :vnodes="menu" />
                   <a-divider style="margin: 4px 0;" />
@@ -190,11 +190,10 @@
   import { JEditableTableMixin } from '@/mixins/JEditableTableMixin'
   import { BillModalMixin } from '../mixins/BillModalMixin'
   import { getMpListShort} from "@/utils/util"
-  import { getAction } from '@/api/manage'
   import JUpload from '@/components/jeecg/JUpload'
   import JDate from '@/components/jeecg/JDate'
   import Vue from 'vue'
-  import { getCurrentSystemConfig } from '@/api/api'
+  import { getCurrentSystemConfig, findBySelectSup } from '@/api/api'
   export default {
     name: "PurchaseBackModal",
     mixins: [JEditableTableMixin, BillModalMixin],
@@ -462,6 +461,9 @@
               'changeAmount': discountLastMoney,
               'accountId': accountId,
               'remark': remark
+            })
+            findBySelectSup({organId: organId, limit:1}).then((res)=> {
+              this.supList = res && Array.isArray(res) ? res : [];
             })
             getCurrentSystemConfig().then((res) => {
               if (res.code === 200 && res.data) {

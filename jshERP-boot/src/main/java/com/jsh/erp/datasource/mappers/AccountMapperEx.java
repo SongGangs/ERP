@@ -9,7 +9,6 @@ import com.jsh.erp.datasource.vo.dto.AccountStatisticDto;
 import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -84,6 +83,6 @@ public interface AccountMapperEx {
      * 获取账户收支子类别统计信息
      */
     List<AccountStatisticDto> getInOutStatistic(@Param("accountId") Long accountId,
-                                                @Param("beginTime") LocalDate beginDate,
-                                                @Param("endTime") LocalDate endDate);
+                                                @Param("beginTime") String beginTime,
+                                                @Param("endTime") String endTime);
 }

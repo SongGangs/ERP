@@ -296,7 +296,7 @@ public class DepotHeadService {
         Long userId = userService.getCurrentUser().getId();
         //获取权限信息
         String ubValue = userBusinessService.getUBValueByTypeAndKeyId(type, userId.toString());
-        List<Supplier> supplierList = supplierService.findBySelectCus();
+        List<SupplierSimple> supplierList = supplierService.getAllCustomer();
         if(BusinessConstants.SUB_TYPE_SALES_ORDER.equals(subType) || BusinessConstants.SUB_TYPE_SALES.equals(subType)
                 ||BusinessConstants.SUB_TYPE_SALES_RETURN.equals(subType) ) {
             //采购订单里面选择销售订单的时候不要过滤
@@ -304,7 +304,7 @@ public class DepotHeadService {
                 if (null != supplierList && supplierList.size() > 0) {
                     boolean customerFlag = systemConfigService.getCustomerFlag();
                     List<String> organList = new ArrayList<>();
-                    for (Supplier supplier : supplierList) {
+                    for (SupplierSimple supplier : supplierList) {
                         boolean flag = ubValue.contains("[" + supplier.getId().toString() + "]");
                         if (!customerFlag || flag) {
                             organList.add(supplier.getId().toString());
@@ -694,6 +694,7 @@ public class DepotHeadService {
     public int batchSetStatus(String status, String depotHeadIDs)throws Exception {
         int result = 0;
         List<Long> dhIds = new ArrayList<>();
+        List<String> noList = new ArrayList<>();
         List<Long> ids = StringUtil.strToLongList(depotHeadIDs);
         for(Long id: ids) {
             DepotHead depotHead = getDepotHead(id);
@@ -701,6 +702,7 @@ public class DepotHeadService {
                 //进行反审核操作
                 if("1".equals(depotHead.getStatus()) && "0".equals(depotHead.getPurchaseStatus())) {
                     dhIds.add(id);
+                    noList.add(depotHead.getNumber());
                 } else if("2".equals(depotHead.getPurchaseStatus())) {
                     throw new BusinessRunTimeException(ExceptionConstants.DEPOT_HEAD_PURCHASE_STATUS_TWO_CODE,
                             String.format(ExceptionConstants.DEPOT_HEAD_PURCHASE_STATUS_TWO_MSG));
@@ -715,13 +717,14 @@ public class DepotHeadService {
                 //进行审核操作
                 if("0".equals(depotHead.getStatus())) {
                     dhIds.add(id);
+                    noList.add(depotHead.getNumber());
                 } else {
                     throw new BusinessRunTimeException(ExceptionConstants.DEPOT_HEAD_UN_AUDIT_TO_AUDIT_FAILED_CODE,
                             String.format(ExceptionConstants.DEPOT_HEAD_UN_AUDIT_TO_AUDIT_FAILED_MSG));
                 }
             }
         }
-        if(dhIds.size()>0) {
+        if(!dhIds.isEmpty()) {
             DepotHead depotHead = new DepotHead();
             depotHead.setStatus(status);
             DepotHeadExample example = new DepotHeadExample();
@@ -735,6 +738,13 @@ public class DepotHeadService {
                         depotItemService.updateCurrentStock(depotItem);
                     }
                 }
+            }
+            //记录日志
+            if(!noList.isEmpty() && ("0".equals(status) || "1".equals(status))) {
+                String statusStr = status.equals("1")?"[审核]":"[反审核]";
+                logService.insertLog("单据",
+                        new StringBuffer(statusStr).append(String.join(", ", noList)).toString(),
+                        ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest());
             }
         }
         return result;
@@ -996,6 +1006,7 @@ public class DepotHeadService {
                 Map<Long,Integer> financialBillNoMap = getFinancialBillNoMapByBillIdList(idList);
                 Map<String,Integer> billSizeMap = getBillSizeMapByLinkNumberList(numberList);
                 Map<Long,String> materialsListMap = findMaterialsListMapByHeaderIdList(idList);
+                Map<Long,BigDecimal> materialCountListMap = getMaterialCountListMapByHeaderIdList(idList);
                 DepotHeadVo4List dh = list.get(0);
                 if (Objects.nonNull(dh.getDepotId())) {
                     Depot depot = depotService.getDepot(dh.getDepotId());
@@ -1058,6 +1069,10 @@ public class DepotHeadService {
                 //商品信息简述
                 if(materialsListMap!=null) {
                     dh.setMaterialsList(materialsListMap.get(dh.getId()));
+                }
+                //商品总数量
+                if(materialCountListMap!=null) {
+                    dh.setMaterialCount(materialCountListMap.get(dh.getId()));
                 }
                 User creatorUser = userService.getUser(dh.getCreator());
                 if(creatorUser!=null) {
@@ -1267,8 +1282,9 @@ public class DepotHeadService {
             /**入库和出库处理单据子表信息*/
             depotItemService.saveDetials(rows, headId, "add", request);
         }
+        String statusStr = depotHead.getStatus().equals("1")?"[审核]":"";
         logService.insertLog("单据",
-                new StringBuffer(BusinessConstants.LOG_OPERATION_TYPE_ADD).append(depotHead.getNumber()).toString(),
+                new StringBuffer(BusinessConstants.LOG_OPERATION_TYPE_ADD).append(depotHead.getNumber()).append(statusStr).toString(),
                 ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest());
     }
 
@@ -1368,8 +1384,9 @@ public class DepotHeadService {
         }
         /**入库和出库处理单据子表信息*/
         depotItemService.saveDetials(rows, depotHead.getId(), "update", request);
+        String statusStr = depotHead.getStatus().equals("1")?"[审核]":"";
         logService.insertLog("单据",
-                new StringBuffer(BusinessConstants.LOG_OPERATION_TYPE_EDIT).append(depotHead.getNumber()).toString(),
+                new StringBuffer(BusinessConstants.LOG_OPERATION_TYPE_EDIT).append(depotHead.getNumber()).append(statusStr).toString(),
                 ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest());
     }
 

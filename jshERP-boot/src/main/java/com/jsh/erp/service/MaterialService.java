@@ -8,6 +8,7 @@ import com.jsh.erp.constants.ExceptionConstants;
 import com.jsh.erp.constants.PriceLimitConstants;
 import com.jsh.erp.datasource.entities.*;
 import com.jsh.erp.datasource.mappers.*;
+import com.jsh.erp.datasource.vo.MaterialDepotStock;
 import com.jsh.erp.datasource.vo.MaterialVoSearch;
 import com.jsh.erp.exception.BusinessRunTimeException;
 import com.jsh.erp.exception.JshException;
@@ -1439,10 +1440,9 @@ public class MaterialService {
     }
 
     @Transactional(value = "transactionManager", rollbackFor = Exception.class)
-    public int batchSetMaterialCurrentStock(String ids) throws Exception {
+    public int batchSetMaterialCurrentStock(String ids, List<Depot> depotList) throws Exception {
         int res = 0;
         List<Long> idList = StringUtil.strToLongList(ids);
-        List<Depot> depotList = depotService.getAllList();
         for(Long mId: idList) {
             BigDecimal currentUnitPrice = materialCurrentStockMapperEx.getCurrentUnitPriceByMId(mId);
             for(Depot depot: depotList) {
@@ -1504,5 +1504,28 @@ public class MaterialService {
         } else {
             return null;
         }
+    }
+
+    public List<MaterialDepotStock> getMaterialDepotStock(String depotIds, Long mId) throws Exception {
+        String[] depotIdArr = null;
+        if(StringUtil.isNotEmpty(depotIds)) {
+            depotIdArr = depotIds.split(",");
+        }
+        boolean moveAvgPriceFlag = systemConfigService.getMoveAvgPriceFlag();
+        List<Long> depotList = depotService.parseDepotListByArr(depotIdArr);
+        Long[] depotIdArray = StringUtil.listToLongArray(depotList);
+        PageUtils.startPage();
+        List<MaterialDepotStock> list = materialMapperEx.getMaterialDepotStock(depotIdArray, mId);
+        for (MaterialDepotStock item: list) {
+            if(moveAvgPriceFlag) {
+                item.setUnitPrice(item.getCurrentUnitPrice());
+            } else {
+                item.setUnitPrice(item.getPurchaseDecimal());
+            }
+            if(item.getCurrentNumber()!=null && item.getUnitPrice()!=null ) {
+                item.setAllPrice(item.getCurrentNumber().multiply(item.getUnitPrice()));
+            }
+        }
+        return list;
     }
 }

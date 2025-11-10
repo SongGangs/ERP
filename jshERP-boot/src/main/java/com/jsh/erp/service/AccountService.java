@@ -31,6 +31,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -656,8 +657,9 @@ public class AccountService {
         Account account = getAccount(req.getAccountId());
         AssertUtils.assertNotNull(account, "账户不存在");
 
-        List<AccountStatisticDto> inOutStats = accountMapperEx.getInOutStatistic(req.getAccountId(),
-                req.getBeginDate(), req.getEndDate());
+        String beginTime= req.getBeginDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + DAY_FIRST_TIME;
+        String endTime = req.getEndDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + DAY_LAST_TIME;
+        List<AccountStatisticDto> inOutStats = accountMapperEx.getInOutStatistic(req.getAccountId(), beginTime, endTime);
         Map<String, BigDecimal> inItemMap = inOutStats.stream()
                 .filter(t -> "收入".equals(t.getTypeName()))
                 .collect(Collectors.toMap(AccountStatisticDto::getItemName, AccountStatisticDto::getAmount, BigDecimal::add));
@@ -669,8 +671,7 @@ public class AccountService {
                 .filter(t -> HeadStatusEnum.AUDITED.isType(t.getStatus()))
                 .collect(Collectors.toMap(AccountStatisticDto::getItemName, AccountStatisticDto::getAmount, BigDecimal::add));
 
-        List<DepotHeadStatisticDto> depotHeadStats = depotHeadMapperEx.getDepotHeadStatistic(req.getAccountId(),
-                req.getBeginDate(), req.getEndDate());
+        List<DepotHeadStatisticDto> depotHeadStats = depotHeadMapperEx.getDepotHeadStatistic(req.getAccountId(), beginTime, endTime);
         Map<String, BigDecimal> purchaseItemMap = depotHeadStats.stream()
                 .filter(t -> SUB_TYPE_PURCHASE_ORDER.equals(t.getSubTypeName()))
                 .collect(Collectors.toMap(DepotHeadStatisticDto::getSubTypeName, DepotHeadStatisticDto::getAmount, BigDecimal::add));

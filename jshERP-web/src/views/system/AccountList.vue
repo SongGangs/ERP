@@ -115,6 +115,7 @@
         quickBtn: {
           user: ''
         },
+        urlPath: '/system/account',
         // 表头
         columns: [
           {

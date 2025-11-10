@@ -46,6 +46,7 @@ export const BillModalMixin = {
       checkFlag: true,
       //零收付款的场景开关
       zeroChangeAmountFlag: false,
+      setTimeFlag: null,
       validatorRules:{
         price:{
           rules: [
@@ -114,7 +115,10 @@ export const BillModalMixin = {
                   this.form.setFieldsValue({'accountId': item.id})
                 }
               }
-            }
+            //数据从前一个页面带过来的情况
+            if(this.transferParam && this.transferParam.accountId) {
+              this.form.setFieldsValue({'accountId': this.transferParam.accountId})
+            }}
           })
         })
       }
@@ -217,7 +221,7 @@ export const BillModalMixin = {
     },
     initSupplier(isChecked) {
       let that = this;
-      findBySelectSup({}).then((res)=>{
+      findBySelectSup({organId: this.model.organId, limit:1}).then((res)=>{
         if(res) {
           that.supList = res
           if(isChecked && res.length>0) {
@@ -228,7 +232,7 @@ export const BillModalMixin = {
     },
     initCustomer(isChecked) {
       let that = this;
-      findBySelectCus({}).then((res)=>{
+      findBySelectCus({organId: this.model.organId, limit:1}).then((res)=>{
         if(res) {
           that.cusList = res
           if(isChecked && res.length>0) {
@@ -239,7 +243,7 @@ export const BillModalMixin = {
     },
     initRetail(isChecked) {
       let that = this;
-      findBySelectRetail({}).then((res)=>{
+      findBySelectRetail({organId: this.model.organId, limit:1}).then((res)=>{
         if(res) {
           that.retailList = res
           if(isChecked && res.length>0) {
@@ -316,6 +320,45 @@ export const BillModalMixin = {
           })
         }
       })
+    },
+    handleSearchSupplier(value) {
+      let that = this
+      if(this.setTimeFlag != null){
+        clearTimeout(this.setTimeFlag);
+      }
+      this.setTimeFlag = setTimeout(()=>{
+        findBySelectSup({key: value, limit:1}).then((res) => {
+          if(res) {
+            that.supList = res;
+          }
+        })
+      },500)
+    },
+    handleSearchCustomer(value) {
+      let that = this
+      if(this.setTimeFlag != null){
+        clearTimeout(this.setTimeFlag);
+      }
+      this.setTimeFlag = setTimeout(()=>{
+        findBySelectCus({key: value, limit:1}).then((res) => {
+          if(res) {
+            that.cusList = res;
+          }
+        })
+      },500)
+    },
+    handleSearchRetail(value) {
+      let that = this
+      if(this.setTimeFlag != null){
+        clearTimeout(this.setTimeFlag);
+      }
+      this.setTimeFlag = setTimeout(()=>{
+        findBySelectRetail({key: value, limit:1}).then((res) => {
+          if(res) {
+            that.retailList = res;
+          }
+        })
+      },500)
     },
     handleManyAccount(){
       this.selectAccount(0)
@@ -508,6 +551,9 @@ export const BillModalMixin = {
                     let mObj = this.parseInfoToObj(mInfo)
                     mObj.depotId = mInfo.depotId
                     mObj.stock = mInfo.stock
+                    mObj.snList = ''
+                    mObj.batchNumber = ''
+                    mObj.expirationDate = ''
                     mArr.push(mObj)
                   }
                   let allPriceTotal = 0
@@ -542,6 +588,9 @@ export const BillModalMixin = {
                     this.changeColumnShow(mInfo)
                     let mInfoEx = this.parseInfoToObj(mInfo)
                     mInfoEx.stock = res.data.stock
+                    mInfoEx.snList = ''
+                    mInfoEx.batchNumber = ''
+                    mInfoEx.expirationDate = ''
                     let mObj = {
                       rowKey: row.id,
                       values: mInfoEx
@@ -576,8 +625,8 @@ export const BillModalMixin = {
           }
           break;
         case "batchNumber":
-          //只针对销售出库、采购退货、其它出库
-          if(this.prefixNo === 'XSCK' || this.prefixNo === 'CGTH' || this.prefixNo === 'QTCK' || this.prefixNo === 'DBCK') {
+          //只针对零售出库、销售出库、采购退货、其它出库
+          if(this.prefixNo === 'LSCK' || this.prefixNo === 'XSCK' || this.prefixNo === 'CGTH' || this.prefixNo === 'QTCK' || this.prefixNo === 'DBCK') {
             batchNumber = value
             let depotItemId = ''
             if(this.model.id) {

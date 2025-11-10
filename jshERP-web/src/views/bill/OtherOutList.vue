@@ -199,7 +199,11 @@
       BillExcelIframe,
       BatchWaitBillList,
       JEllipsis,
-      JDate
+      JDate,
+      VNodes: {
+        functional: true,
+        render: (h, ctx) => ctx.props.vnodes,
+      }
     },
     data () {
       return {
@@ -218,6 +222,7 @@
         },
         prefixNo: 'QTCK',
         depotList: [],
+        urlPath: '/bill/other_out',
         //出入库管理开关，适合独立仓管场景
         inOutManageFlag: false,
         labelCol: {

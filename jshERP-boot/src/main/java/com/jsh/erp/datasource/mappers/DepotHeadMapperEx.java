@@ -6,7 +6,6 @@ import com.jsh.erp.datasource.vo.dto.DepotHeadStatisticDto;
 import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -307,6 +306,6 @@ public interface DepotHeadMapperEx {
      * 获取仓库单据不同类型统计数据
      */
     List<DepotHeadStatisticDto> getDepotHeadStatistic(@Param("accountId") Long accountId,
-                                                      @Param("beginTime") LocalDate beginDate,
-                                                      @Param("endTime") LocalDate endDate);
+                                                      @Param("beginTime") String beginTime,
+                                                      @Param("endTime") String endTime);
 }

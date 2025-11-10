@@ -4,10 +4,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.jsh.erp.base.BaseController;
 import com.jsh.erp.base.TableDataInfo;
-import com.jsh.erp.datasource.entities.Material;
-import com.jsh.erp.datasource.entities.MaterialExtend;
-import com.jsh.erp.datasource.entities.MaterialVo4Unit;
-import com.jsh.erp.datasource.entities.Unit;
+import com.jsh.erp.datasource.entities.*;
+import com.jsh.erp.datasource.vo.MaterialDepotStock;
 import com.jsh.erp.service.DepotService;
 import com.jsh.erp.service.DepotItemService;
 import com.jsh.erp.service.MaterialService;
@@ -341,17 +339,19 @@ public class MaterialController extends BaseController {
                         unit = unitService.getUnit(material.getUnitId());
                         //拼接副单位的比例
                         String commodityUnit = material.getCommodityUnit();
-                        if(commodityUnit.equals(unit.getBasicUnit())) {
-                            ratioStr = "[基本]";
-                        }
-                        if(commodityUnit.equals(unit.getOtherUnit()) && unit.getRatio()!=null) {
-                            ratioStr = "[" + unit.getRatio().stripTrailingZeros().toPlainString() + unit.getBasicUnit() + "]";
-                        }
-                        if(commodityUnit.equals(unit.getOtherUnitTwo()) && unit.getRatioTwo()!=null) {
-                            ratioStr = "[" + unit.getRatioTwo().stripTrailingZeros().toPlainString() + unit.getBasicUnit() + "]";
-                        }
-                        if(commodityUnit.equals(unit.getOtherUnitThree()) && unit.getRatioThree()!=null) {
-                            ratioStr = "[" + unit.getRatioThree().stripTrailingZeros().toPlainString() + unit.getBasicUnit() + "]";
+                        if(StringUtil.isNotEmpty(commodityUnit) && unit!=null) {
+                            if(commodityUnit.equals(unit.getBasicUnit())) {
+                                ratioStr = "[基本]";
+                            }
+                            if(commodityUnit.equals(unit.getOtherUnit()) && unit.getRatio()!=null) {
+                                ratioStr = "[" + unit.getRatio().stripTrailingZeros().toPlainString() + unit.getBasicUnit() + "]";
+                            }
+                            if(commodityUnit.equals(unit.getOtherUnitTwo()) && unit.getRatioTwo()!=null) {
+                                ratioStr = "[" + unit.getRatioTwo().stripTrailingZeros().toPlainString() + unit.getBasicUnit() + "]";
+                            }
+                            if(commodityUnit.equals(unit.getOtherUnitThree()) && unit.getRatioThree()!=null) {
+                                ratioStr = "[" + unit.getRatioThree().stripTrailingZeros().toPlainString() + unit.getBasicUnit() + "]";
+                            }
                         }
                     }
                     item.put("mBarCode", material.getmBarCode());
@@ -776,7 +776,11 @@ public class MaterialController extends BaseController {
                                  HttpServletRequest request)throws Exception {
         String ids = jsonObject.getString("ids");
         Map<String, Object> objectMap = new HashMap<>();
-        int res = materialService.batchSetMaterialCurrentStock(ids);
+        List<Depot> depotList = depotService.getAllList();
+        if(depotList.isEmpty()) {
+            return returnJson(objectMap, "请先创建仓库后再操作", ErpInfo.WARING_MSG.code);
+        }
+        int res = materialService.batchSetMaterialCurrentStock(ids, depotList);
         if(res > 0) {
             return returnJson(objectMap, ErpInfo.OK.name, ErpInfo.OK.code);
         } else {
@@ -843,5 +847,21 @@ public class MaterialController extends BaseController {
             res.data = "获取数据失败";
         }
         return res;
+    }
+
+    /**
+     * 根据仓库和商品查询库存分布情况
+     * @param mId
+     * @param request
+     * @return
+     */
+    @GetMapping(value = "/getMaterialDepotStock")
+    @ApiOperation(value = "根据仓库和商品查询库存分布情况")
+    public TableDataInfo getMaterialDepotStock(
+            @RequestParam(value = "depotIds",required = false) String depotIds,
+            @RequestParam("materialId") Long mId,
+            HttpServletRequest request)throws Exception {
+        List<MaterialDepotStock> list = materialService.getMaterialDepotStock(depotIds, mId);
+        return getDataTable(list);
     }
 }

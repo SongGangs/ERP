@@ -149,14 +149,18 @@ public class SupplierController extends BaseController {
      */
     @PostMapping(value = "/findBySelect_cus")
     @ApiOperation(value = "查找客户信息")
-    public JSONArray findBySelectCus(HttpServletRequest request) {
+    public JSONArray findBySelectCus(@RequestBody JSONObject jsonObject,
+                                     HttpServletRequest request) {
         JSONArray arr = new JSONArray();
         try {
+            String key = jsonObject.get("key")!=null ? jsonObject.getString("key") : null;
+            Long organId = jsonObject.get("organId")!=null ? jsonObject.getLong("organId") : null;
+            Integer limit = jsonObject.get("limit")!=null ? jsonObject.getInteger("limit") : null;
             String type = "UserCustomer";
             Long userId = userService.getUserId(request);
             //获取权限信息
             String ubValue = userBusinessService.getUBValueByTypeAndKeyId(type, userId.toString());
-            List<Supplier> supplierList = supplierService.findBySelectCus();
+            List<Supplier> supplierList = supplierService.findBySelectCus(key, organId, limit);
             JSONArray dataArray = new JSONArray();
             if (null != supplierList) {
                 boolean customerFlag = systemConfigService.getCustomerFlag();
@@ -184,10 +188,14 @@ public class SupplierController extends BaseController {
      */
     @PostMapping(value = "/findBySelect_sup")
     @ApiOperation(value = "查找供应商信息")
-    public JSONArray findBySelectSup(HttpServletRequest request) throws Exception{
+    public JSONArray findBySelectSup(@RequestBody JSONObject jsonObject,
+                                     HttpServletRequest request) throws Exception{
         JSONArray arr = new JSONArray();
         try {
-            List<Supplier> supplierList = supplierService.findBySelectSup();
+            String key = jsonObject.get("key")!=null ? jsonObject.getString("key") : null;
+            Long organId = jsonObject.get("organId")!=null ? jsonObject.getLong("organId") : null;
+            Integer limit = jsonObject.get("limit")!=null ? jsonObject.getInteger("limit") : null;
+            List<Supplier> supplierList = supplierService.findBySelectSup(key, organId, limit);
             JSONArray dataArray = new JSONArray();
             if (null != supplierList) {
                 for (Supplier supplier : supplierList) {
@@ -212,12 +220,16 @@ public class SupplierController extends BaseController {
      */
     @PostMapping(value = "/findBySelect_organ")
     @ApiOperation(value = "查找往来单位，含供应商和客户信息")
-    public JSONArray findBySelectOrgan(HttpServletRequest request) throws Exception{
+    public JSONArray findBySelectOrgan(@RequestBody JSONObject jsonObject,
+                                       HttpServletRequest request) throws Exception{
         JSONArray arr = new JSONArray();
         try {
+            String key = jsonObject.get("key")!=null ? jsonObject.getString("key") : null;
+            Long organId = jsonObject.get("organId")!=null ? jsonObject.getLong("organId") : null;
+            Integer limit = jsonObject.get("limit")!=null ? jsonObject.getInteger("limit") : null;
             JSONArray dataArray = new JSONArray();
             //1、获取供应商信息
-            List<Supplier> supplierList = supplierService.findBySelectSup();
+            List<Supplier> supplierList = supplierService.findBySelectSup(key, organId, limit);
             if (null != supplierList) {
                 for (Supplier supplier : supplierList) {
                     JSONObject item = new JSONObject();
@@ -230,7 +242,7 @@ public class SupplierController extends BaseController {
             String type = "UserCustomer";
             Long userId = userService.getUserId(request);
             String ubValue = userBusinessService.getUBValueByTypeAndKeyId(type, userId.toString());
-            List<Supplier> customerList = supplierService.findBySelectCus();
+            List<Supplier> customerList = supplierService.findBySelectCus(key, organId, limit);
             if (null != customerList) {
                 boolean customerFlag = systemConfigService.getCustomerFlag();
                 for (Supplier supplier : customerList) {
@@ -257,10 +269,14 @@ public class SupplierController extends BaseController {
      */
     @PostMapping(value = "/findBySelect_retail")
     @ApiOperation(value = "查找会员信息")
-    public JSONArray findBySelectRetail(HttpServletRequest request)throws Exception {
+    public JSONArray findBySelectRetail(@RequestBody JSONObject jsonObject,
+                                        HttpServletRequest request)throws Exception {
         JSONArray arr = new JSONArray();
         try {
-            List<Supplier> supplierList = supplierService.findBySelectRetail();
+            String key = jsonObject.get("key")!=null ? jsonObject.getString("key") : null;
+            Long organId = jsonObject.get("organId")!=null ? jsonObject.getLong("organId") : null;
+            Integer limit = jsonObject.get("limit")!=null ? jsonObject.getInteger("limit") : null;
+            List<Supplier> supplierList = supplierService.findBySelectRetail(key, organId, limit);
             JSONArray dataArray = new JSONArray();
             if (null != supplierList) {
                 for (Supplier supplier : supplierList) {
@@ -486,6 +502,21 @@ public class SupplierController extends BaseController {
         Map<String, Object> objectMap = new HashMap<>();
         int res = supplierService.batchSetAdvanceIn(ids);
         if(res > 0) {
+            return returnJson(objectMap, ErpInfo.OK.name, ErpInfo.OK.code);
+        } else {
+            return returnJson(objectMap, ErpInfo.ERROR.name, ErpInfo.ERROR.code);
+        }
+    }
+
+    @GetMapping(value = "/getInfoByName")
+    @ApiOperation(value = "根据名称获取信息")
+    public String getInfoByName(@RequestParam("name") String name,
+                                @RequestParam("type") String type,
+                                HttpServletRequest request) throws Exception {
+        Supplier supplier = supplierService.getInfoByName(name, type);
+        Map<String, Object> objectMap = new HashMap<>();
+        if(supplier != null) {
+            objectMap.put("info", supplier);
             return returnJson(objectMap, ErpInfo.OK.name, ErpInfo.OK.code);
         } else {
             return returnJson(objectMap, ErpInfo.ERROR.name, ErpInfo.ERROR.code);

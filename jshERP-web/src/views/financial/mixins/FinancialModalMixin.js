@@ -27,6 +27,7 @@ export const FinancialModalMixin = {
       },
       /* 原始审核是否开启 */
       checkFlag: true,
+      setTimeFlag: null,
       spans: {
         labelCol1: {span: 2},
         wrapperCol1: {span: 22},
@@ -100,7 +101,7 @@ export const FinancialModalMixin = {
     },
     initSupplier() {
       let that = this;
-      findBySelectSup({}).then((res)=>{
+      findBySelectSup({organId: this.model.organId, limit:1}).then((res)=>{
         if(res) {
           that.supList = res;
         }
@@ -108,7 +109,7 @@ export const FinancialModalMixin = {
     },
     initCustomer() {
       let that = this;
-      findBySelectCus({}).then((res)=>{
+      findBySelectCus({organId: this.model.organId, limit:1}).then((res)=>{
         if(res) {
           that.cusList = res;
         }
@@ -116,7 +117,7 @@ export const FinancialModalMixin = {
     },
     initOrgan() {
       let that = this;
-      findBySelectOrgan({}).then((res)=>{
+      findBySelectOrgan({organId: this.model.organId, limit:1}).then((res)=>{
         if(res) {
           that.organList = res;
         }
@@ -124,7 +125,7 @@ export const FinancialModalMixin = {
     },
     initRetail() {
       let that = this;
-      findBySelectRetail({}).then((res)=>{
+      findBySelectRetail({organId: this.model.organId, limit:1}).then((res)=>{
         if(res) {
           that.retailList = res;
         }
@@ -187,6 +188,58 @@ export const FinancialModalMixin = {
         }
       })
     },
+    handleSearchSupplier(value) {
+      let that = this
+      if(this.setTimeFlag != null){
+        clearTimeout(this.setTimeFlag);
+      }
+      this.setTimeFlag = setTimeout(()=>{
+        findBySelectSup({key: value, limit:1}).then((res) => {
+          if(res) {
+            that.supList = res;
+          }
+        })
+      },500)
+    },
+    handleSearchCustomer(value) {
+      let that = this
+      if(this.setTimeFlag != null){
+        clearTimeout(this.setTimeFlag);
+      }
+      this.setTimeFlag = setTimeout(()=>{
+        findBySelectCus({key: value, limit:1}).then((res) => {
+          if(res) {
+            that.cusList = res;
+          }
+        })
+      },500)
+    },
+    handleSearchOrgan(value) {
+      let that = this
+      if(this.setTimeFlag != null){
+        clearTimeout(this.setTimeFlag);
+      }
+      this.setTimeFlag = setTimeout(()=>{
+        findBySelectOrgan({key: value, limit:1}).then((res) => {
+          if(res) {
+            that.organList = res;
+          }
+        })
+      },500)
+    },
+    handleSearchRetail(value) {
+      let that = this
+      if(this.setTimeFlag != null){
+        clearTimeout(this.setTimeFlag);
+      }
+      this.setTimeFlag = setTimeout(()=>{
+        findBySelectRetail({key: value, limit:1}).then((res) => {
+          if(res) {
+            that.retailList = res;
+          }
+        })
+      },500)
+    },
     //选择供应商或客户的触发事件
     onChangeOrgan(value) {
       this.accountTable.dataSource = []
@@ -237,6 +290,15 @@ export const FinancialModalMixin = {
     waitNeedListOk(organType, organId, selectBillRows) {
       if(organId) {
         this.form.setFieldsValue({'organId': organId})
+        if(organType === '供应商') {
+          findBySelectSup({organId: organId, limit:1}).then((res)=> {
+            this.supList = res && Array.isArray(res) ? res : [];
+          })
+        } else if(organType === '客户') {
+          findBySelectCus({organId: organId, limit:1}).then((res)=> {
+            this.cusList = res && Array.isArray(res) ? res : [];
+          })
+        }
       }
       if (selectBillRows && selectBillRows.length > 0) {
         this.requestSubTableDataEx(selectBillRows, this.accountTable);

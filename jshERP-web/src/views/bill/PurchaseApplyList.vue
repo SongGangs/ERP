@@ -215,6 +215,7 @@
         },
         prefixNo: 'QGD',
         depotList: [],
+        urlPath: '/bill/purchase_apply',
         labelCol: {
           span: 5
         },

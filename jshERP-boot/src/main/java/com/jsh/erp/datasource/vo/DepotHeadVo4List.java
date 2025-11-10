@@ -65,4 +65,24 @@ public class DepotHeadVo4List extends DepotHead{
      * 实际欠款
      */
     private BigDecimal realNeedDebt;
+
+    /**
+     * 开户行
+     */
+    private String bankName;
+
+    /**
+     * 账号
+     */
+    private String accountNumber;
+
+    /**
+     * 纳税人识别号
+     */
+    private String taxNum;
+
+    /**
+     * 联系电话
+     */
+    private String phoneNum;
 }

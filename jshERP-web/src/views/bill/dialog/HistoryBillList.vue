@@ -22,7 +22,12 @@
           <a-row :gutter="24">
             <a-col :md="4" :sm="24" v-if="organLabel">
               <a-form-item :label="organLabel" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
-                <a-select v-model="queryParam.organId" :dropdownMatchSelectWidth="false" showSearch optionFilterProp="children">
+                <a-select placeholder="请选择" v-model="queryParam.organId" :dropdownMatchSelectWidth="false" showSearch optionFilterProp="children" @search="handleSearchSupplier">
+                  <div slot="dropdownRender" slot-scope="menu">
+                    <v-nodes :vnodes="menu" />
+                    <a-divider style="margin: 4px 0;" />
+                    <div class="dropdown-btn" @mousedown="e => e.preventDefault()" @click="loadSupplier(organLabel)"><a-icon type="reload" /> 刷新列表</div>
+                  </div>
                   <a-select-option v-for="(item,index) in supplierList" :key="index" :value="item.id">
                     {{ item.supplier }}
                   </a-select-option>
@@ -104,6 +109,10 @@
     mixins:[JeecgListMixin, mixinDevice],
     components: {
       BillDetail,
+      VNodes: {
+        functional: true,
+        render: (h, ctx) => ctx.props.vnodes,
+      }
     },
     data () {
       return {
@@ -114,7 +123,7 @@
         supplierList: [],
         priceLimit: false,
         queryParam: {
-          organId: "",
+          organId: undefined,
           number: "",
           materialParam: "",
           type: "",
@@ -211,7 +220,7 @@
       },
       loadSupplier(organType, organId) {
         if(organType === '供应商') {
-          findBySelectSup({}).then((res)=>{
+          findBySelectSup({limit:1}).then((res)=>{
             if(res) {
               this.supplierList = res
               if(organId) {
@@ -221,7 +230,7 @@
             }
           })
         } else if(organType === '客户') {
-          findBySelectCus({}).then((res)=>{
+          findBySelectCus({limit:1}).then((res)=>{
             if(res) {
               this.supplierList = res
               if(organId) {
@@ -230,6 +239,29 @@
               }
             }
           })
+        }
+      },
+      handleSearchSupplier(value) {
+        let that = this
+        if(this.setTimeFlag != null){
+          clearTimeout(this.setTimeFlag);
+        }
+        if(this.organLabel === '供应商') {
+          this.setTimeFlag = setTimeout(() => {
+            findBySelectSup({ key: value, limit:1 }).then((res) => {
+              if (res) {
+                that.supplierList = res;
+              }
+            })
+          }, 500)
+        } else if(this.organLabel === '客户') {
+          this.setTimeFlag = setTimeout(() => {
+            findBySelectCus({ key: value, limit:1 }).then((res) => {
+              if (res) {
+                that.supplierList = res;
+              }
+            })
+          }, 500)
         }
       },
       close () {

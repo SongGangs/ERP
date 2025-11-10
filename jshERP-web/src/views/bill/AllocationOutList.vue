@@ -202,6 +202,7 @@
         },
         prefixNo: 'DBCK',
         depotList: [],
+        urlPath: '/bill/allocation_out',
         labelCol: {
           span: 5
         },

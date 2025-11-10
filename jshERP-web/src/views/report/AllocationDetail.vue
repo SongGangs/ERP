@@ -307,7 +307,7 @@
       },
       initSupplier() {
         let that = this;
-        findBySelectSup({}).then((res)=>{
+        findBySelectSup({limit:1}).then((res)=>{
           if(res) {
             that.supList = res;
           }

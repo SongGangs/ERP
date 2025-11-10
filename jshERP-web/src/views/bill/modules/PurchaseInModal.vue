@@ -29,7 +29,7 @@
             <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="供应商" data-step="1" data-title="供应商"
               data-intro="供应商必须选择，如果发现需要选择的供应商尚未录入，可以在下拉框中点击新增供应商进行录入">
               <a-select placeholder="请选择供应商" v-decorator="[ 'organId', validatorRules.organId ]" :disabled="!rowCanEdit"
-                :dropdownMatchSelectWidth="false" showSearch optionFilterProp="children">
+                :dropdownMatchSelectWidth="false" showSearch optionFilterProp="children" @search="handleSearchSupplier">
                 <div slot="dropdownRender" slot-scope="menu">
                   <v-nodes :vnodes="menu" />
                   <a-divider style="margin: 4px 0;" />
@@ -221,7 +221,7 @@
   import JUpload from '@/components/jeecg/JUpload'
   import JDate from '@/components/jeecg/JDate'
   import Vue from 'vue'
-  import { getCurrentSystemConfig } from '@/api/api'
+  import { getCurrentSystemConfig, findBySelectSup } from '@/api/api'
 
   export default {
     name: "PurchaseInModal",
@@ -524,6 +524,9 @@
               'changeAmount': changeAmount,
               'accountId': accountId,
               'remark': remark
+            })
+            findBySelectSup({organId: organId, limit:1}).then((res)=> {
+              this.supList = res && Array.isArray(res) ? res : [];
             })
             // getCurrentSystemConfig().then((res) => {
             //   if (res.code === 200 && res.data) {

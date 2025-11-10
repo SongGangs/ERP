@@ -131,7 +131,7 @@
         <!-- 现金流水结余 -->
         <div class="balance-box">
           <span class="balance-label">现金流水结余: <span class="profit-amount">{{ cashBalance }}</span>元</span>
-          <span class="balance-formula">收入单-支出单(已付款)-付款单-采购订单</span>
+          <span class="balance-formula">公式：收入单-支出单(已付款)-付款单-采购订单</span>
         </div>
 
         <!-- 利润账单明细 -->
@@ -190,7 +190,7 @@
         <!-- 利润 -->
         <div class="balance-box">
           <span class="balance-label">当前利润: <span class="profit-amount">{{ profit }}</span>元</span>
-          <span class="balance-formula">收入单-支出单-出库</span>
+          <span class="balance-formula">公式：收入单-支出单-出库</span>
         </div>
       </div>
     </a-modal>

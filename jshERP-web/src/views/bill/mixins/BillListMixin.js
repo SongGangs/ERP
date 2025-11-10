@@ -16,6 +16,7 @@ export const BillListMixin = {
       isShowExcel: false,
       //以销定购的场景开关
       purchaseBySaleFlag: false,
+      setTimeFlag: null,
       waitTotal: 0,
       dateFormat: 'YYYY-MM-DD',
       billExcelUrl: '',
@@ -590,7 +591,7 @@ export const BillListMixin = {
     },
     initSupplier() {
       let that = this;
-      findBySelectSup({}).then((res)=>{
+      findBySelectSup({limit:1}).then((res)=>{
         if(res) {
           that.supList = res;
         }
@@ -598,7 +599,7 @@ export const BillListMixin = {
     },
     initCustomer() {
       let that = this;
-      findBySelectCus({}).then((res)=>{
+      findBySelectCus({limit:1}).then((res)=>{
         if(res) {
           that.cusList = res;
         }
@@ -606,7 +607,7 @@ export const BillListMixin = {
     },
     initRetail() {
       let that = this;
-      findBySelectRetail({}).then((res)=>{
+      findBySelectRetail({limit:1}).then((res)=>{
         if(res) {
           that.retailList = res;
         }
@@ -705,6 +706,45 @@ export const BillListMixin = {
         }
       }
     },
+    handleSearchSupplier(value) {
+      let that = this
+      if(this.setTimeFlag != null){
+        clearTimeout(this.setTimeFlag);
+      }
+      this.setTimeFlag = setTimeout(()=>{
+        findBySelectSup({key: value, limit:1}).then((res) => {
+          if(res) {
+            that.supList = res;
+          }
+        })
+      },500)
+    },
+    handleSearchCustomer(value) {
+      let that = this
+      if(this.setTimeFlag != null){
+        clearTimeout(this.setTimeFlag);
+      }
+      this.setTimeFlag = setTimeout(()=>{
+        findBySelectCus({key: value, limit:1}).then((res) => {
+          if(res) {
+            that.cusList = res;
+          }
+        })
+      },500)
+    },
+    handleSearchRetail(value) {
+      let that = this
+      if(this.setTimeFlag != null){
+        clearTimeout(this.setTimeFlag);
+      }
+      this.setTimeFlag = setTimeout(()=>{
+        findBySelectRetail({key: value, limit:1}).then((res) => {
+          if(res) {
+            that.retailList = res;
+          }
+        })
+      },500)
+    },
     getDepotByCurrentUser() {
       getAction('/depot/findDepotByCurrentUser').then((res) => {
         if (res.code === 200) {
@@ -746,13 +786,14 @@ export const BillListMixin = {
           }
           getAction('/depotItem/getDetailList', param).then((res) => {
             if (res.code === 200) {
+              let deposit = info.changeAmount - info.finishDeposit
               let transferParam = {
                 list: res.data.rows,
                 number: info.number,
                 organId: info.organId,
                 depotId: info.depotId,
                 discountMoney: info.discountMoney,
-                deposit: info.deposit,
+                deposit: deposit,
                 remark: info.remark,
                 accountId: info.accountId,
                 salesMan: info.salesMan
