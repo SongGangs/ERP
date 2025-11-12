@@ -19,13 +19,12 @@
         <a-form layout="inline" @keyup.enter.native="searchQuery">
           <a-row :gutter="24">
             <a-col :md="6" :sm="24">
-              <a-form-item label="单据编号" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
-                <a-input placeholder="请输入单据编号查询" v-model="queryParam.number"></a-input>
-              </a-form-item>
-            </a-col>
-            <a-col :md="6" :sm="24">
-              <a-form-item label="商品信息" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
-                <a-input placeholder="请输入名称、规格、型号" v-model="queryParam.materialParam"></a-input>
+              <a-form-item label="仓库名称" :labelCol="labelCol" :wrapperCol="wrapperCol">
+                <a-select placeholder="请选择仓库" showSearch allow-clear optionFilterProp="children" v-model="queryParam.depotId">
+                  <a-select-option v-for="(depot,index) in depotList" :key="index" :value="depot.id">
+                    {{ depot.depotName }}
+                  </a-select-option>
+                </a-select>
               </a-form-item>
             </a-col>
             <a-col :md="6" :sm="24">
@@ -40,12 +39,33 @@
                 />
               </a-form-item>
             </a-col>
+            <a-col :md="6" :sm="24">
+              <a-form-item label="操作员" :labelCol="labelCol" :wrapperCol="wrapperCol">
+                <a-select placeholder="请选择操作员" showSearch allow-clear optionFilterProp="children" v-model="queryParam.creator">
+                  <a-select-option v-for="(item,index) in userList" :key="index" :value="item.id">
+                    {{ item.userName }}
+                  </a-select-option>
+                </a-select>
+              </a-form-item>
+            </a-col>
             <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
               <a-col :md="6" :sm="24">
                 <a-button type="primary" @click="searchQuery">查询</a-button>
                 <a-button style="margin-left: 8px" @click="searchReset">重置</a-button>
               </a-col>
             </span>
+          </a-row>
+          <a-row :gutter="24">
+            <a-col :md="6" :sm="24">
+              <a-form-item label="单据编号" :labelCol="labelCol" :wrapperCol="wrapperCol">
+                <a-input placeholder="请输入单据编号查询" v-model="queryParam.number"></a-input>
+              </a-form-item>
+            </a-col>
+            <a-col :md="6" :sm="24">
+              <a-form-item label="商品信息" :labelCol="labelCol" :wrapperCol="wrapperCol">
+                <a-input placeholder="请输入名称、规格、型号" v-model="queryParam.materialParam"></a-input>
+              </a-form-item>
+            </a-col>
           </a-row>
         </a-form>
       </div>
@@ -75,13 +95,14 @@
 
 <script>
   import BillDetail from '../../bill/dialog/BillDetail'
+  import { BillListMixin } from '../../bill/mixins/BillListMixin'
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
   import {mixinDevice} from '@/utils/mixin'
   import { findBillDetailByNumber } from '@/api/api'
   import Vue from 'vue'
   export default {
     name: 'DebtBillList',
-    mixins:[JeecgListMixin, mixinDevice],
+    mixins:[JeecgListMixin, mixinDevice, BillListMixin],
     components: {
       BillDetail
     },
@@ -93,6 +114,8 @@
         selectedRowKeys: [],
         selectionRows: [],
         selectBillRows: [],
+        depotList: [],
+        userList: [],
         selectBillIds: '',
         queryParam: {
           organId: "",
@@ -100,7 +123,9 @@
           number: "",
           type: "",
           subType: "",
-          status: ""
+          status: "",
+          depotId: undefined,
+          creator: undefined
         },
         labelCol: {
           xs: { span: 24 },
@@ -141,6 +166,8 @@
       }
     },
     created() {
+      this.getDepotData()
+      this.initUser()
     },
     methods: {
       show(organId, type, subType, organType, status) {
@@ -166,7 +193,7 @@
         findBillDetailByNumber({ number: record.number }).then((res) => {
           if (res && res.code === 200) {
             let type = res.data.depotHeadType
-            type = type.replace('其它','')
+            // type = type.replace('其它','')
             this.handleDetail(res.data, type)
           }
         })
@@ -199,7 +226,8 @@
       searchReset() {
         this.queryParam = {
           type: this.queryParam.type,
-          subType: this.queryParam.subType
+          subType: this.queryParam.subType,
+          organId: this.queryParam.organId
         }
         this.loadData(1);
       },

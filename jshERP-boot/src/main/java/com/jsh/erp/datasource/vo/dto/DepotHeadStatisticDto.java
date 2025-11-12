@@ -18,7 +18,7 @@ public class DepotHeadStatisticDto {
 
     private String subTypeName;
 
-    private Integer outType;
+    private Integer bizType;
 
     private Integer status;
 

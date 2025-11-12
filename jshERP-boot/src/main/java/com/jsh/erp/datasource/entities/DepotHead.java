@@ -75,7 +75,7 @@ public class DepotHead {
 
     private String linkApply;
 
-    private Integer outType;
+    private Integer bizType;
 
     private Long tenantId;
 

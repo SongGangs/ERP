@@ -12,7 +12,7 @@ import com.jsh.erp.datasource.vo.AccountVo4List;
 import com.jsh.erp.datasource.vo.dto.DepotHeadStatisticDto;
 import com.jsh.erp.datasource.vo.enums.HeadStatusEnum;
 import com.jsh.erp.datasource.vo.dto.AccountStatisticDto;
-import com.jsh.erp.datasource.vo.enums.OutTypeEnum;
+import com.jsh.erp.datasource.vo.enums.BizTypeEnum;
 import com.jsh.erp.datasource.vo.req.AccountStatisticReq;
 import com.jsh.erp.datasource.vo.resp.AccountStatisticItemResp;
 import com.jsh.erp.datasource.vo.resp.AccountStatisticResp;
@@ -670,6 +670,10 @@ public class AccountService {
                 .filter(t -> "支出".equals(t.getTypeName()))
                 .filter(t -> HeadStatusEnum.AUDITED.isType(t.getStatus()))
                 .collect(Collectors.toMap(AccountStatisticDto::getItemName, AccountStatisticDto::getAmount, BigDecimal::add));
+        Map<String, BigDecimal> companyOutItemMap = inOutStats.stream()
+                .filter(t -> "支出".equals(t.getTypeName()))
+                .filter(t -> t.getItemName().contains("公司"))
+                .collect(Collectors.toMap(AccountStatisticDto::getItemName, AccountStatisticDto::getAmount, BigDecimal::add));
 
         List<DepotHeadStatisticDto> depotHeadStats = depotHeadMapperEx.getDepotHeadStatistic(req.getAccountId(), beginTime, endTime);
         Map<String, BigDecimal> purchaseItemMap = depotHeadStats.stream()
@@ -678,7 +682,7 @@ public class AccountService {
         Map<String, BigDecimal> outStoreItemMap = depotHeadStats.stream()
                 .filter(t -> DEPOTHEAD_TYPE_OUT.equals(t.getTypeName()))
                 .filter(t -> SUB_TYPE_OTHER.equals(t.getSubTypeName()))
-                .collect(Collectors.toMap(t -> EnumUtils.getDesc(t.getOutType(), OutTypeEnum.class), DepotHeadStatisticDto::getAmount, BigDecimal::add));
+                .collect(Collectors.toMap(t -> EnumUtils.getDesc(t.getBizType(), BizTypeEnum.class), DepotHeadStatisticDto::getAmount, BigDecimal::add));
         Map<String, BigDecimal> paidOtherInStoreItemMap = depotHeadStats.stream()
                 .filter(t -> DEPOTHEAD_TYPE_IN.equals(t.getTypeName()))
                 .filter(t -> SUB_TYPE_OTHER.equals(t.getSubTypeName()))
@@ -697,6 +701,8 @@ public class AccountService {
         // 利润 = 收入单-支出单-出库
         BigDecimal profit = sumAmount(inItemMap).subtract(sumAmount(outItemMap))
                 .subtract(sumAmount(paidOtherInStoreItemMap)).subtract(sumAmount(outStoreItemMap));
+        // 打款 = 收入单-维修费（公司）-清洁费（公司）-清洁费（公司）-管理费（公司）-水电等公摊（公司）
+        BigDecimal paymentAmount = sumAmount(inItemMap).subtract(sumAmount(companyOutItemMap));
 
         return AccountStatisticResp.builder()
                 .accountId(account.getId())
@@ -708,8 +714,10 @@ public class AccountService {
                 .outStore(AccountStatisticItemResp.from(outStoreItemMap))
                 .paidOtherInStore(AccountStatisticItemResp.from(paidOtherInStoreItemMap))
                 .unPaidOtherInStore(AccountStatisticItemResp.from(unPaidOtherInStoreItemMap))
+                .companyOut(AccountStatisticItemResp.from(companyOutItemMap))
                 .cashBalance(cashBalance)
                 .profit(profit)
+                .paymentAmount(paymentAmount)
                 .build();
     }
 

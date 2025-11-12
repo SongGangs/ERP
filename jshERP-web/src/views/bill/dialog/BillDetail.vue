@@ -966,6 +966,13 @@
               </a-form-item>
             </a-col>
           </a-row>
+          <a-row class="form-row" :gutter="24">
+            <a-col :span="6">
+              <a-form-item :labelCol="{xs: { span: 24 },sm: { span: 6 }}" :wrapperCol="wrapperCol" label="结算账户">
+                {{model.accountName}}
+              </a-form-item>
+            </a-col>
+          </a-row>
         </section>
       </template>
       <!--其它出库-->
@@ -974,7 +981,7 @@
           <a-row class="form-row" :gutter="24">
             <a-col :span="6">
               <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="出库类型">
-                {{ convertOutType(model.outType) }}
+                {{ convertBizType(model.bizType) }}
               </a-form-item>
             </a-col>
             <a-col :span="6">
@@ -1019,6 +1026,13 @@
             <a-col :lg="24" :md="24" :sm="24">
               <a-form-item :labelCol="labelCol" :wrapperCol="{xs: { span: 24 },sm: { span: 24 }}" label="" style="padding:20px 10px;">
                 {{model.remark}}
+              </a-form-item>
+            </a-col>
+          </a-row>
+          <a-row class="form-row" :gutter="24">
+            <a-col :span="6">
+              <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="结算账户">
+                {{model.accountName}}
               </a-form-item>
             </a-col>
           </a-row>
@@ -2102,7 +2116,7 @@
           list.push(item)
         }
         let organName = this.model.organName? this.model.organName: ''
-        let tip = '出库类型：' + this.convertOutType(this.model.outType) + ' ' + organType + organName + ' ' + '单据日期：' + this.model.operTimeStr + ' ' + '单据编号：' + this.model.number
+        let tip = '出库类型：' + this.convertBizType(this.model.bizType) + ' ' + organType + organName + ' ' + '单据日期：' + this.model.operTimeStr + ' ' + '单据编号：' + this.model.number
         exportXlsPost(this.billType + '_' + this.model.number, '单据导出', head, tip, list)
       },
       //调拨出库
@@ -2158,8 +2172,8 @@
         let tip = '单据日期：' + this.model.operTimeStr + ' ' + '单据编号：' + this.model.number + '' + '关联单号：' + linkNumber
         exportXlsPost(this.billType + '_' + this.model.number, '单据导出', head, tip, list)
       },
-      convertOutType(outType){
-        return outType === 1 ? '原材料消耗' : (outType === 2 ? '损坏报损' : (outType === 3 ? '临期过期报损' : ''))
+      convertBizType(bizType){
+        return bizType === 1 ? '原材料消耗' : (bizType === 2 ? '损坏报损' : (bizType === 3 ? '临期过期报损' : (bizType === 4 ? '盘亏报损' : '')))
       }
     }
   }

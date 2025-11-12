@@ -32,6 +32,8 @@ public class AccountStatisticResp {
 
     private List<AccountStatisticItemResp> unPaidOtherInStore;
 
+    private List<AccountStatisticItemResp> companyOut;
+
     /**
      * 现金流水结余 = 收入单-支出单(已付款)-付款单-采购订单
      */
@@ -41,4 +43,10 @@ public class AccountStatisticResp {
      * 利润 = 收入单-支出单-出库
      */
     private BigDecimal profit;
+
+    /**
+     * 当前打款 = 收入单-维修费（公司）-清洁费（公司）-清洁费（公司）-管理费（公司）-水电等公摊（公司）
+     * 带（公司）字符的支出单
+     */
+    private BigDecimal paymentAmount;
 }

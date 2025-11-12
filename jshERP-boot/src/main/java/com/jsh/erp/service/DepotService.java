@@ -372,6 +372,14 @@ public class DepotService {
         return depotStr;
     }
 
+    public String[] findDepotStrByCurrentUser(String depotId) throws Exception {
+        JSONArray arr = findDepotByCurrentUser();
+        return arr.stream().map(t -> (JSONObject) t)
+                .map(t -> t.getString("id"))
+                .filter(t -> Objects.isNull(depotId) || t.equals(depotId))
+                .toArray(String[]::new);
+    }
+
     @Transactional(value = "transactionManager", rollbackFor = Exception.class)
     public int batchSetStatus(Boolean status, String ids)throws Exception {
         logService.insertLog("仓库",

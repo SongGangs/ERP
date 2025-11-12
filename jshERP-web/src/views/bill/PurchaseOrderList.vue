@@ -96,6 +96,15 @@
                   </a-form-item>
                 </a-col>
                 <a-col :md="6" :sm="24">
+                  <a-form-item label="结算账户" :labelCol="labelCol" :wrapperCol="wrapperCol">
+                    <a-select placeholder="请选择结算账户" showSearch allow-clear optionFilterProp="children" v-model="queryParam.accountId">
+                      <a-select-option v-for="(item,index) in accountList" :key="index" :value="item.id">
+                        {{ item.name }}
+                      </a-select-option>
+                    </a-select>
+                  </a-form-item>
+                </a-col>
+                <a-col :md="6" :sm="24">
                   <a-form-item label="单据备注" :labelCol="labelCol" :wrapperCol="wrapperCol">
                     <a-input placeholder="请输入单据备注" v-model="queryParam.remark"></a-input>
                   </a-form-item>
@@ -247,6 +256,7 @@
           linkApply: "",
           linkNumber: "",
           creator: undefined,
+          accountId: undefined,
           status: undefined,
           remark: ""
         },
@@ -261,8 +271,8 @@
           offset: 1
         },
         // 默认索引
-        defDataIndex:['action','organName','number','materialsList','operTimeStr','userName','materialCount','totalPrice','totalTaxLastMoney',
-          'changeAmount','status'],
+        defDataIndex:['action','number','materialsList','operTimeStr','userName','materialCount','totalPrice','totalTaxLastMoney',
+          'changeAmount','accountName','status'],
         // 默认列
         defColumns: [
           { title: '状态', dataIndex: 'status', width: 80, align: "center",
@@ -306,7 +316,7 @@
           },
           { title: '付款优惠', dataIndex: 'discountMoney',width:80},
           { title: '优惠后金额', dataIndex: 'discountLastMoney',width:100},
-          { title: '结算账户', dataIndex: 'accountName',width:80},
+          { title: '结算账户', dataIndex: 'accountName',width:120, ellipsis:true},
           { title: '支付订金', dataIndex: 'changeAmount',width:80},
           { title: '备注', dataIndex: 'remark',width:200}
         ],
@@ -326,6 +336,7 @@
       this.initUser()
       this.initQuickBtn()
       this.getDepotByCurrentUser()
+      this.initAccount()
       // Todo Childs
       // this.queryParam.status = '1,2,3'
     },

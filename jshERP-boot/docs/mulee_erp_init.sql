@@ -109,7 +109,7 @@ CREATE TABLE `jsh_depot_head`  (
   `source` varchar(1) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '0' COMMENT '单据来源，0-pc，1-手机',
   `link_number` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '关联订单号',
   `link_apply` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '关联请购单',
-  `out_type` tinyint(4) NULL DEFAULT NULL COMMENT '出库类型，1-原材料消耗 2-损坏报损 3-临期过期报损',
+  `biz_type` tinyint(4) NULL DEFAULT NULL COMMENT '业务类型，1-原材料消耗 2-损坏报损 3-临期过期报损',
   `tenant_id` bigint(20) NULL DEFAULT NULL COMMENT '租户id',
   `delete_flag` varchar(1) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '0' COMMENT '删除标记，0未删除，1删除',
   PRIMARY KEY (`id`) USING BTREE,

@@ -59,6 +59,7 @@
                 <td :rowspan="incomeData.length" class="sub-category-cell">收入单</td>
                 <td class="item-cell">{{ incomeData[0] ? incomeData[0].itemName : '' }}</td>
                 <td class="amount-cell">{{ incomeData[0] ? incomeData[0].amount : '' }}</td>
+                <td :rowspan="incomeData.length" class="total-amount-cell" style="background: #e6f7ff; font-weight: bold;">{{ incomeTotalAmount }}</td>
               </tr>
               <tr v-for="(item, index) in incomeData.slice(1)" :key="'profit-income-' + index">
                 <td class="item-cell">{{ item.itemName }}</td>
@@ -78,6 +79,7 @@
                   <td :rowspan="paidOutData.length" class="sub-category-cell">支出单(已付款)</td>
                   <td class="item-cell">{{ paidOutData[0].itemName }}</td>
                   <td class="amount-cell">{{ paidOutData[0].amount }}</td>
+                  <td :rowspan="paidOutData.length" class="total-amount-cell" style="background: #fff1f0; font-weight: bold;">{{ paidOutTotalAmount }}</td>
                 </tr>
                 <tr v-for="(item, index) in paidOutData.slice(1)" :key="'paidOut-' + index">
                   <td class="item-cell">{{ item.itemName }}</td>
@@ -91,6 +93,7 @@
                   <td :rowspan="paidOtherInStoreData.length" class="sub-category-cell">其它入库(已付款)</td>
                   <td class="item-cell">{{ paidOtherInStoreData[0].itemName }}</td>
                   <td class="amount-cell">{{ paidOtherInStoreData[0].amount }}</td>
+                  <td :rowspan="paidOtherInStoreData.length" class="total-amount-cell" style="background: #fff1f0; font-weight: bold;">{{ paidOtherInStoreTotalAmount }}</td>
                 </tr>
                 <tr v-for="(item, index) in paidOtherInStoreData.slice(1)" :key="'paidOtherInStore-' + index">
                   <td class="item-cell">{{ item.itemName }}</td>
@@ -98,12 +101,13 @@
                 </tr>
               </template>
 
-              <!-- 其它入库(待付款) -->
+              <!-- 其它入库(未付款) -->
               <template v-if="unPaidOtherInStoreData.length > 0">
                 <tr>
-                  <td :rowspan="unPaidOtherInStoreData.length" class="sub-category-cell">其它入库(已付款)</td>
+                  <td :rowspan="unPaidOtherInStoreData.length" class="sub-category-cell">其它入库(未付款)</td>
                   <td class="item-cell">{{ unPaidOtherInStoreData[0].itemName }}</td>
                   <td class="amount-cell">{{ unPaidOtherInStoreData[0].amount }}</td>
+                  <td :rowspan="unPaidOtherInStoreData.length" class="total-amount-cell" style="background: #fff1f0; font-weight: bold;">{{ unPaidOtherInStoreTotalAmount }}</td>
                 </tr>
                 <tr v-for="(item, index) in unPaidOtherInStoreData.slice(1)" :key="'unPaidOtherInStore-' + index">
                   <td class="item-cell">{{ item.itemName }}</td>
@@ -117,6 +121,7 @@
                   <td :rowspan="purchaseData.length" class="sub-category-cell">采购</td>
                   <td class="item-cell">{{ purchaseData[0].itemName }}</td>
                   <td class="amount-cell">{{ purchaseData[0].amount }}</td>
+                  <td :rowspan="purchaseData.length" class="total-amount-cell" style="background: #fff1f0; font-weight: bold;">{{ purchaseTotalAmount }}</td>
                 </tr>
                 <tr v-for="(item, index) in purchaseData.slice(1)" :key="'purchase-' + index">
                   <td class="item-cell">{{ item.itemName }}</td>
@@ -134,6 +139,12 @@
           <span class="balance-formula">公式：收入单-支出单(已付款)-付款单-采购订单</span>
         </div>
 
+        <!-- 现金流水结余 -->
+        <div class="balance-box">
+          <span class="balance-label">当前打款: <span class="profit-amount">{{ paymentAmount }}</span>元</span>
+          <span class="balance-formula">公式：{{ paymentFormula }}</span>
+        </div>
+
         <!-- 利润账单明细 -->
         <div class="statistic-section-title" style="margin-top: 30px">利润账单明细</div>
         <a-row :gutter="16">
@@ -142,9 +153,10 @@
             <table class="statistic-table">
               <tbody>
               <tr>
-                <td rowspan="50" class="sub-category-cell">收入单</td>
+                <td :rowspan="incomeData.length" class="sub-category-cell">收入单</td>
                 <td class="item-cell">{{ incomeData[0] ? incomeData[0].itemName : '' }}</td>
                 <td class="amount-cell">{{ incomeData[0] ? incomeData[0].amount : '' }}</td>
+                <td :rowspan="incomeData.length" class="total-amount-cell" style="background: #e6f7ff; font-weight: bold;">{{ incomeTotalAmount }}</td>
               </tr>
               <tr v-for="(item, index) in incomeData.slice(1)" :key="'income-' + index">
                 <td class="item-cell">{{ item.itemName }}</td>
@@ -163,6 +175,7 @@
                   <td :rowspan="outData.length" class="sub-category-cell">支出单(已付款和未付款)</td>
                   <td class="item-cell">{{ outData[0].itemName }}</td>
                   <td class="amount-cell">{{ outData[0].amount }}</td>
+                  <td :rowspan="outData.length" class="total-amount-cell" style="background: #fff1f0; font-weight: bold;">{{ outTotalAmount }}</td>
                 </tr>
                 <tr v-for="(item, index) in outData.slice(1)" :key="'out-' + index">
                   <td class="item-cell">{{ item.itemName }}</td>
@@ -176,6 +189,7 @@
                   <td :rowspan="outStoreData.length" class="sub-category-cell">支出(出库)</td>
                   <td class="item-cell">{{ outStoreData[0].itemName }}</td>
                   <td class="amount-cell">{{ outStoreData[0].amount }}</td>
+                  <td :rowspan="outStoreData.length" class="total-amount-cell" style="background: #fff1f0; font-weight: bold;">{{ outStoreTotalAmount }}</td>
                 </tr>
                 <tr v-for="(item, index) in outStoreData.slice(1)" :key="'outStore-' + index">
                   <td class="item-cell">{{ item.itemName }}</td>
@@ -200,7 +214,7 @@
 import { JeecgListMixin } from '@/mixins/JeecgListMixin'
 import { mixinDevice } from '@/utils/mixin'
 import JEllipsis from '@/components/jeecg/JEllipsis'
-import { getFirstDayOfCurrentMonth, getFormatDate } from '@/utils/util'
+import { getFirstDayOfCurrentMonth, getFormatDate, getLastDayOfCurrentMonth } from '@/utils/util'
 import { getAction } from '@/api/manage'
 import moment from 'moment/moment'
 
@@ -222,8 +236,8 @@ export default {
       queryParam: {
         accountId: '',
         beginDate: getFirstDayOfCurrentMonth(),
-        endDate: getFormatDate(),
-        createTimeRange: [moment(getFirstDayOfCurrentMonth()), moment(getFormatDate())]
+        endDate: getLastDayOfCurrentMonth(),
+        createTimeRange: [moment(getFirstDayOfCurrentMonth()), moment(getLastDayOfCurrentMonth())]
       },
       tabKey: '1',
       pageName: 'accountStatisticModel',
@@ -237,10 +251,23 @@ export default {
       outStoreData: [],
       paidOtherInStoreData: [],
       unPaidOtherInStoreData: [],
+      companyOutData: [],
       // 现金结余
       cashBalance: 0,
+      // 打款
+      paymentAmount: 0,
+      // 打款公式
+      paymentFormula: '',
       // 利润
       profit: 0,
+      // 各类别总金额
+      incomeTotalAmount: 0,
+      paidOutTotalAmount: 0,
+      paidOtherInStoreTotalAmount: 0,
+      unPaidOtherInStoreTotalAmount: 0,
+      purchaseTotalAmount: 0,
+      outTotalAmount: 0,
+      outStoreTotalAmount: 0,
       labelCol: {
         xs: { span: 1 },
         sm: { span: 2 }
@@ -308,8 +335,8 @@ export default {
       this.queryParam = {
         accountId: this.currentAccountId,
         beginDate: getFirstDayOfCurrentMonth(),
-        endDate: getFormatDate(),
-        createTimeRange: [moment(getFirstDayOfCurrentMonth()), moment(getFormatDate())]
+        endDate: getLastDayOfCurrentMonth(),
+        createTimeRange: [moment(getFirstDayOfCurrentMonth()), moment(getLastDayOfCurrentMonth())]
       }
       this.loadData()
     },
@@ -407,6 +434,12 @@ export default {
       list.push([]) // 空行
       list.push([]) // 空行
 
+      // 当前打款
+      list.push([])
+      list.push(['当前打款: ', this.paymentAmount + '元'])
+      list.push([]) // 空行
+      list.push([]) // 空行
+
       // ========== 利润账单明细 ==========
       list.push(['利润账单明细'])
       list.push([]) // 空行
@@ -466,9 +499,9 @@ export default {
         list.push(row)
       }
 
-      // 当月利润
+      // 当前利润
       list.push([])
-      list.push(['当月利润: ', this.profit + '元'])
+      list.push(['当前利润: ', this.profit + '元'])
 
       let head = '收入分类,收入项目,收入金额,,,,支出分类,支出项目,支出金额'
       let tip = this.statisticData.accountName
@@ -540,9 +573,43 @@ export default {
         }))
       }
 
+      // 计算各类别总金额
+      this.incomeTotalAmount = this.incomeData.reduce((sum, item) => sum + parseFloat(item.amount), 0).toFixed(2)
+      this.paidOutTotalAmount = this.paidOutData.reduce((sum, item) => sum + parseFloat(item.amount), 0).toFixed(2)
+      this.paidOtherInStoreTotalAmount = this.paidOtherInStoreData.reduce((sum, item) => sum + parseFloat(item.amount), 0).toFixed(2)
+      this.unPaidOtherInStoreTotalAmount = this.unPaidOtherInStoreData.reduce((sum, item) => sum + parseFloat(item.amount), 0).toFixed(2)
+      this.purchaseTotalAmount = this.purchaseData.reduce((sum, item) => sum + parseFloat(item.amount), 0).toFixed(2)
+      this.outTotalAmount = this.outData.reduce((sum, item) => sum + parseFloat(item.amount), 0).toFixed(2)
+      this.outStoreTotalAmount = this.outStoreData.reduce((sum, item) => sum + parseFloat(item.amount), 0).toFixed(2)
+
       // 设置结余和利润
       this.cashBalance = parseFloat(this.statisticData.cashBalance || 0).toFixed(2)
+      this.paymentAmount = parseFloat(this.statisticData.paymentAmount || 0).toFixed(2)
       this.profit = parseFloat(this.statisticData.profit || 0).toFixed(2)
+
+      // 处理打款支出项数据
+      this.companyOutData = []
+      if (this.statisticData.companyOut && this.statisticData.companyOut.length > 0) {
+        this.companyOutData = this.statisticData.companyOut.map(item => ({
+          itemName: item.itemName,
+          amount: parseFloat(item.amount || 0).toFixed(2)
+        }))
+      }
+
+      // 动态生成打款公式
+      this.generatePaymentFormula()
+    },
+    generatePaymentFormula() {
+      // 基础公式：收入单
+      let formula = '收入单'
+
+      // 添加支出项
+      if (this.companyOutData && this.companyOutData.length > 0) {
+        const outItems = this.companyOutData.map(item => item.itemName).join(' - ')
+        formula += '-' + outItems
+      }
+
+      this.paymentFormula = formula
     }
   }
 }
@@ -596,6 +663,13 @@ export default {
   font-weight: bold;
   background: #fafafa;
   vertical-align: middle;
+}
+
+.total-amount-cell {
+  width: 15%;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 14px;
 }
 
 .sub-category-cell {

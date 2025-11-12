@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum OutTypeEnum implements BaseEnum {
+public enum BizTypeEnum implements BaseEnum {
 
     /**
      * 原材料消耗
@@ -20,7 +20,17 @@ public enum OutTypeEnum implements BaseEnum {
     /**
      * 临期过期报损
      */
-    EXPIRING_LOSS(3, "临期过期报损");
+    EXPIRING_LOSS(3, "临期过期报损"),
+    /**
+     * 盘亏报损
+     */
+    STOCK_LOSS(4, "盘亏报损"),
+
+    /**
+     * 盘盈入库
+     */
+    STOCK_Profit(14, "盘盈入库"),
+    ;
 
     private final Integer type;
     private final String desc;

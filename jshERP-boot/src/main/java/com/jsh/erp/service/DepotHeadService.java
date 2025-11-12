@@ -19,7 +19,8 @@ import com.jsh.erp.utils.Tools;
 import jxl.Workbook;
 import jxl.write.WritableWorkbook;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -268,6 +269,21 @@ public class DepotHeadService {
             creatorArray = creator.split(",");
         }
         return creatorArray;
+    }
+
+    private String[] getCreatorArray(String creatorId) throws Exception {
+        String creator = getCreatorByCurrentUser();
+        String[] creatorArray = null;
+        if (StringUtil.isNotEmpty(creator)) {
+            creatorArray = creator.split(",");
+        }
+        if (StringUtils.isBlank(creatorId)) {
+            return creatorArray;
+        }
+        if (Objects.isNull(creatorArray) || ArrayUtils.isEmpty(creatorArray)) {
+            return new String[]{creatorId};
+        }
+        return Arrays.stream(creatorArray).filter(s -> s.equals(creatorId)).toArray(String[]::new);
     }
 
     /**
@@ -1511,12 +1527,11 @@ public class DepotHeadService {
     }
 
     public List<DepotHeadVo4List> debtList(Long organId, String materialParam, String number, String beginTime, String endTime,
-                                           String status, Integer offset, Integer rows) {
+                                           String status, String depotId, String creator, Integer offset, Integer rows) {
         List<DepotHeadVo4List> resList = new ArrayList<>();
         try{
-            String depotIds = depotService.findDepotStrByCurrentUser();
-            String [] depotArray=depotIds.split(",");
-            String [] creatorArray = getCreatorArray();
+            String[] depotArray = depotService.findDepotStrByCurrentUser(depotId);
+            String[] creatorArray = getCreatorArray(creator);
             beginTime = Tools.parseDayToTime(beginTime,BusinessConstants.DAY_FIRST_TIME);
             endTime = Tools.parseDayToTime(endTime,BusinessConstants.DAY_LAST_TIME);
             List<DepotHeadVo4List> list=depotHeadMapperEx.debtList(organId, creatorArray, status, number,
@@ -1531,12 +1546,11 @@ public class DepotHeadService {
     }
 
     public int debtListCount(Long organId, String materialParam, String number, String beginTime, String endTime,
-                             String status) {
+                             String status, String depotId, String creator) {
         int total = 0;
         try {
-            String depotIds = depotService.findDepotStrByCurrentUser();
-            String[] depotArray = depotIds.split(",");
-            String[] creatorArray = getCreatorArray();
+            String[] depotArray = depotService.findDepotStrByCurrentUser(depotId);
+            String[] creatorArray = getCreatorArray(creator);
             beginTime = Tools.parseDayToTime(beginTime, BusinessConstants.DAY_FIRST_TIME);
             endTime = Tools.parseDayToTime(endTime, BusinessConstants.DAY_LAST_TIME);
             total = depotHeadMapperEx.debtListCount(organId, creatorArray, status, number,

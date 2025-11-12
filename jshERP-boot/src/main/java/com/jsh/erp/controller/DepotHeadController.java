@@ -695,9 +695,11 @@ public class DepotHeadController extends BaseController {
         String beginTime = StringUtil.getInfo(search, "beginTime");
         String endTime = StringUtil.getInfo(search, "endTime");
         String status = StringUtil.getInfo(search, "status");
+        String depotId = StringUtil.getInfo(search, "depotId");
+        String creator = StringUtil.getInfo(search, "creator");
         List<DepotHeadVo4List> list = depotHeadService.debtList(organId, materialParam, number, beginTime, endTime,
-                status, (currentPage-1)*pageSize, pageSize);
-        int total = depotHeadService.debtListCount(organId, materialParam, number, beginTime, endTime, status);
+                status, depotId, creator, (currentPage - 1) * pageSize, pageSize);
+        int total = depotHeadService.debtListCount(organId, materialParam, number, beginTime, endTime, status, depotId, creator);
         if (list != null) {
             objectMap.put("rows", list);
             objectMap.put("total", total);

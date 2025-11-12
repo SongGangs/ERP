@@ -75,6 +75,15 @@
                   </a-form-item>
                 </a-col>
                 <a-col :md="6" :sm="24">
+                  <a-form-item label="结算账户" :labelCol="labelCol" :wrapperCol="wrapperCol">
+                    <a-select placeholder="请选择结算账户" showSearch allow-clear optionFilterProp="children" v-model="queryParam.accountId">
+                      <a-select-option v-for="(item,index) in accountList" :key="index" :value="item.id">
+                        {{ item.name }}
+                      </a-select-option>
+                    </a-select>
+                  </a-form-item>
+                </a-col>
+                <a-col :md="6" :sm="24">
                   <a-form-item label="单据备注" :labelCol="labelCol" :wrapperCol="wrapperCol">
                     <a-input placeholder="请输入单据备注" v-model="queryParam.remark"></a-input>
                   </a-form-item>
@@ -151,10 +160,10 @@
               <a-tag v-if="status == '1'" color="green">已审核</a-tag>
               <a-tag v-if="status == '9'" color="orange">审核中</a-tag>
             </template>
-            <template slot="customRenderOutType" slot-scope="outType">
-              <a-tag v-if="outType === 1" color="cyan">原材料消耗</a-tag>
-              <a-tag v-if="outType === 2" color="green">损坏报损</a-tag>
-              <a-tag v-if="outType === 3" color="orange">临期过期报损</a-tag>
+            <template slot="customRenderBizType" slot-scope="bizType">
+              <a-tag v-if="bizType === 1" color="cyan">原材料消耗</a-tag>
+              <a-tag v-if="bizType === 2" color="green">损坏报损</a-tag>
+              <a-tag v-if="bizType === 3" color="orange">临期过期报损</a-tag>
             </template>
             <a-table
               bordered
@@ -216,6 +225,7 @@
           organId: undefined,
           depotId: undefined,
           creator: undefined,
+          accountId: undefined,
           linkNumber: "",
           status: undefined,
           remark: ""
@@ -233,7 +243,7 @@
           offset: 1
         },
         // 默认索引
-        defDataIndex:['action','outType','number','materialsList','operTimeStr','userName','materialCount','totalPrice','status'],
+        defDataIndex:['action','bizType','accountName','number','materialsList','operTimeStr','userName','materialCount','totalPrice','status'],
         // 默认列
         defColumns: [
           { title: '状态', dataIndex: 'status', width: 80, align: "center",
@@ -246,8 +256,8 @@
             scopedSlots: { customRender: 'action' },
           },
           { title: '客户', dataIndex: 'organName',width:120, ellipsis:true},
-          { title: '出库类型', dataIndex: 'outType', width: 80, align: "center",
-            scopedSlots: { customRender: 'customRenderOutType' }
+          { title: '出库类型', dataIndex: 'bizType', width: 80, align: "center",
+            scopedSlots: { customRender: 'customRenderBizType' }
           },
           { title: '单据编号', dataIndex: 'number',width:160,
             customRender:function (text,record,index) {
@@ -261,6 +271,7 @@
           { title: '操作员', dataIndex: 'userName',width:80, ellipsis:true},
           { title: '数量', dataIndex: 'materialCount',width:60},
           { title: '金额合计', dataIndex: 'totalPrice',width:80},
+          { title: '结算账户', dataIndex: 'accountName',width:120, ellipsis:true},
           { title: '备注', dataIndex: 'remark',width:200}
         ],
         url: {
@@ -279,6 +290,7 @@
       this.getDepotData()
       this.initUser()
       this.initWaitBillCount('出库', '销售,采购退货', '1,3')
+      this.initAccount()
     },
     methods: {
       searchQuery() {

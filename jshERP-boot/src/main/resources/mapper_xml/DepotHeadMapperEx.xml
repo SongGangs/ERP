@@ -1427,7 +1427,7 @@
     </select>
 
     <select id="getDepotHeadStatistic" resultType="com.jsh.erp.datasource.vo.dto.DepotHeadStatisticDto">
-        SELECT type as typeName, sub_type as subTypeName, out_type as outType, status, abs(SUM(total_price)) as amount
+        SELECT type as typeName, sub_type as subTypeName, biz_type as bizType, status, abs(SUM(total_price)) as amount
         FROM jsh_depot_head
         WHERE type IN ( "入库", "出库", "其它" )
           AND sub_type IN ( "采购订单", "其它" )
@@ -1441,6 +1441,6 @@
         <if test="endTime != null">
             and oper_time &lt;= #{endTime}
         </if>
-        GROUP BY type, sub_type, out_type, status
+        GROUP BY type, sub_type, biz_type, status
     </select>
 </mapper>

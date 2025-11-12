@@ -33,7 +33,7 @@
     <result column="source" jdbcType="VARCHAR" property="source" />
     <result column="link_number" jdbcType="VARCHAR" property="linkNumber" />
     <result column="link_apply" jdbcType="VARCHAR" property="linkApply" />
-    <result column="out_type" jdbcType="INTEGER" property="outType" />
+    <result column="biz_type" jdbcType="INTEGER" property="bizType" />
     <result column="tenant_id" jdbcType="BIGINT" property="tenantId" />
     <result column="delete_flag" jdbcType="VARCHAR" property="deleteFlag" />
   </resultMap>
@@ -100,7 +100,7 @@
     account_id, change_amount, back_amount, total_price, pay_type, bill_type, remark, 
     file_name, sales_man, account_id_list, account_money_list, discount, discount_money, 
     discount_last_money, other_money, deposit, status, purchase_status, source, link_number, 
-    link_apply, out_type, tenant_id, delete_flag
+    link_apply, biz_type, tenant_id, delete_flag
   </sql>
   <select id="selectByExample" parameterType="com.jsh.erp.datasource.entities.DepotHeadExample" resultMap="BaseResultMap">
     select
@@ -142,7 +142,7 @@
       account_id_list, account_money_list, discount, 
       discount_money, discount_last_money, other_money, 
       deposit, status, purchase_status, 
-      source, link_number, link_apply, out_type,
+      source, link_number, link_apply, biz_type,
       tenant_id, delete_flag)
     values (#{id,jdbcType=BIGINT}, #{type,jdbcType=VARCHAR}, #{subType,jdbcType=VARCHAR}, 
       #{defaultNumber,jdbcType=VARCHAR}, #{number,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
@@ -153,7 +153,7 @@
       #{accountIdList,jdbcType=VARCHAR}, #{accountMoneyList,jdbcType=VARCHAR}, #{discount,jdbcType=DECIMAL}, 
       #{discountMoney,jdbcType=DECIMAL}, #{discountLastMoney,jdbcType=DECIMAL}, #{otherMoney,jdbcType=DECIMAL}, 
       #{deposit,jdbcType=DECIMAL}, #{status,jdbcType=VARCHAR}, #{purchaseStatus,jdbcType=VARCHAR}, 
-      #{source,jdbcType=VARCHAR}, #{linkNumber,jdbcType=VARCHAR}, #{linkApply,jdbcType=VARCHAR}, #{outType,jdbcType=INTEGER},
+      #{source,jdbcType=VARCHAR}, #{linkNumber,jdbcType=VARCHAR}, #{linkApply,jdbcType=VARCHAR}, #{bizType,jdbcType=INTEGER},
       #{tenantId,jdbcType=BIGINT}, #{deleteFlag,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.jsh.erp.datasource.entities.DepotHead">
@@ -252,8 +252,8 @@
       <if test="linkApply != null">
         link_apply,
       </if>
-      <if test="outType != null">
-        out_type,
+      <if test="bizType != null">
+        biz_type,
       </if>
       <if test="tenantId != null">
         tenant_id,
@@ -356,8 +356,8 @@
       <if test="linkApply != null">
         #{linkApply,jdbcType=VARCHAR},
       </if>
-      <if test="outType != null">
-        #{outType,jdbcType=INTEGER},
+      <if test="bizType != null">
+        #{bizType,jdbcType=INTEGER},
       </if>
       <if test="tenantId != null">
         #{tenantId,jdbcType=BIGINT},
@@ -469,8 +469,8 @@
       <if test="record.linkApply != null">
         link_apply = #{record.linkApply,jdbcType=VARCHAR},
       </if>
-      <if test="record.outType != null">
-        out_type = #{record.outType,jdbcType=INTEGER},
+      <if test="record.bizType != null">
+        biz_type = #{record.bizType,jdbcType=INTEGER},
       </if>
       <if test="record.tenantId != null">
         tenant_id = #{record.tenantId,jdbcType=BIGINT},
@@ -516,7 +516,7 @@
       source = #{record.source,jdbcType=VARCHAR},
       link_number = #{record.linkNumber,jdbcType=VARCHAR},
       link_apply = #{record.linkApply,jdbcType=VARCHAR},
-      out_type = #{record.outType,jdbcType=INTEGER},
+      biz_type = #{record.bizType,jdbcType=INTEGER},
       tenant_id = #{record.tenantId,jdbcType=BIGINT},
       delete_flag = #{record.deleteFlag,jdbcType=VARCHAR}
     <if test="_parameter != null">
@@ -616,8 +616,8 @@
       <if test="linkApply != null">
         link_apply = #{linkApply,jdbcType=VARCHAR},
       </if>
-      <if test="outType != null">
-        out_type = #{outType,jdbcType=INTEGER},
+      <if test="bizType != null">
+        biz_type = #{bizType,jdbcType=INTEGER},
       </if>
       <if test="tenantId != null">
         tenant_id = #{tenantId,jdbcType=BIGINT},
@@ -660,7 +660,7 @@
       source = #{source,jdbcType=VARCHAR},
       link_number = #{linkNumber,jdbcType=VARCHAR},
       link_apply = #{linkApply,jdbcType=VARCHAR},
-      out_type = #{outType,jdbcType=INTEGER},
+      biz_type = #{bizType,jdbcType=INTEGER},
       tenant_id = #{tenantId,jdbcType=BIGINT},
       delete_flag = #{deleteFlag,jdbcType=VARCHAR}
     where id = #{id,jdbcType=BIGINT}

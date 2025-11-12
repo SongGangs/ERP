@@ -429,6 +429,20 @@ export function getFirstDayOfCurrentMonth() {
 }
 
 /**
+ * js获取当前月份最后一天， 格式“yyyy-MM-dd”
+ */
+export function getLastDayOfCurrentMonth() {
+  const date = new Date();
+  const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+
+  const year = lastDay.getFullYear();
+  const month = String(lastDay.getMonth() + 1).padStart(2, '0');
+  const day = String(lastDay.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+}
+
+/**
  * js获取当前日期， 格式“yyyy-MM-dd”
  */
 export function getFormatDate() {
