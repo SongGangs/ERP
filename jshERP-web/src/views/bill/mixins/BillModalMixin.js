@@ -1,5 +1,5 @@
 import { FormTypes, getListData } from '@/utils/JEditableTableUtil'
-import { findBySelectCus, findBySelectRetail, findBySelectSup, findStockByDepotAndBarCode, getAccount, getDepot,
+import { findBySelectCus, findBySelectRetail, findBySelectSup, findStockByDepotAndBarCode, findStockAndPriceByDepotAndBarCode, getAccount, getDepot,
   getBatchNumberList, getCurrentSystemConfig, getMaterialByBarCode, getPersonByNumType, getPlatformConfigByKey } from '@/api/api'
 import { getAction } from '@/api/manage'
 import { formatDate, getCheckFlag, getMpListShort, getNowFormatDateTime } from '@/utils/util'
@@ -520,7 +520,17 @@ export const BillModalMixin = {
         case "depotId":
           that.currentSelectDepotId = row.depotId
           if(row.barCode){
-            that.getStockByDepotBarCode(row, target)
+            if (row.enableBatchNumber === "1" && (this.prefixNo === 'CGTH' || this.prefixNo === 'QTCK' || this.prefixNo === 'DBCK')) {
+              target.setValues([{
+                rowKey: row.id, values: {
+                  expirationDate: '', batchStock: 0,
+                  productionDate: '', operNumber: 0, unitPrice: 0,
+                  allPrice: 0, taxMoney: 0, taxLastMoney: 0
+                }
+              }])
+              that.autoChangePrice(target)
+            }
+            that.getStockAndPriceByDepotBarCode(row, target)
           }
           break;
         case "barCode":
@@ -531,8 +541,10 @@ export const BillModalMixin = {
             that.autoChangePrice(target)
             return
           }
+          let depotIdSelected = this.prefixNo !== 'CGDD' && this.prefixNo !== 'XSDD'? row.depotId: ''
           param = {
             barCode: value,
+            depotId: depotIdSelected,
             organId: this.form.getFieldValue('organId'),
             mpList: getMpListShort(Vue.ls.get('materialPropertyList')),  //扩展属性
             prefixNo: this.prefixNo
@@ -580,14 +592,10 @@ export const BillModalMixin = {
                 })
               } else {
                 //单个条码
-                let depotIdSelected = this.prefixNo !== 'CGDD' && this.prefixNo !== 'XSDD'? row.depotId: ''
-                findStockByDepotAndBarCode({ depotId: depotIdSelected, barCode: row.barCode }).then((res) => {
-                  if (res && res.code === 200) {
                     let mArr = []
                     let mInfo = mList[0]
                     this.changeColumnShow(mInfo)
                     let mInfoEx = this.parseInfoToObj(mInfo)
-                    mInfoEx.stock = res.data.stock
                     mInfoEx.snList = ''
                     mInfoEx.batchNumber = ''
                     mInfoEx.expirationDate = ''
@@ -603,8 +611,6 @@ export const BillModalMixin = {
                     //强制渲染
                     target.$forceUpdate()
                   }
-                })
-              }
             }
           });
           break;
@@ -637,7 +643,7 @@ export const BillModalMixin = {
               }
             }
             if (value === ""){
-              target.setValues([{rowKey: row.id, values: {expirationDate: "", expiryNum: null, batchStock: 0,
+              target.setValues([{rowKey: row.id, values: {expirationDate: "", batchStock: 0,
                   productionDate: "", operNumber: 0, unitPrice: 0,
                   allPrice: 0, taxMoney: 0, taxLastMoney: 0}}])
               target.recalcAllStatisticsColumns()
@@ -672,7 +678,7 @@ export const BillModalMixin = {
                       batchStock: totalNum, productionDate: info.productionDateStr, operNumber: operNumber, unitPrice: unitPrice,
                       allPrice: allPrice, taxMoney: taxMoney, taxLastMoney: taxLastMoney}}])
                 } else {
-                  target.setValues([{rowKey: row.id, values: {expirationDate: "", expiryNum: null, batchStock: 0,
+                  target.setValues([{rowKey: row.id, values: {expirationDate: "", batchStock: 0,
                       productionDate: "", operNumber: 0, unitPrice: 0,
                       allPrice: 0, taxMoney: 0, taxLastMoney: 0}}])
                 }
@@ -776,6 +782,7 @@ export const BillModalMixin = {
         // brand: mInfo.brand,
         // mfrs: mInfo.mfrs,
         categoryName: mInfo.categoryName,
+        enableBatchNumber: mInfo.enableBatchNumber,
         otherField1: mInfo.otherField1,
         otherField2: mInfo.otherField2,
         otherField3: mInfo.otherField3,
@@ -853,6 +860,7 @@ export const BillModalMixin = {
           this.changeFormTypes(this.materialTable.columns, 'productionDate', 1)
           this.changeFormTypes(this.materialTable.columns, 'expiryNum', 1)
           this.changeFormTypes(this.materialTable.columns, 'expirationDate', 1)
+          this.changeFormTypes(this.materialTable.columns, 'batchStock', 1)
         }
       }
     },
@@ -862,13 +870,28 @@ export const BillModalMixin = {
       this.autoChangePrice(target)
     },
     //根据仓库和条码查询库存
-    getStockByDepotBarCode(row, target){
-      findStockByDepotAndBarCode({ depotId: row.depotId, barCode: row.barCode }).then((res) => {
-        if (res && res.code === 200) {
-          target.setValues([{rowKey: row.id, values: {stock: res.data.stock}}])
-          target.recalcAllStatisticsColumns()
-        }
-      })
+    getStockAndPriceByDepotBarCode(row, target){
+      if (row.enableBatchNumber !== "1" && (this.prefixNo === 'QTCK' || this.prefixNo === 'DBCK')) {
+        findStockAndPriceByDepotAndBarCode({ depotId: row.depotId, barCode: row.barCode }).then((res) => {
+          if (res && res.code === 200) {
+            let unitPrice = res.data.unitPrice
+            let operNumber = row.operNumber
+            let allPrice = (unitPrice * operNumber).toFixed(2) - 0
+            target.setValues([{
+              rowKey: row.id,
+              values: { stock: res.data.stock, unitPrice: unitPrice, allPrice: allPrice }
+            }])
+            target.recalcAllStatisticsColumns()
+          }
+        })
+      } else {
+        findStockByDepotAndBarCode({ depotId: row.depotId, barCode: row.barCode }).then((res) => {
+          if (res && res.code === 200) {
+            target.setValues([{ rowKey: row.id, values: { stock: res.data.stock } }])
+            target.recalcAllStatisticsColumns()
+          }
+        })
+      }
     },
     hiddenPriceColumns() {
       let prefixNo = this.prefixNo

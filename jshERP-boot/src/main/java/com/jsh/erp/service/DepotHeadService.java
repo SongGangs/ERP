@@ -752,6 +752,10 @@ public class DepotHeadService {
                     List<DepotItem> list = depotItemService.getListByHeaderId(dhId);
                     for (DepotItem depotItem : list) {
                         depotItemService.updateCurrentStock(depotItem);
+                        if (systemConfigService.getMoveAvgPriceFlag()){
+                            //更新当前成本价
+                            depotItemService.updateCurrentUnitPrice(depotItem);
+                        }
                     }
                 }
             }

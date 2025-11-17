@@ -226,6 +226,7 @@
             { title: '原数量', key: 'preNumber', width: '4%', type: FormTypes.normal },
             { title: '已入库', key: 'finishNumber', width: '4%', type: FormTypes.normal },
             { title: '批次库存', key: 'batchStock', width: '5%', type: FormTypes.inputNumber, readonly: true },
+            { title: '是否批次商品', key: 'enableBatchNumber', width: '1%', type: FormTypes.hidden },
             { title: '数量', key: 'operNumber', width: '5%', type: FormTypes.inputNumber, statistics: true,
               validateRules: [{ required: true, message: '${title}不能为空' },
                 {
@@ -290,7 +291,9 @@
         this.changeFormTypes(this.materialTable.columns, 'snList', 0)
         this.changeFormTypes(this.materialTable.columns, 'batchNumber', 0)
         this.changeFormTypes(this.materialTable.columns, 'productionDate', 0)
+        this.changeFormTypes(this.materialTable.columns, 'expiryNum', 0)
         this.changeFormTypes(this.materialTable.columns, 'expirationDate', 0)
+        this.changeFormTypes(this.materialTable.columns, 'batchStock', 0)
         this.changeFormTypes(this.materialTable.columns, 'preNumber', 0)
         this.changeFormTypes(this.materialTable.columns, 'finishNumber', 0)
         if (this.action === 'add') {

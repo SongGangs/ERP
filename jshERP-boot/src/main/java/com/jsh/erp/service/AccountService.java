@@ -699,8 +699,7 @@ public class AccountService {
                 .subtract(sumAmount(paidOtherInStoreItemMap)).subtract(sumAmount(unPaidOtherInStoreItemMap))
                 .subtract(sumAmount(purchaseItemMap));
         // 利润 = 收入单-支出单-出库
-        BigDecimal profit = sumAmount(inItemMap).subtract(sumAmount(outItemMap))
-                .subtract(sumAmount(paidOtherInStoreItemMap)).subtract(sumAmount(outStoreItemMap));
+        BigDecimal profit = sumAmount(inItemMap).subtract(sumAmount(outItemMap)).subtract(sumAmount(outStoreItemMap));
         // 打款 = 收入单-维修费（公司）-清洁费（公司）-清洁费（公司）-管理费（公司）-水电等公摊（公司）
         BigDecimal paymentAmount = sumAmount(inItemMap).subtract(sumAmount(companyOutItemMap));
 

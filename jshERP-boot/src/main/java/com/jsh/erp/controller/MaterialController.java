@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.jsh.erp.base.BaseController;
 import com.jsh.erp.base.TableDataInfo;
+import com.jsh.erp.constants.BusinessConstants;
 import com.jsh.erp.datasource.entities.*;
 import com.jsh.erp.datasource.vo.MaterialDepotStock;
 import com.jsh.erp.service.DepotService;
@@ -26,10 +27,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.jsh.erp.utils.ResponseJsonUtil.returnJson;
 import static com.jsh.erp.utils.ResponseJsonUtil.returnStr;
@@ -610,11 +608,17 @@ public class MaterialController extends BaseController {
                     } else if ("CGDD".equals(prefixNo) || "CGRK".equals(prefixNo) || "CGTH".equals(prefixNo)) {
                         //采购价
                         mvo.setBillPrice(mvo.getPurchaseDecimal());
-                    } else if("QTRK".equals(prefixNo) || "DBCK".equals(prefixNo) || "ZZD".equals(prefixNo) || "CXD".equals(prefixNo)
-                            || "PDLR".equals(prefixNo) || "PDFP".equals(prefixNo)) {
+                    } else if ("QTRK".equals(prefixNo) || "DBCK".equals(prefixNo) || "ZZD".equals(prefixNo) || "CXD".equals(prefixNo)
+                            || "PDLR".equals(prefixNo) || "PDFP".equals(prefixNo) || "QTCK".equals(prefixNo)) {
+                        BigDecimal billPrice = mvo.getPurchaseDecimal();
+                        if (!BusinessConstants.ENABLE_BATCH_NUMBER_ENABLED.equals(mvo.getEnableBatchNumber())) {
+                            if (Objects.nonNull(depotId) && systemConfigService.getMoveAvgPriceFlag()) {
+                                billPrice = materialService.getCurrentUnitPriceByMaterialId(mvo.getId(), depotId);
+                            }
+                        }
                         //采购价-给录入界面按权限屏蔽
-                        mvo.setBillPrice(roleService.parseBillPriceByLimit(mvo.getPurchaseDecimal(), "buy", priceLimit, request));
-                    } else if ("XSDD".equals(prefixNo) || "XSCK".equals(prefixNo) || "XSTH".equals(prefixNo) || "QTCK".equals(prefixNo)) {
+                        mvo.setBillPrice(roleService.parseBillPriceByLimit(billPrice, "buy", priceLimit, request));
+                    } else if ("XSDD".equals(prefixNo) || "XSCK".equals(prefixNo) || "XSTH".equals(prefixNo) ) {
                         //销售价
                         if(organId == null) {
                             mvo.setBillPrice(mvo.getWholesaleDecimal());
@@ -635,7 +639,7 @@ public class MaterialController extends BaseController {
                     } else if ("other".equals(prefixNo)) {
                         //其它需要填充商品采购价或者成本价的场景
                         if(systemConfigService.getMoveAvgPriceFlag()) {
-                            BigDecimal currentUnitPrice = materialService.getCurrentUnitPriceByMaterialId(mvo.getId());
+                            BigDecimal currentUnitPrice = materialService.getCurrentUnitPriceByMaterialId(mvo.getId(), depotId);
                             mvo.setBillPrice(currentUnitPrice);
                         } else {
                             mvo.setBillPrice(mvo.getPurchaseDecimal());
@@ -801,7 +805,11 @@ public class MaterialController extends BaseController {
                                                HttpServletRequest request)throws Exception {
         String ids = jsonObject.getString("ids");
         Map<String, Object> objectMap = new HashMap<>();
-        int res = materialService.batchSetMaterialCurrentUnitPrice(ids);
+        List<Depot> depotList = depotService.getAllList();
+        if(depotList.isEmpty()) {
+            return returnJson(objectMap, "请先创建仓库后再操作", ErpInfo.WARING_MSG.code);
+        }
+        int res = materialService.batchSetMaterialCurrentUnitPrice(ids, depotList);
         if(res > 0) {
             return returnJson(objectMap, ErpInfo.OK.name, ErpInfo.OK.code);
         } else {

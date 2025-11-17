@@ -112,6 +112,7 @@ const waitBillCount = (params)=>getAction("/depotHead/waitBillCount",params);
 const getNeedCount = (params)=>getAction("/depotHead/getNeedCount",params);
 const batchAddDepotHeadAndDetail = (params)=>postAction("/depotHead/batchAddDepotHeadAndDetail",params);
 const findStockByDepotAndBarCode = (params)=>getAction("/depotItem/findStockByDepotAndBarCode",params);
+const findStockAndPriceByDepotAndBarCode = (params)=>getAction("/depotItem/findStockAndPriceByDepotAndBarCode",params);
 const getBatchNumberList = (params)=>getAction("/depotItem/getBatchNumberList",params);
 const findFinancialDetailByNumber = (params)=>getAction("/accountHead/getDetailByNumber",params);
 
@@ -207,6 +208,7 @@ export {
   getNeedCount,
   batchAddDepotHeadAndDetail,
   findStockByDepotAndBarCode,
+  findStockAndPriceByDepotAndBarCode,
   getBatchNumberList,
   findFinancialDetailByNumber
 }

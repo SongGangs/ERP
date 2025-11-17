@@ -264,6 +264,7 @@
             { title: '多属性', key: 'sku', width: '9%', type: FormTypes.normal },
             { title: '原数量', key: 'preNumber', width: '5%', type: FormTypes.normal },
             { title: '已退货', key: 'finishNumber', width: '5%', type: FormTypes.normal },
+            { title: '是否批次商品', key: 'enableBatchNumber', width: '1%', type: FormTypes.hidden },
             { title: '数量', key: 'operNumber', width: '5%', type: FormTypes.inputNumber, statistics: true,
               validateRules: [{ required: true, message: '${title}不能为空' },
                 {

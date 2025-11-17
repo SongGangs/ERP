@@ -171,6 +171,7 @@
             { title: '有效期至', key: 'expirationDate',width: '7%', type: FormTypes.input, readonly: true },
             { title: '多属性', key: 'sku', width: '9%', type: FormTypes.normal },
             { title: '批次库存', key: 'batchStock', width: '5%', type: FormTypes.inputNumber, readonly: true },
+            { title: '是否批次商品', key: 'enableBatchNumber', width: '1%', type: FormTypes.hidden },
             { title: '数量', key: 'operNumber', width: '5%', type: FormTypes.inputNumber, statistics: true,
               validateRules: [{ required: true, message: '${title}不能为空' },
                 {

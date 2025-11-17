@@ -24,6 +24,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import jxl.Sheet;
 import jxl.Workbook;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -125,7 +126,7 @@ public class DepotItemController {
                 item.put("depotName", d.getDepotName()); //仓库名称
                 item.put("basicNumber", d.getBnum()); //数量
                 item.put("unitPrice", roleService.parseMaterialPriceByLimit(d.getUnitPrice(), PriceLimitConstants.BUY,priceLimit)); //单价
-                item.put("allPrice", roleService.parseMaterialPriceByLimit(d.getUnitPrice(), PriceLimitConstants.BUY, priceLimit)); //金额
+                item.put("allPrice", roleService.parseMaterialPriceByLimit(d.getAllPrice(), PriceLimitConstants.BUY, priceLimit)); //金额
                 item.put("operTime", Tools.getCenternTime(d.getOtime())); //时间
                 dataArray.add(item);
             }
@@ -139,6 +140,48 @@ public class DepotItemController {
         objectMap.put("total", depotItemService.findDetailByDepotIdsAndMaterialIdCount(depotIds, forceFlag, inOutManageFlag, sku,
                 batchNumber, StringUtil.toNull(number), beginTime, endTime, mId));
         return returnJson(objectMap, ErpInfo.OK.name, ErpInfo.OK.code);
+    }
+
+    /**
+     * 根据商品条码和仓库id查询库存数量+平均价格
+     * @param depotId
+     * @param barCode
+     * @return
+     */
+    @GetMapping(value = "/findStockAndPriceByDepotAndBarCode")
+    @ApiOperation(value = "根据商品条码和仓库id查询库存数量和价格")
+    public BaseResponseInfo findStockAndPriceByDepotAndBarCode(@RequestParam(value = "depotId") Long depotId,
+                                                               @RequestParam("barCode") String barCode) {
+        BaseResponseInfo res = new BaseResponseInfo();
+        Map<String, Object> map = new HashMap<String, Object>();
+        try {
+            BigDecimal stock = BigDecimal.ZERO;
+            BigDecimal unitPrice = BigDecimal.ZERO;
+            List<MaterialVo4Unit> list = materialService.getMaterialByBarCode(barCode);
+            if (CollectionUtils.isNotEmpty(list)) {
+                MaterialVo4Unit materialVo4Unit = list.get(0);
+                unitPrice = materialService.getCurrentUnitPriceByMaterialId(materialVo4Unit.getId(), depotId);
+                if (StringUtil.isNotEmpty(materialVo4Unit.getSku())) {
+                    stock = depotItemService.getSkuStockByParam(depotId, materialVo4Unit.getMeId(), null, null);
+                } else {
+                    stock = depotItemService.getCurrentStockByParam(depotId, materialVo4Unit.getId());
+                    if (materialVo4Unit.getUnitId() != null) {
+                        Unit unit = unitService.getUnit(materialVo4Unit.getUnitId());
+                        String commodityUnit = materialVo4Unit.getCommodityUnit();
+                        stock = unitService.parseStockByUnit(stock, unit, commodityUnit);
+                    }
+                }
+            }
+            map.put("stock", stock);
+            map.put("unitPrice", unitPrice);
+            res.code = 200;
+            res.data = map;
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            res.code = 500;
+            res.data = "获取数据失败";
+        }
+        return res;
     }
 
     /**
@@ -529,7 +572,7 @@ public class DepotItemController {
             BigDecimal outSum = intervalMap.get("outSum");
             BigDecimal thisSum = prevSum.add(inSum).subtract(outSum);
             materialDepotStock.setCurrentNumber(thisSum);
-            materialDepotStock.setUnitPrice(unitPrice);
+            materialDepotStock.setUnitPrice(materialService.getCurrentUnitPriceByMaterialId(mId, depotId));
             if(materialDepotStock.getCurrentNumber()!=null && materialDepotStock.getUnitPrice()!=null ) {
                 materialDepotStock.setAllPrice(materialDepotStock.getCurrentNumber().multiply(materialDepotStock.getUnitPrice()));
             }

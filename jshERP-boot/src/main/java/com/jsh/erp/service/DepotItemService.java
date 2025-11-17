@@ -588,20 +588,6 @@ public class DepotItemService {
                         }
                     }
                 }
-                //如果是销售出库、销售退货、零售出库、零售退货则给采购单价字段赋值（如果是批次商品，则要根据批号去找之前的入库价）
-                if(BusinessConstants.SUB_TYPE_SALES.equals(depotHead.getSubType()) ||
-                    BusinessConstants.SUB_TYPE_SALES_RETURN.equals(depotHead.getSubType()) ||
-                    BusinessConstants.SUB_TYPE_RETAIL.equals(depotHead.getSubType()) ||
-                    BusinessConstants.SUB_TYPE_RETAIL_RETURN.equals(depotHead.getSubType())) {
-                    boolean moveAvgPriceFlag = systemConfigService.getMoveAvgPriceFlag();
-                    BigDecimal currentUnitPrice = materialCurrentStockMapperEx.getCurrentUnitPriceByMId(materialExtend.getMaterialId());
-                    currentUnitPrice = unitService.parseUnitPriceByUnit(currentUnitPrice, unitInfo, depotItem.getMaterialUnit());
-                    BigDecimal unitPrice = moveAvgPriceFlag? currentUnitPrice: materialExtend.getPurchaseDecimal();
-                    depotItem.setPurchaseUnitPrice(unitPrice);
-                    if(StringUtil.isNotEmpty(depotItem.getBatchNumber())) {
-                        depotItem.setPurchaseUnitPrice(getDepotItemByBatchNumber(depotItem.getMaterialExtendId(),depotItem.getBatchNumber()).getUnitPrice());
-                    }
-                }
                 if (StringUtil.isExist(rowObj.get("taxUnitPrice"))) {
                     depotItem.setTaxUnitPrice(rowObj.getBigDecimal("taxUnitPrice"));
                 }
@@ -616,6 +602,20 @@ public class DepotItemService {
                             && !BusinessConstants.SUB_TYPE_SALES_ORDER.equals(depotHead.getSubType())) {
                         throw new BusinessRunTimeException(ExceptionConstants.DEPOT_HEAD_DEPOT_FAILED_CODE,
                                 String.format(ExceptionConstants.DEPOT_HEAD_DEPOT_FAILED_MSG));
+                    }
+                }
+                //如果是销售出库、销售退货、零售出库、零售退货则给采购单价字段赋值（如果是批次商品，则要根据批号去找之前的入库价）
+                if(BusinessConstants.SUB_TYPE_SALES.equals(depotHead.getSubType()) ||
+                        BusinessConstants.SUB_TYPE_SALES_RETURN.equals(depotHead.getSubType()) ||
+                        BusinessConstants.SUB_TYPE_RETAIL.equals(depotHead.getSubType()) ||
+                        BusinessConstants.SUB_TYPE_RETAIL_RETURN.equals(depotHead.getSubType())) {
+                    boolean moveAvgPriceFlag = systemConfigService.getMoveAvgPriceFlag();
+                    BigDecimal currentUnitPrice = materialCurrentStockMapperEx.getCurrentUnitPriceByMId(materialExtend.getMaterialId(), depotItem.getDepotId());
+                    currentUnitPrice = unitService.parseUnitPriceByUnit(currentUnitPrice, unitInfo, depotItem.getMaterialUnit());
+                    BigDecimal unitPrice = moveAvgPriceFlag? currentUnitPrice: materialExtend.getPurchaseDecimal();
+                    depotItem.setPurchaseUnitPrice(unitPrice);
+                    if(StringUtil.isNotEmpty(depotItem.getBatchNumber())) {
+                        depotItem.setPurchaseUnitPrice(getDepotItemByBatchNumber(depotItem.getMaterialExtendId(),depotItem.getBatchNumber()).getUnitPrice());
                     }
                 }
                 if(BusinessConstants.SUB_TYPE_TRANSFER.equals(depotHead.getSubType())) {
@@ -929,27 +929,34 @@ public class DepotItemService {
      */
     @Transactional(value = "transactionManager", rollbackFor = Exception.class)
     public void updateMaterialExtendPrice(Long meId, String subType, String billType, JSONObject rowObj) throws Exception {
-        if(systemConfigService.getUpdateUnitPriceFlag()) {
+        if (systemConfigService.getUpdateUnitPriceFlag()) {
             if (StringUtil.isExist(rowObj.get("unitPrice"))) {
                 BigDecimal unitPrice = rowObj.getBigDecimal("unitPrice");
                 MaterialExtend materialExtend = new MaterialExtend();
                 materialExtend.setId(meId);
-                if(BusinessConstants.SUB_TYPE_PURCHASE.equals(subType)) {
+                boolean priceUpdateFlag = false;
+                if (BusinessConstants.SUB_TYPE_PURCHASE.equals(subType)) {
                     materialExtend.setPurchaseDecimal(unitPrice);
+                    priceUpdateFlag = true;
                 }
-                if(BusinessConstants.SUB_TYPE_SALES.equals(subType)) {
+                if (BusinessConstants.SUB_TYPE_SALES.equals(subType)) {
                     materialExtend.setWholesaleDecimal(unitPrice);
+                    priceUpdateFlag = true;
                 }
-                if(BusinessConstants.SUB_TYPE_RETAIL.equals(subType)) {
+                if (BusinessConstants.SUB_TYPE_RETAIL.equals(subType)) {
                     materialExtend.setCommodityDecimal(unitPrice);
+                    priceUpdateFlag = true;
                 }
                 //其它入库-生产入库的情况更新采购单价
-                if(BusinessConstants.SUB_TYPE_OTHER.equals(subType)) {
-                    if(BusinessConstants.BILL_TYPE_PRODUCE_IN.equals(billType)) {
+                if (BusinessConstants.SUB_TYPE_OTHER.equals(subType)) {
+                    if (BusinessConstants.BILL_TYPE_PRODUCE_IN.equals(billType)) {
                         materialExtend.setPurchaseDecimal(unitPrice);
+                        priceUpdateFlag = true;
                     }
                 }
-                materialExtendService.updateMaterialExtend(materialExtend);
+                if (priceUpdateFlag) {
+                    materialExtendService.updateMaterialExtend(materialExtend);
+                }
             }
         }
     }
@@ -1098,7 +1105,7 @@ public class DepotItemService {
      */
     @Transactional(value = "transactionManager", rollbackFor = Exception.class)
     public void updateCurrentStock(DepotItem depotItem) throws Exception {
-        BigDecimal currentUnitPrice = materialCurrentStockMapperEx.getCurrentUnitPriceByMId(depotItem.getMaterialId());
+        BigDecimal currentUnitPrice = materialCurrentStockMapperEx.getCurrentUnitPriceByMId(depotItem.getMaterialId(), depotItem.getDepotId());
         updateCurrentStockFun(depotItem.getMaterialId(), depotItem.getDepotId(), currentUnitPrice);
         if(depotItem.getAnotherDepotId()!=null){
             updateCurrentStockFun(depotItem.getMaterialId(), depotItem.getAnotherDepotId(), currentUnitPrice);
@@ -1111,12 +1118,20 @@ public class DepotItemService {
      */
     @Transactional(value = "transactionManager", rollbackFor = Exception.class)
     public void updateCurrentUnitPrice(DepotItem depotItem) throws Exception {
+        updateCurrentUnitPriceFun(depotItem);
+        if (Objects.nonNull(depotItem.getAnotherDepotId())) {
+            DepotItem anotherDepotItem = DepotItem.builder().depotId(depotItem.getAnotherDepotId()).materialId(depotItem.getMaterialId()).build();
+            updateCurrentUnitPriceFun(anotherDepotItem);
+        }
+    }
+
+    private void updateCurrentUnitPriceFun(DepotItem depotItem) throws Exception {
         Boolean forceFlag = systemConfigService.getForceApprovalFlag();
         //此处给出入库管理的传值默认为false，不然会导致查询不到销售相关的单据
         Boolean inOutManageFlag = false;
         //查询多单位信息
         Unit unitInfo = materialService.findUnit(depotItem.getMaterialId());
-        List<DepotItemVo4DetailByTypeAndMId> itemList = findDetailByDepotIdsAndMaterialIdList(null, forceFlag, inOutManageFlag, null,
+        List<DepotItemVo4DetailByTypeAndMId> itemList = findDetailByDepotIdsAndMaterialIdList(depotItem.getDepotId().toString(), forceFlag, inOutManageFlag, null,
                 null, null, null, null, depotItem.getMaterialId(), null, null);
         Collections.reverse(itemList); //倒序之后变成按时间从前往后排序
         BigDecimal currentNumber = BigDecimal.ZERO;
@@ -1178,7 +1193,7 @@ public class DepotItemService {
             }
         }
         //更新实时库存中的当前单价
-        materialCurrentStockMapperEx.updateUnitPriceByMId(currentUnitPrice, depotItem.getMaterialId());
+        materialCurrentStockMapperEx.updateUnitPriceByMId(currentUnitPrice, depotItem.getMaterialId(), depotItem.getDepotId());
     }
 
     /**
