@@ -597,6 +597,7 @@ export const BillModalMixin = {
                     this.changeColumnShow(mInfo)
                     let mInfoEx = this.parseInfoToObj(mInfo)
                     mInfoEx.snList = ''
+                    mInfoEx.stock = mInfo.stock
                     mInfoEx.batchNumber = ''
                     mInfoEx.expirationDate = ''
                     let mObj = {

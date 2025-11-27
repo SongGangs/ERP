@@ -1090,6 +1090,64 @@
         order by expiration_date asc
     </select>
 
+    <select id="getCurrentValidProductionDates" resultType="com.jsh.erp.datasource.vo.dto.GetProductionDatesDto">
+        select material_id,  date_format(production_date, '%Y-%m-%d') production_date from
+        (select di.material_id,di.production_date,
+        di.basic_number*(case dh.type when '入库' then 1 when '出库' then -1 end) as basic_number
+        from jsh_depot_head dh
+        join jsh_depot_item di on dh.id=di.header_id
+        <if test="depotIds.size()>0">
+            and di.depot_id in
+            <foreach collection="depotIds" item="item" index="index" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        join jsh_material m on m.id=di.material_id and ifnull(m.delete_flag, '0') != '1' and m.enable_batch_number =1
+        <if test="materialIds.size()>0">
+            and m.id in
+            <foreach collection="materialIds" item="item" index="index" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        where di.delete_flag!=1
+        <if test="forceFlag">
+            and dh.status = '1'
+        </if>
+        <if test="inOutManageFlag">
+            and (dh.sub_type!='采购' and dh.sub_type!='采购退货' and dh.sub_type!='销售' and dh.sub_type!='销售退货')
+        </if>
+
+        union all
+
+        select di.material_id,di.production_date,
+        di.basic_number*(case dh.type when '入库' then -1 when '出库' then 1 end) as basic_number
+        from jsh_depot_head dh
+        join jsh_depot_item di on dh.id=di.header_id
+        <if test="depotIds.size()>0">
+            and di.another_depot_id in
+            <foreach collection="depotIds" item="item" index="index" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        join jsh_material m on m.id=di.material_id and ifnull(m.delete_flag, '0') != '1' and m.enable_batch_number =1
+        <if test="materialIds.size()>0">
+            and m.id in
+            <foreach collection="materialIds" item="item" index="index" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        where di.delete_flag!=1
+        <if test="forceFlag">
+            and dh.status = '1'
+        </if>
+        <if test="inOutManageFlag">
+            and (dh.sub_type!='采购' and dh.sub_type!='采购退货' and dh.sub_type!='销售' and dh.sub_type!='销售退货')
+        </if>
+        ) tb
+        group by material_id,production_date
+        HAVING SUM(basic_number) > 0
+    </select>
+
     <select id="getCountByMaterialAndDepot" resultType="java.lang.Long">
         select count(1) from jsh_depot_item di
         where di.material_id=#{mId} and di.depot_id=#{depotId}

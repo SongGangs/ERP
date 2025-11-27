@@ -204,7 +204,7 @@
         pageName: 'materialStock',
         // 默认索引
         defDataIndex:['rowIndex','action','mBarCode','name','standard','model','categoryName', 'unitName',
-          'purchaseDecimal','initialStock','currentStock','currentStockPrice','currentWeight'],
+          'purchaseDecimal','initialStock','currentStock','currentStockPrice','currentWeight','productionDates'],
         // 默认列
         defColumns: [
           {
@@ -225,6 +225,7 @@
           {title: '品牌', dataIndex: 'brand', width: 100, ellipsis:true},
           {title: '制造商', dataIndex: 'mfrs', width: 100, ellipsis:true},
           {title: '类别', dataIndex: 'categoryName', width: 60, ellipsis:true},
+          {title: '生产日期', dataIndex: 'productionDates', width: 90},
           {title: '仓位货架', dataIndex: 'position', width: 60, ellipsis:true},
           {title: '单位', dataIndex: 'unitName', width: 60, ellipsis:true},
           {title: '成本价', dataIndex: 'purchaseDecimal', sorter: (a, b) => a.purchaseDecimal - b.purchaseDecimal, width: 60},

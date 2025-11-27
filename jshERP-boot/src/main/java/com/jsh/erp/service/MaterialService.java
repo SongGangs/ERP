@@ -10,11 +10,13 @@ import com.jsh.erp.datasource.entities.*;
 import com.jsh.erp.datasource.mappers.*;
 import com.jsh.erp.datasource.vo.MaterialDepotStock;
 import com.jsh.erp.datasource.vo.MaterialVoSearch;
+import com.jsh.erp.datasource.vo.dto.GetProductionDatesDto;
 import com.jsh.erp.exception.BusinessRunTimeException;
 import com.jsh.erp.exception.JshException;
 import com.jsh.erp.utils.*;
 import jxl.Sheet;
 import jxl.Workbook;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class MaterialService {
@@ -1368,6 +1371,16 @@ public class MaterialService {
             initialStockMap.put(mism.getMaterialId(), mism.getNumber());
         }
         List<MaterialVo4Unit> dataList = materialMapperEx.getListWithStock(depotList, idList, position, materialParam, zeroStock, column, order, offset, rows);
+        if (CollectionUtils.isEmpty(dataList)) {
+            return dataList;
+        }
+        List<Long> materialIds = dataList.stream().map(Material::getId).collect(Collectors.toList());
+        Boolean forceFlag = systemConfigService.getForceApprovalFlag();
+        Boolean inOutManageFlag = systemConfigService.getInOutManageFlag();
+        List<GetProductionDatesDto> currentValidProductionDates = depotItemMapperEx.getCurrentValidProductionDates(depotList, materialIds, forceFlag, inOutManageFlag);
+        Map<Long, String> productionDatesMap = currentValidProductionDates.stream()
+                .collect(Collectors.groupingBy(GetProductionDatesDto::getMaterialId,
+                        Collectors.mapping(GetProductionDatesDto::getProductionDate, Collectors.joining(","))));
         for(MaterialVo4Unit item: dataList) {
             item.setCurrentUnitPrice(roleService.parseMaterialPriceByLimit(item.getCurrentUnitPrice(),PriceLimitConstants.BUY, priceLimit));
             item.setPurchaseDecimal(roleService.parseMaterialPriceByLimit(item.getPurchaseDecimal(),PriceLimitConstants.BUY, priceLimit));
@@ -1384,6 +1397,7 @@ public class MaterialService {
                 item.setImgSmall("small");
                 item.setImgLarge("large");
             }
+            item.setProductionDates(productionDatesMap.get(item.getId()));
         }
         return dataList;
     }

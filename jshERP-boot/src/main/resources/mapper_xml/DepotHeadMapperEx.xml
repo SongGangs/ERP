@@ -36,6 +36,7 @@
         <result column="dname" jdbcType="VARCHAR" property="dname" />
         <result column="operTime" jdbcType="VARCHAR" property="operTime" />
         <result column="newType" jdbcType="VARCHAR" property="newType" />
+        <result column="productionDate" jdbcType="VARCHAR" property="productionDate" />
     </resultMap>
 
     <resultMap id="ResultInOutMaterialCount" type="com.jsh.erp.datasource.vo.DepotHeadVo4InOutMCount">
@@ -207,7 +208,7 @@
         select dh.number,me.bar_code barCode, m.name mname,m.model,m.standard,m.color,m.brand,m.mfrs,di.unit_price unitPrice,di.material_unit as mUnit, di.sku,
         di.oper_number operNumber,di.all_price allPrice, ifnull(di.tax_rate,0) taxRate, ifnull(di.tax_money,0) taxMoney, ifnull(di.tax_last_money,0) taxLastMoney,
         s.supplier sname,d.dname dname, date_format(dh.oper_time, '%Y-%m-%d') operTime, concat(dh.sub_type,dh.type) as newType,
-        concat_ws('  ',dh.remark,di.remark) as newRemark
+        concat_ws('  ',dh.remark,di.remark) as newRemark,date_format(di.production_date, '%Y-%m-%d') productionDate
         from jsh_depot_head dh
         left join jsh_depot_item di on di.header_id=dh.id and ifnull(di.delete_flag,'0') !='1'
         left join jsh_material m on m.id=di.material_id and ifnull(m.delete_flag,'0') !='1'

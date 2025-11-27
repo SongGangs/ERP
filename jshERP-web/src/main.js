@@ -14,8 +14,10 @@ import '@/permission' // permission control
 import '@/utils/filter' // base filter
 import Print from 'vue-print-nb-jeecg'
 /*import '@babel/polyfill'*/
-import preview from 'vue-photo-preview'
-import 'vue-photo-preview/dist/skin.css'
+// vue-photo-preview 已移除(存在大量安全漏洞且5年未更新)
+// 如需图片预览功能,建议使用 v-viewer 或 vue-easy-lightbox 替代
+// import preview from 'vue-photo-preview'
+// import 'vue-photo-preview/dist/skin.css'
 import 'intro.js/introjs.css'
 
 import {
@@ -46,7 +48,7 @@ Vue.use(VueAxios, router)
 Vue.use(Viser)
 Vue.use(hasPermission)
 Vue.use(Print)
-Vue.use(preview)
+// Vue.use(preview) // vue-photo-preview 已移除
 Vue.use(vueBus);
 Vue.use(JeecgComponents)
 Vue.use(VueAreaLinkage)

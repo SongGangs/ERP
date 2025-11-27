@@ -20,17 +20,26 @@
         <!-- 搜索区域 -->
         <a-form layout="inline" @keyup.enter.native="searchQuery">
           <a-row :gutter="24">
-            <a-col :md="8" :sm="24">
+            <a-col :md="12" :sm="24">
               <a-form-item label="统计日期" :labelCol="labelCol" :wrapperCol="wrapperCol">
                 <a-range-picker
                   style="width:100%"
                   v-model="queryParam.createTimeRange"
                   format="YYYY-MM-DD"
                   :placeholder="['开始时间', '结束时间']"
+                  :allowClear="false"
                   @change="onDateChange"
-                  @ok="onDateOk"
                 />
               </a-form-item>
+              <!-- 月份快速选择按钮 -->
+              <div class="month-quick-select">
+                <div class="quick-select-buttons">
+                  <a-button size="small" @click="selectMonth(0)" :type="selectedQuickMonth === 0 ? 'primary' : 'default'">本月</a-button>
+                  <a-button size="small" @click="selectMonth(-1)" :type="selectedQuickMonth === -1 ? 'primary' : 'default'">上月</a-button>
+                  <a-button size="small" @click="selectMonth(-2)" :type="selectedQuickMonth === -2 ? 'primary' : 'default'">上上月</a-button>
+                  <a-button size="small" @click="selectMonth(-3)" :type="selectedQuickMonth === -3 ? 'primary' : 'default'">三月前</a-button>
+                </div>
+              </div>
             </a-col>
             <a-col :md="8" :sm="24">
               <a-button type="primary" @click="searchQuery">查询</a-button>
@@ -76,13 +85,22 @@
               <!-- 支出单(已付款) -->
               <template v-if="paidOutData.length > 0">
                 <tr>
-                  <td :rowspan="paidOutData.length" class="sub-category-cell">支出单(已付款)</td>
-                  <td class="item-cell">{{ paidOutData[0].itemName }}</td>
+                  <td :rowspan="paidOutData.length" class="sub-category-cell">
+                    支出单(已付款)
+                    <span class="percentage-text">{{ calculatePercentage(paidOutTotalAmount) }}</span>
+                  </td>
+                  <td class="item-cell">
+                    {{ paidOutData[0].itemName }}
+                    <span class="percentage-text">{{ calculatePercentage(paidOutData[0].amount) }}</span>
+                  </td>
                   <td class="amount-cell">{{ paidOutData[0].amount }}</td>
                   <td :rowspan="paidOutData.length" class="total-amount-cell" style="background: #fff1f0; font-weight: bold;">{{ paidOutTotalAmount }}</td>
                 </tr>
                 <tr v-for="(item, index) in paidOutData.slice(1)" :key="'paidOut-' + index">
-                  <td class="item-cell">{{ item.itemName }}</td>
+                  <td class="item-cell">
+                    {{ item.itemName }}
+                    <span class="percentage-text">{{ calculatePercentage(item.amount) }}</span>
+                  </td>
                   <td class="amount-cell">{{ item.amount }}</td>
                 </tr>
               </template>
@@ -90,13 +108,22 @@
               <!-- 其它入库(已付款) -->
               <template v-if="paidOtherInStoreData.length > 0">
                 <tr>
-                  <td :rowspan="paidOtherInStoreData.length" class="sub-category-cell">其它入库(已付款)</td>
-                  <td class="item-cell">{{ paidOtherInStoreData[0].itemName }}</td>
+                  <td :rowspan="paidOtherInStoreData.length" class="sub-category-cell">
+                    其它入库(已付款)
+                    <span class="percentage-text">{{ calculatePercentage(paidOtherInStoreTotalAmount) }}</span>
+                  </td>
+                  <td class="item-cell">
+                    {{ paidOtherInStoreData[0].itemName }}
+                    <span class="percentage-text">{{ calculatePercentage(paidOtherInStoreData[0].amount) }}</span>
+                  </td>
                   <td class="amount-cell">{{ paidOtherInStoreData[0].amount }}</td>
                   <td :rowspan="paidOtherInStoreData.length" class="total-amount-cell" style="background: #fff1f0; font-weight: bold;">{{ paidOtherInStoreTotalAmount }}</td>
                 </tr>
                 <tr v-for="(item, index) in paidOtherInStoreData.slice(1)" :key="'paidOtherInStore-' + index">
-                  <td class="item-cell">{{ item.itemName }}</td>
+                  <td class="item-cell">
+                    {{ item.itemName }}
+                    <span class="percentage-text">{{ calculatePercentage(item.amount) }}</span>
+                  </td>
                   <td class="amount-cell">{{ item.amount }}</td>
                 </tr>
               </template>
@@ -104,13 +131,22 @@
               <!-- 其它入库(未付款) -->
               <template v-if="unPaidOtherInStoreData.length > 0">
                 <tr>
-                  <td :rowspan="unPaidOtherInStoreData.length" class="sub-category-cell">其它入库(未付款)</td>
-                  <td class="item-cell">{{ unPaidOtherInStoreData[0].itemName }}</td>
+                  <td :rowspan="unPaidOtherInStoreData.length" class="sub-category-cell">
+                    其它入库(未付款)
+                    <span class="percentage-text">{{ calculatePercentage(unPaidOtherInStoreTotalAmount) }}</span>
+                  </td>
+                  <td class="item-cell">
+                    {{ unPaidOtherInStoreData[0].itemName }}
+                    <span class="percentage-text">{{ calculatePercentage(unPaidOtherInStoreData[0].amount) }}</span>
+                  </td>
                   <td class="amount-cell">{{ unPaidOtherInStoreData[0].amount }}</td>
                   <td :rowspan="unPaidOtherInStoreData.length" class="total-amount-cell" style="background: #fff1f0; font-weight: bold;">{{ unPaidOtherInStoreTotalAmount }}</td>
                 </tr>
                 <tr v-for="(item, index) in unPaidOtherInStoreData.slice(1)" :key="'unPaidOtherInStore-' + index">
-                  <td class="item-cell">{{ item.itemName }}</td>
+                  <td class="item-cell">
+                    {{ item.itemName }}
+                    <span class="percentage-text">{{ calculatePercentage(item.amount) }}</span>
+                  </td>
                   <td class="amount-cell">{{ item.amount }}</td>
                 </tr>
               </template>
@@ -118,13 +154,22 @@
               <!-- 采购 -->
               <template v-if="purchaseData.length > 0">
                 <tr>
-                  <td :rowspan="purchaseData.length" class="sub-category-cell">采购</td>
-                  <td class="item-cell">{{ purchaseData[0].itemName }}</td>
+                  <td :rowspan="purchaseData.length" class="sub-category-cell">
+                    采购
+                    <span class="percentage-text">{{ calculatePercentage(purchaseTotalAmount) }}</span>
+                  </td>
+                  <td class="item-cell">
+                    {{ purchaseData[0].itemName }}
+                    <span class="percentage-text">{{ calculatePercentage(purchaseData[0].amount) }}</span>
+                  </td>
                   <td class="amount-cell">{{ purchaseData[0].amount }}</td>
                   <td :rowspan="purchaseData.length" class="total-amount-cell" style="background: #fff1f0; font-weight: bold;">{{ purchaseTotalAmount }}</td>
                 </tr>
                 <tr v-for="(item, index) in purchaseData.slice(1)" :key="'purchase-' + index">
-                  <td class="item-cell">{{ item.itemName }}</td>
+                  <td class="item-cell">
+                    {{ item.itemName }}
+                    <span class="percentage-text">{{ calculatePercentage(item.amount) }}</span>
+                  </td>
                   <td class="amount-cell">{{ item.amount }}</td>
                 </tr>
               </template>
@@ -172,13 +217,22 @@
               <!-- 支出单(已付款和未付款) -->
               <template v-if="outData.length > 0">
                 <tr>
-                  <td :rowspan="outData.length" class="sub-category-cell">支出单(已付款和未付款)</td>
-                  <td class="item-cell">{{ outData[0].itemName }}</td>
+                  <td :rowspan="outData.length" class="sub-category-cell">
+                    支出单(已付款和未付款)
+                    <span class="percentage-text">{{ calculatePercentage(outTotalAmount) }}</span>
+                  </td>
+                  <td class="item-cell">
+                    {{ outData[0].itemName }}
+                    <span class="percentage-text">{{ calculatePercentage(outData[0].amount) }}</span>
+                  </td>
                   <td class="amount-cell">{{ outData[0].amount }}</td>
                   <td :rowspan="outData.length" class="total-amount-cell" style="background: #fff1f0; font-weight: bold;">{{ outTotalAmount }}</td>
                 </tr>
                 <tr v-for="(item, index) in outData.slice(1)" :key="'out-' + index">
-                  <td class="item-cell">{{ item.itemName }}</td>
+                  <td class="item-cell">
+                    {{ item.itemName }}
+                    <span class="percentage-text">{{ calculatePercentage(item.amount) }}</span>
+                  </td>
                   <td class="amount-cell">{{ item.amount }}</td>
                 </tr>
               </template>
@@ -186,13 +240,22 @@
               <!-- 支出(出库) -->
               <template v-if="outStoreData.length > 0">
                 <tr>
-                  <td :rowspan="outStoreData.length" class="sub-category-cell">支出(出库)</td>
-                  <td class="item-cell">{{ outStoreData[0].itemName }}</td>
+                  <td :rowspan="outStoreData.length" class="sub-category-cell">
+                    支出(出库)
+                    <span class="percentage-text">{{ calculatePercentage(outStoreTotalAmount) }}</span>
+                  </td>
+                  <td class="item-cell">
+                    {{ outStoreData[0].itemName }}
+                    <span class="percentage-text">{{ calculatePercentage(outStoreData[0].amount) }}</span>
+                  </td>
                   <td class="amount-cell">{{ outStoreData[0].amount }}</td>
                   <td :rowspan="outStoreData.length" class="total-amount-cell" style="background: #fff1f0; font-weight: bold;">{{ outStoreTotalAmount }}</td>
                 </tr>
                 <tr v-for="(item, index) in outStoreData.slice(1)" :key="'outStore-' + index">
-                  <td class="item-cell">{{ item.itemName }}</td>
+                  <td class="item-cell">
+                    {{ item.itemName }}
+                    <span class="percentage-text">{{ calculatePercentage(item.amount) }}</span>
+                  </td>
                   <td class="amount-cell">{{ item.amount }}</td>
                 </tr>
               </template>
@@ -232,6 +295,7 @@ export default {
       disableMixinCreated: true,
       toFromType: '',
       currentAccountId: '',
+      selectedQuickMonth: 0, // 当前选中的快速月份按钮
       // 查询条件
       queryParam: {
         accountId: '',
@@ -327,9 +391,22 @@ export default {
     onDateChange: function(value, dateString) {
       this.queryParam.beginDate = dateString[0]
       this.queryParam.endDate = dateString[1]
+      // 手动选择日期时，清除快速选择的高亮
+      this.selectedQuickMonth = null
     },
-    onDateOk(value) {
-      console.log(value)
+    selectMonth(monthOffset) {
+      // monthOffset: 0=本月, -1=上月, -2=上上月, -3=三月前
+      this.selectedQuickMonth = monthOffset
+      const targetMonth = moment().add(monthOffset, 'months')
+      const startDate = targetMonth.clone().startOf('month')
+      const endDate = targetMonth.clone().endOf('month')
+
+      this.queryParam.beginDate = startDate.format('YYYY-MM-DD')
+      this.queryParam.endDate = endDate.format('YYYY-MM-DD')
+      this.queryParam.createTimeRange = [startDate, endDate]
+
+      // 自动触发查询
+      this.loadData()
     },
     searchReset() {
       this.queryParam = {
@@ -338,6 +415,7 @@ export default {
         endDate: getLastDayOfCurrentMonth(),
         createTimeRange: [moment(getFirstDayOfCurrentMonth()), moment(getLastDayOfCurrentMonth())]
       }
+      this.selectedQuickMonth = 0
       this.loadData()
     },
     exportExcel() {
@@ -566,7 +644,7 @@ export default {
       }
 
       this.unPaidOtherInStoreData = []
-      if (this.statisticData.paidOtherInStore && this.statisticData.unPaidOtherInStore.length > 0) {
+      if (this.statisticData.unPaidOtherInStore && this.statisticData.unPaidOtherInStore.length > 0) {
         this.unPaidOtherInStoreData = this.statisticData.unPaidOtherInStore.map(item => ({
           itemName: item.itemName,
           amount: parseFloat(item.amount || 0).toFixed(2)
@@ -598,6 +676,14 @@ export default {
 
       // 动态生成打款公式
       this.generatePaymentFormula()
+    },
+    calculatePercentage(amount) {
+      // 计算百分比：当前项除以收入总额
+      if (!this.incomeTotalAmount || parseFloat(this.incomeTotalAmount) === 0) {
+        return ''
+      }
+      const percentage = (parseFloat(amount) / parseFloat(this.incomeTotalAmount) * 100).toFixed(2)
+      return `${percentage}%`
     },
     generatePaymentFormula() {
       // 基础公式：收入单
@@ -714,5 +800,29 @@ export default {
 .profit-amount {
   color: #ff4d4f;
   font-weight: bold;
+}
+
+.percentage-text {
+  display: block;
+  font-size: 11px;
+  color: #ff6b35;
+  font-weight: 500;
+  margin-top: 2px;
+  background: #fff3e0;
+  padding: 1px 4px;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+.month-quick-select {
+  margin-top: 8px;
+  margin-left: 80px;
+  display: flex;
+  align-items: center;
+}
+
+.quick-select-buttons {
+  display: flex;
+  gap: 8px;
 }
 </style>

@@ -60,6 +60,8 @@ public class MaterialVo4Unit extends Material{
 
     private String imgLarge;
 
+    private String productionDates;
+
     public String getUnitName() {
         return unitName;
     }
@@ -258,5 +260,13 @@ public class MaterialVo4Unit extends Material{
 
     public void setBigUnitInitialStock(String bigUnitInitialStock) {
         this.bigUnitInitialStock = bigUnitInitialStock;
+    }
+
+    public String getProductionDates() {
+        return productionDates;
+    }
+
+    public void setProductionDates(String productionDates) {
+        this.productionDates = productionDates;
     }
 }

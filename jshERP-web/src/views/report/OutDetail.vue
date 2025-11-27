@@ -237,7 +237,7 @@
         pageName: 'outDetail',
         // 默认索引
         defDataIndex:['rowIndex','number','barCode','mname','standard','model','mUnit','operNumber', 'unitPrice','allPrice',
-          'taxRate','taxMoney','sname','dname','operTime','newRemark'],
+          'taxRate','taxMoney','sname','dname','operTime','newRemark','productionDate'],
         // 默认列
         defColumns: [
           {
@@ -266,6 +266,7 @@
           {title: '税额', dataIndex: 'taxMoney', sorter: (a, b) => a.taxMoney - b.taxMoney, width: 60},
           {title: '往来单位', dataIndex: 'sname', width: 80, ellipsis:true},
           {title: '仓库', dataIndex: 'dname', width: 80, ellipsis:true},
+          {title: '生产日期', dataIndex: 'productionDate', width: 70},
           {title: '出库日期', dataIndex: 'operTime', width: 70},
           {title: '备注', dataIndex: 'newRemark', width: 100, ellipsis:true}
         ],

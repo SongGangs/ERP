@@ -5,6 +5,7 @@ import com.jsh.erp.datasource.vo.DepotItemStockWarningCount;
 import com.jsh.erp.datasource.vo.DepotItemVo4Stock;
 import com.jsh.erp.datasource.vo.DepotItemVoBatchNumberList;
 import com.jsh.erp.datasource.vo.InOutPriceVo;
+import com.jsh.erp.datasource.vo.dto.GetProductionDatesDto;
 import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
@@ -225,6 +226,12 @@ public interface DepotItemMapperEx {
             @Param("depotId") Long depotId,
             @Param("barCode") String barCode,
             @Param("batchNumber") String batchNumber,
+            @Param("forceFlag") Boolean forceFlag,
+            @Param("inOutManageFlag") Boolean inOutManageFlag);
+
+    List<GetProductionDatesDto> getCurrentValidProductionDates(
+            @Param("depotIds") List<Long> depotIds,
+            @Param("materialIds") List<Long> materialIds,
             @Param("forceFlag") Boolean forceFlag,
             @Param("inOutManageFlag") Boolean inOutManageFlag);
 
