@@ -84,6 +84,15 @@
                   </a-form-item>
                 </a-col>
                 <a-col :md="6" :sm="24">
+                  <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="出库类型">
+                    <a-select placeholder="请选择出库类型" showSearch allow-clear optionFilterProp="children" v-model="queryParam.bizType">
+                      <a-select-option :value="1">原材料消耗</a-select-option>
+                      <a-select-option :value="2">损坏报损</a-select-option>
+                      <a-select-option :value="3">临期过期报损</a-select-option>
+                    </a-select>
+                  </a-form-item>
+                </a-col>
+                <a-col :md="6" :sm="24">
                   <a-form-item label="单据备注" :labelCol="labelCol" :wrapperCol="wrapperCol">
                     <a-input placeholder="请输入单据备注" v-model="queryParam.remark"></a-input>
                   </a-form-item>
@@ -199,9 +208,11 @@
   import JEllipsis from '@/components/jeecg/JEllipsis'
   import JDate from '@/components/jeecg/JDate'
   import { deleteAction } from '@/api/manage'
+  import moment from 'moment/moment'
+  import { TabParamsMixin } from '@/mixins/TabParamsMixin'
   export default {
     name: "OtherOutList",
-    mixins:[JeecgListMixin,BillListMixin],
+    mixins: [JeecgListMixin, BillListMixin, TabParamsMixin],
     components: {
       OtherOutModal,
       BillDetail,
@@ -366,6 +377,26 @@
         this.loadData()
         this.initWaitBillCount('出库', '销售,采购退货', '1,3')
       },
+      // 实现 TabParamsMixin 要求的方法
+      applyRouteParams(params) {
+        const { accountId, bizType, beginDate, endDate } = params
+
+        if (accountId) {
+          this.queryParam.accountId = parseInt(accountId)
+        }
+        this.queryParam.bizType = parseInt(bizType) || undefined
+        if (beginDate && endDate) {
+          this.queryParam.createTimeRange = [moment(beginDate), moment(endDate)]
+          this.queryParam.beginTime = beginDate
+          this.queryParam.endTime = endDate
+        }
+        // 展开搜索区域以显示筛选条件
+        this.toggleSearchStatus = true
+        // 应用筛选条件后重新加载数据
+        this.$nextTick(() => {
+          this.loadData(1)
+        })
+      }
     }
   }
 </script>

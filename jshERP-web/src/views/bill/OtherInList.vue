@@ -208,9 +208,11 @@
   import JEllipsis from '@/components/jeecg/JEllipsis'
   import JDate from '@/components/jeecg/JDate'
   import { deleteAction } from '@/api/manage'
+  import { TabParamsMixin } from '@/mixins/TabParamsMixin'
+  import moment from 'moment/moment'
   export default {
     name: "OtherInList",
-    mixins:[JeecgListMixin,BillListMixin],
+    mixins: [JeecgListMixin, BillListMixin, TabParamsMixin],
     components: {
       OtherInModal,
       BillDetail,
@@ -372,6 +374,26 @@
         this.loadData()
         this.initWaitBillCount('入库', '采购,销售退货', '1,3')
       },
+      // 实现 TabParamsMixin 要求的方法
+      applyRouteParams(params) {
+        const { accountId, status, beginDate, endDate } = params
+
+        if (accountId) {
+          this.queryParam.accountId = parseInt(accountId)
+        }
+        this.queryParam.status = status
+        if (beginDate && endDate) {
+          this.queryParam.createTimeRange = [moment(beginDate), moment(endDate)]
+          this.queryParam.beginTime = beginDate
+          this.queryParam.endTime = endDate
+        }
+        // 展开搜索区域以显示筛选条件
+        this.toggleSearchStatus = true
+        // 应用筛选条件后重新加载数据
+        this.$nextTick(() => {
+          this.loadData(1)
+        })
+      }
     }
   }
 </script>

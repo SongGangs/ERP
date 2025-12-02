@@ -109,7 +109,7 @@ public class DepotHeadService {
         return list;
     }
 
-    public List<DepotHeadVo4List> select(String type, String subType, String hasDebt, String status, String purchaseStatus, String number, String linkApply, String linkNumber,
+    public List<DepotHeadVo4List> select(String type, String subType, Integer bizType, String hasDebt, String status, String purchaseStatus, String number, String linkApply, String linkNumber,
            String beginTime, String endTime, String materialParam, Long organId, Long creator, Long depotId, Long accountId, String salesMan, String remark) throws Exception {
         List<DepotHeadVo4List> list = new ArrayList<>();
         try{
@@ -129,7 +129,7 @@ public class DepotHeadService {
             beginTime = Tools.parseDayToTime(beginTime,BusinessConstants.DAY_FIRST_TIME);
             endTime = Tools.parseDayToTime(endTime,BusinessConstants.DAY_LAST_TIME);
             PageUtils.startPage();
-            list = depotHeadMapperEx.selectByConditionDepotHead(type, subType, creatorArray, hasDebt,
+            list = depotHeadMapperEx.selectByConditionDepotHead(type, subType, bizType, creatorArray, hasDebt,
                     statusArray, purchaseStatusArray, number, linkApply, linkNumber, beginTime, endTime,
                     materialParam, organId, organArray, creator, depotId, depotArray, accountId, salesMan, remark);
             if (null != list) {

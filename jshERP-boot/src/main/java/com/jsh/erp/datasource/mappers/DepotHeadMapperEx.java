@@ -19,6 +19,7 @@ public interface DepotHeadMapperEx {
     List<DepotHeadVo4List> selectByConditionDepotHead(
             @Param("type") String type,
             @Param("subType") String subType,
+            @Param("bizType") Integer bizType,
             @Param("creatorArray") String[] creatorArray,
             @Param("hasDebt") String hasDebt,
             @Param("statusArray") String[] statusArray,

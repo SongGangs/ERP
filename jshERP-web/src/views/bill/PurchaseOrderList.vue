@@ -228,9 +228,10 @@
   import JEllipsis from '@/components/jeecg/JEllipsis'
   import JDate from '@/components/jeecg/JDate'
   import Vue from 'vue'
+  import { TabParamsMixin } from '@/mixins/TabParamsMixin'
   export default {
     name: "PurchaseOrderList",
-    mixins:[JeecgListMixin,BillListMixin],
+    mixins: [JeecgListMixin, BillListMixin, TabParamsMixin],
     components: {
       PurchaseOrderModal,
       PurchaseInModal,
@@ -343,6 +344,25 @@
     computed: {
     },
     methods: {
+      // 实现 TabParamsMixin 要求的方法
+      applyRouteParams(params) {
+        const { accountId, beginDate, endDate } = params
+
+        if (accountId) {
+          this.queryParam.accountId = parseInt(accountId)
+        }
+        if (beginDate && endDate) {
+          this.queryParam.createTimeRange = [moment(beginDate), moment(endDate)]
+          this.queryParam.beginTime = beginDate
+          this.queryParam.endTime = endDate
+        }
+        // 展开搜索区域以显示筛选条件
+        this.toggleSearchStatus = true
+        // 应用筛选条件后重新加载数据
+        this.$nextTick(() => {
+          this.loadData(1)
+        })
+      }
     }
   }
 </script>

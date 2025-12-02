@@ -78,6 +78,9 @@
         <if test="subType != null">
             and dh.sub_type=#{subType}
         </if>
+        <if test="bizType != null">
+            and dh.biz_type=#{bizType}
+        </if>
         <if test="statusArray != null and statusArray !=''">
             and dh.status in (
             <foreach collection="statusArray" item="status" separator=",">

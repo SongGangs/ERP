@@ -16,6 +16,8 @@ public class AccountStatisticDto {
 
     private String typeName;
 
+    private Long itemCode;
+
     private String itemName;
 
     private Integer status;

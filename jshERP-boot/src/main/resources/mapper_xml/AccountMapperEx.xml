@@ -509,7 +509,7 @@
     </update>
 
     <select id="getInOutStatistic" resultType="com.jsh.erp.datasource.vo.dto.AccountStatisticDto">
-        SELECT ah.type as typeName, IFNULL(MIN(ioi.`name`),ah.type) as itemName, ah.status, abs(sum(ai.each_amount)) as amount
+        SELECT ah.type as typeName, ioi.id as itemCode, IFNULL(MIN(ioi.`name`),ah.type) as itemName, ah.status, abs(sum(ai.each_amount)) as amount
         FROM jsh_account_head ah
         JOIN jsh_account_item ai ON ai.header_id = ah.id AND ifnull(ai.delete_flag,'0') !='1'
         LEFT JOIN jsh_in_out_item ioi ON ioi.id = ai.in_out_item_id

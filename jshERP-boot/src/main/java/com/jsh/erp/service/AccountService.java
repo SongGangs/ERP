@@ -660,29 +660,45 @@ public class AccountService {
         String beginTime= req.getBeginDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + DAY_FIRST_TIME;
         String endTime = req.getEndDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + DAY_LAST_TIME;
         List<AccountStatisticDto> inOutStats = accountMapperEx.getInOutStatistic(req.getAccountId(), beginTime, endTime);
-        Map<String, BigDecimal> inItemMap = inOutStats.stream()
+        Map<Long, String> itemMap = inOutStats.stream().collect(Collectors.toMap(AccountStatisticDto::getItemCode,
+                AccountStatisticDto::getItemName, (t1, t2) -> t1));
+
+        Map<Long, BigDecimal> inItemMap = inOutStats.stream()
                 .filter(t -> "收入".equals(t.getTypeName()))
-                .collect(Collectors.toMap(AccountStatisticDto::getItemName, AccountStatisticDto::getAmount, BigDecimal::add));
-        Map<String, BigDecimal> outItemMap = inOutStats.stream()
+                .collect(Collectors.toMap(AccountStatisticDto::getItemCode, AccountStatisticDto::getAmount, BigDecimal::add));
+        List<AccountStatisticItemResp> income = AccountStatisticItemResp.from(inItemMap, itemMap);
+
+        Map<Long, BigDecimal> outItemMap = inOutStats.stream()
                 .filter(t -> "支出".equals(t.getTypeName()))
-                .collect(Collectors.toMap(AccountStatisticDto::getItemName, AccountStatisticDto::getAmount, BigDecimal::add));
-        Map<String, BigDecimal> paidOutItemMap = inOutStats.stream()
+                .collect(Collectors.toMap(AccountStatisticDto::getItemCode, AccountStatisticDto::getAmount, BigDecimal::add));
+        List<AccountStatisticItemResp> out = AccountStatisticItemResp.from(outItemMap, itemMap);
+
+        Map<Long, BigDecimal> paidOutItemMap = inOutStats.stream()
                 .filter(t -> "支出".equals(t.getTypeName()))
                 .filter(t -> HeadStatusEnum.AUDITED.isType(t.getStatus()))
-                .collect(Collectors.toMap(AccountStatisticDto::getItemName, AccountStatisticDto::getAmount, BigDecimal::add));
-        Map<String, BigDecimal> companyOutItemMap = inOutStats.stream()
+                .collect(Collectors.toMap(AccountStatisticDto::getItemCode, AccountStatisticDto::getAmount, BigDecimal::add));
+        List<AccountStatisticItemResp> paidOut = AccountStatisticItemResp.from(paidOutItemMap, itemMap);
+
+        Map<Long, BigDecimal> companyOutItemMap = inOutStats.stream()
                 .filter(t -> "支出".equals(t.getTypeName()))
                 .filter(t -> t.getItemName().contains("公司"))
-                .collect(Collectors.toMap(AccountStatisticDto::getItemName, AccountStatisticDto::getAmount, BigDecimal::add));
+                .collect(Collectors.toMap(AccountStatisticDto::getItemCode, AccountStatisticDto::getAmount, BigDecimal::add));
+        List<AccountStatisticItemResp> companyOut = AccountStatisticItemResp.from(companyOutItemMap, itemMap);
 
         List<DepotHeadStatisticDto> depotHeadStats = depotHeadMapperEx.getDepotHeadStatistic(req.getAccountId(), beginTime, endTime);
         Map<String, BigDecimal> purchaseItemMap = depotHeadStats.stream()
                 .filter(t -> SUB_TYPE_PURCHASE_ORDER.equals(t.getSubTypeName()))
                 .collect(Collectors.toMap(DepotHeadStatisticDto::getSubTypeName, DepotHeadStatisticDto::getAmount, BigDecimal::add));
-        Map<String, BigDecimal> outStoreItemMap = depotHeadStats.stream()
+        List<AccountStatisticItemResp> outStore = depotHeadStats.stream()
                 .filter(t -> DEPOTHEAD_TYPE_OUT.equals(t.getTypeName()))
                 .filter(t -> SUB_TYPE_OTHER.equals(t.getSubTypeName()))
-                .collect(Collectors.toMap(t -> EnumUtils.getDesc(t.getBizType(), BizTypeEnum.class), DepotHeadStatisticDto::getAmount, BigDecimal::add));
+                .collect(Collectors.toMap(DepotHeadStatisticDto::getBizType, DepotHeadStatisticDto::getAmount, BigDecimal::add))
+                .entrySet().stream()
+                .map(entry -> AccountStatisticItemResp.builder()
+                        .itemCode(entry.getKey().longValue())
+                        .itemName(EnumUtils.getDesc(entry.getKey(), BizTypeEnum.class))
+                        .amount(entry.getValue()).build())
+                .collect(Collectors.toList());
         Map<String, BigDecimal> paidOtherInStoreItemMap = depotHeadStats.stream()
                 .filter(t -> DEPOTHEAD_TYPE_IN.equals(t.getTypeName()))
                 .filter(t -> SUB_TYPE_OTHER.equals(t.getSubTypeName()))
@@ -695,29 +711,33 @@ public class AccountService {
                 .collect(Collectors.toMap(t -> "未付款单", DepotHeadStatisticDto::getAmount, BigDecimal::add));
 
         // 现金流水结余 = 收入单-支出单(已付款)-付款单-采购订单
-        BigDecimal cashBalance = sumAmount(inItemMap).subtract(sumAmount(paidOutItemMap))
+        BigDecimal cashBalance = sumAmount(income).subtract(sumAmount(paidOut))
                 .subtract(sumAmount(paidOtherInStoreItemMap)).subtract(sumAmount(unPaidOtherInStoreItemMap))
                 .subtract(sumAmount(purchaseItemMap));
         // 利润 = 收入单-支出单-出库
-        BigDecimal profit = sumAmount(inItemMap).subtract(sumAmount(outItemMap)).subtract(sumAmount(outStoreItemMap));
+        BigDecimal profit = sumAmount(income).subtract(sumAmount(out)).subtract(sumAmount(outStore));
         // 打款 = 收入单-维修费（公司）-清洁费（公司）-清洁费（公司）-管理费（公司）-水电等公摊（公司）
-        BigDecimal paymentAmount = sumAmount(inItemMap).subtract(sumAmount(companyOutItemMap));
+        BigDecimal paymentAmount = sumAmount(income).subtract(sumAmount(companyOut));
 
         return AccountStatisticResp.builder()
                 .accountId(account.getId())
                 .accountName(account.getName())
-                .income(AccountStatisticItemResp.from(inItemMap))
-                .out(AccountStatisticItemResp.from(outItemMap))
-                .paidOut(AccountStatisticItemResp.from(paidOutItemMap))
+                .income(income)
+                .out(out)
+                .paidOut(paidOut)
                 .purchase(AccountStatisticItemResp.from(purchaseItemMap))
-                .outStore(AccountStatisticItemResp.from(outStoreItemMap))
+                .outStore(outStore)
                 .paidOtherInStore(AccountStatisticItemResp.from(paidOtherInStoreItemMap))
                 .unPaidOtherInStore(AccountStatisticItemResp.from(unPaidOtherInStoreItemMap))
-                .companyOut(AccountStatisticItemResp.from(companyOutItemMap))
+                .companyOut(companyOut)
                 .cashBalance(cashBalance)
                 .profit(profit)
                 .paymentAmount(paymentAmount)
                 .build();
+    }
+
+    private BigDecimal sumAmount(List<AccountStatisticItemResp> items) {
+        return items.stream().map(AccountStatisticItemResp::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     private BigDecimal sumAmount(Map<String, BigDecimal> itemMap) {

@@ -80,6 +80,7 @@ public class DepotHeadController extends BaseController {
                                  HttpServletRequest request)throws Exception {
         String type = StringUtil.getInfo(search, "type");
         String subType = StringUtil.getInfo(search, "subType");
+        Integer bizType = StringUtil.parseInteger(StringUtil.getInfo(search, "bizType"));
         String hasDebt = StringUtil.getInfo(search, "hasDebt");
         String status = StringUtil.getInfo(search, "status");
         String purchaseStatus = StringUtil.getInfo(search, "purchaseStatus");
@@ -95,7 +96,7 @@ public class DepotHeadController extends BaseController {
         Long accountId = StringUtil.parseStrLong(StringUtil.getInfo(search, "accountId"));
         String salesMan = StringUtil.getInfo(search, "salesMan");
         String remark = StringUtil.getInfo(search, "remark");
-        List<DepotHeadVo4List> list = depotHeadService.select(type, subType, hasDebt, status, purchaseStatus, number, linkApply, linkNumber,
+        List<DepotHeadVo4List> list = depotHeadService.select(type, subType, bizType, hasDebt, status, purchaseStatus, number, linkApply, linkNumber,
                 beginTime, endTime, materialParam, organId, creator, depotId, accountId, salesMan, remark);
         return getDataTable(list);
     }
