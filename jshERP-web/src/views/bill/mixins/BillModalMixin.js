@@ -667,7 +667,13 @@ export const BillModalMixin = {
                   } else {
                     operNumber = totalNum
                   }
-                  if (this.prefixNo === 'QTCK' ||this.prefixNo === 'DBCK') {
+                  if (this.prefixNo === 'QTCK') {
+                    if (row.operNumber && row.operNumber > 0) {
+                      operNumber = row.operNumber - 0
+                    } else {
+                      operNumber = 0
+                    }
+                  } else if (this.prefixNo === 'DBCK') {
                     operNumber = 0
                   }
                   taxRate = row.taxRate-0 //税率
@@ -783,6 +789,7 @@ export const BillModalMixin = {
         // brand: mInfo.brand,
         // mfrs: mInfo.mfrs,
         categoryName: mInfo.categoryName,
+        enableSerialNumber: mInfo.enableSerialNumber,
         enableBatchNumber: mInfo.enableBatchNumber,
         otherField1: mInfo.otherField1,
         otherField2: mInfo.otherField2,

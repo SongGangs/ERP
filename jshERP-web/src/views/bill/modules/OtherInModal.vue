@@ -70,6 +70,17 @@
           @valueChange="onValueChange"
           @added="onAdded"
           @deleted="onDeleted">
+          <template v-slot:customName="{ value, index, allValues }">
+            <span>{{ value || '' }}</span>
+            <template v-if="allValues && allValues.inputValues && allValues.inputValues[index]">
+              <span v-if="allValues.inputValues[index].enableSerialNumber === '1'"
+                    style="display: inline-block; margin-left: 4px; padding: 0 4px; background-color: #fff7e6;
+                           border: 1px solid #ffd591; border-radius: 2px; color: #fa8c16; font-size: 12px;">序</span>
+              <span v-if="allValues.inputValues[index].enableBatchNumber === '1'"
+                    style="display: inline-block; margin-left: 4px; padding: 0 4px; background-color: #f6ffed;
+                           border: 1px solid #b7eb8f; border-radius: 2px; color: #52c41a; font-size: 12px;">批</span>
+            </template>
+          </template>
           <template #buttonAfter>
             <a-row v-if="rowCanEdit" :gutter="24" style="float:left;" data-step="4" data-title="扫码录入" data-intro="此功能支持扫码枪扫描商品条码进行录入">
               <a-col v-if="scanStatus" :md="6" :sm="24">
@@ -256,7 +267,7 @@
             { title: '条码', key: 'barCode', width: '12%', type: FormTypes.popupJsh, kind: 'material', multi: true,
               validateRules: [{ required: true, message: '${title}不能为空' }]
             },
-            { title: '名称', key: 'name', width: '10%', type: FormTypes.normal },
+            { title: '名称', key: 'name', width: '10%', type: FormTypes.slot, slotName: 'customName' },
             { title: '规格', key: 'standard', width: '7%', type: FormTypes.normal },
             { title: '类别', key: 'categoryName', width: '5%', type: FormTypes.normal },
             { title: '扩展1', key: 'otherField1', width: '4%', type: FormTypes.normal },
@@ -286,6 +297,8 @@
             { title: '价税合计', key: 'taxLastMoney', width: '5%', type: FormTypes.hidden, statistics: true },
             { title: '备注', key: 'remark', width: '5%', type: FormTypes.input },
             { title: '关联id', key: 'linkId', width: '5%', type: FormTypes.hidden },
+            { title: '启用序列号', key: 'enableSerialNumber', width: '0%', type: FormTypes.hidden },
+            { title: '启用批号', key: 'enableBatchNumber', width: '0%', type: FormTypes.hidden },
           ]
         },
         confirmLoading: false,
