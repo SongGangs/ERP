@@ -205,6 +205,7 @@
   import BatchWaitBillList from './dialog/BatchWaitBillList'
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
   import { BillListMixin } from './mixins/BillListMixin'
+  import { BillFromStockCheckMixin } from './mixins/BillFromStockCheckMixin'
   import JEllipsis from '@/components/jeecg/JEllipsis'
   import JDate from '@/components/jeecg/JDate'
   import { deleteAction } from '@/api/manage'
@@ -212,7 +213,7 @@
   import { TabParamsMixin } from '@/mixins/TabParamsMixin'
   export default {
     name: "OtherOutList",
-    mixins: [JeecgListMixin, BillListMixin, TabParamsMixin],
+    mixins: [JeecgListMixin, BillListMixin, TabParamsMixin, BillFromStockCheckMixin],
     components: {
       OtherOutModal,
       BillDetail,
@@ -272,7 +273,9 @@
           },
           { title: '单据编号', dataIndex: 'number',width:160,
             customRender:function (text,record,index) {
-              text = record.linkNumber?text+"[转]":text
+              if (record.linkNumber) {
+                text = record.linkNumber.startsWith('PDFP') ? text + "[盘]" : text + "[转]"
+              }
               return text
             }
           },
@@ -304,6 +307,9 @@
       this.initAccount()
     },
     methods: {
+      getStockCheckStorageKey() {
+        return 'otherOutBillData'
+      },
       searchQuery() {
         this.loadData(1)
         if(this.inOutManageFlag) {

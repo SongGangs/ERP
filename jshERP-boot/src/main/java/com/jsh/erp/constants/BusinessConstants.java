@@ -242,4 +242,9 @@ public class BusinessConstants {
      * 微信发送订阅消息接口
      */
     public static final String WEIXIN_MESSAGE_SEND = "/cgi-bin/message/subscribe/send";
+
+    /**
+     * 盘点分配
+     */
+    public static final String PDFP = "PDFP";
 }

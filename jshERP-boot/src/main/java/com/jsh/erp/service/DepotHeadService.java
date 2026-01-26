@@ -10,6 +10,7 @@ import com.jsh.erp.datasource.mappers.DepotHeadMapper;
 import com.jsh.erp.datasource.mappers.DepotHeadMapperEx;
 import com.jsh.erp.datasource.mappers.DepotItemMapperEx;
 import com.jsh.erp.datasource.vo.*;
+import com.jsh.erp.datasource.vo.req.DepotCheckLinkBillReq;
 import com.jsh.erp.exception.BusinessRunTimeException;
 import com.jsh.erp.exception.JshException;
 import com.jsh.erp.utils.ExcelUtils;
@@ -86,6 +87,8 @@ public class DepotHeadService {
     DepotItemMapperEx depotItemMapperEx;
     @Resource
     private LogService logService;
+    @Resource
+    private DepotCheckService depotCheckService;
 
     public DepotHead getDepotHead(long id)throws Exception {
         DepotHead result=null;
@@ -1292,6 +1295,18 @@ public class DepotHeadService {
                             String.format(ExceptionConstants.DEPOT_HEAD_MEMBER_PAY_LACK_MSG));
                 }
             }
+        }
+        // 盘点关联出入库单子
+        if (BusinessConstants.SUB_TYPE_OTHER.equals(depotHead.getSubType())
+                && (BusinessConstants.DEPOTHEAD_TYPE_IN.equals(depotHead.getType()) || BusinessConstants.DEPOTHEAD_TYPE_OUT.equals(depotHead.getType()))
+                && StringUtils.isNotBlank(depotHead.getLinkNumber()) && depotHead.getLinkNumber().startsWith(BusinessConstants.PDFP)) {
+            DepotCheckLinkBillReq linkBillReq = DepotCheckLinkBillReq.builder().checkNumber(depotHead.getLinkNumber()).build();
+            if (BusinessConstants.DEPOTHEAD_TYPE_IN.equals(depotHead.getType())) {
+                linkBillReq.setRkNumber(depotHead.getNumber());
+            } else {
+                linkBillReq.setCkNumber(depotHead.getNumber());
+            }
+            depotCheckService.linkBillAndAdjust(linkBillReq);
         }
         //根据单据编号查询单据id
         DepotHeadExample dhExample = new DepotHeadExample();

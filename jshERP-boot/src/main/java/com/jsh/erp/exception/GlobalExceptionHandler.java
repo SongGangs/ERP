@@ -3,6 +3,7 @@ package com.jsh.erp.exception;
 import com.alibaba.fastjson.JSONObject;
 import com.jsh.erp.constants.ExceptionConstants;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -24,11 +25,22 @@ public class GlobalExceptionHandler {
             status.put(ExceptionConstants.GLOBAL_RETURNS_DATA, ((BusinessParamCheckingException) e).getData());
             return status;
         }
+        if (e instanceof MethodArgumentNotValidException) {
+            status.put(ExceptionConstants.GLOBAL_RETURNS_CODE, ExceptionConstants.SERVICE_SYSTEM_ERROR_CODE);
+            status.put(ExceptionConstants.GLOBAL_RETURNS_DATA, "参数异常，请联系管理员");
+            return status;
+        }
 
         //针对业务运行时异常的处理
         if (e instanceof BusinessRunTimeException) {
             status.put(ExceptionConstants.GLOBAL_RETURNS_CODE, ((BusinessRunTimeException) e).getCode());
             status.put(ExceptionConstants.GLOBAL_RETURNS_DATA, ((BusinessRunTimeException) e).getData());
+            return status;
+        }
+        //针对业务运行时异常的处理
+        if (e instanceof BizException) {
+            status.put(ExceptionConstants.GLOBAL_RETURNS_CODE, ((BizException) e).getCode());
+            status.put(ExceptionConstants.GLOBAL_RETURNS_DATA, ((BizException) e).getMessage());
             return status;
         }
 

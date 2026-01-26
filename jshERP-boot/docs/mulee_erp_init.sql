@@ -750,3 +750,58 @@ create index depot_id on jsh_serial_number(depot_id) using btree;
 create index type on jsh_user_business(type) using btree;
 create index key_id on jsh_user_business(key_id) using btree;
 create index tenant_id on jsh_user_business(tenant_id) using btree;
+
+
+DROP TABLE IF EXISTS `jsh_depot_check_head`;
+CREATE TABLE `jsh_depot_check_head` (
+                                        `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+                                        `check_number` varchar(50) NOT NULL COMMENT '盘点编号',
+                                        `depot_id` bigint(20) NOT NULL COMMENT '盘点仓库ID',
+                                        `check_date` date DEFAULT NULL COMMENT '盘点日期',
+                                        `should_check_number` int(11) DEFAULT '0' COMMENT '应盘总数',
+                                        `checked_number` int(11) DEFAULT '0' COMMENT '已盘总数',
+                                        `origin_number` int(11) DEFAULT '0' COMMENT '账面总数量',
+                                        `actual_number` int(11) DEFAULT '0' COMMENT '盘点总数量',
+                                        `origin_amount` decimal(24,6) DEFAULT '0.000000' COMMENT '账面总金额',
+                                        `actual_amount` decimal(24,6) DEFAULT '0.000000' COMMENT '盘点总金额',
+                                        `loss_number` int(11) DEFAULT '0' COMMENT '盘亏总数量',
+                                        `loss_amount` decimal(24,6) DEFAULT '0.000000' COMMENT '盘亏总金额',
+                                        `profit_number` int(11) DEFAULT '0' COMMENT '盘盈总数量',
+                                        `profit_amount` decimal(24,6) DEFAULT '0.000000' COMMENT '盘盈总金额',
+                                        `rk_number` varchar(50) DEFAULT '' COMMENT '盘盈入库订单号',
+                                        `ck_number` varchar(50) DEFAULT '' COMMENT '盘亏出库订单号',
+                                        `status` tinyint(4) DEFAULT '1' COMMENT '状态：1-盘点中，2-已盘点（未审核），3-已盘点（已审核），4-已调整',
+                                        `remark` varchar(500) DEFAULT NULL COMMENT '备注',
+                                        `file_name` varchar(1000) CHARACTER SET utf8 DEFAULT '' COMMENT '附件名称',
+                                        `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                                        `creator` bigint(20) DEFAULT NULL COMMENT '创建人',
+                                        `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+                                        `updater` bigint(20) DEFAULT NULL COMMENT '更新人',
+                                        `delete_flag` tinyint(4) DEFAULT '0' COMMENT '删除标记',
+                                        `tenant_id` bigint(20) DEFAULT NULL COMMENT '租户ID',
+                                        PRIMARY KEY (`id`) USING BTREE,
+                                        UNIQUE KEY `uk_check_number` (`check_number`,`delete_flag`),
+                                        KEY `idx_depot_id` (`depot_id`),
+                                        KEY `idx_check_date` (`check_date`),
+                                        KEY `idx_tenant_id` (`tenant_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='盘点主表';
+
+
+DROP TABLE IF EXISTS `jsh_depot_check_item`;
+CREATE TABLE `jsh_depot_check_item` (
+                                        `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+                                        `header_id` bigint(20) NOT NULL COMMENT '盘点主表ID',
+                                        `material_id` bigint(20) NOT NULL COMMENT '商品ID',
+                                        `origin_number` int(11) DEFAULT '0' COMMENT '账面数量',
+                                        `actual_number` int(11) DEFAULT NULL COMMENT '盘点数量',
+                                        `unit_price` decimal(24,6) DEFAULT '0.000000' COMMENT '单价',
+                                        `origin_amount` decimal(24,6) DEFAULT '0.000000' COMMENT '账面金额',
+                                        `actual_amount` decimal(24,6) DEFAULT NULL COMMENT '盘点金额',
+                                        `remark` varchar(500) DEFAULT NULL COMMENT '备注',
+                                        `tenant_id` bigint(20) DEFAULT NULL COMMENT '租户ID',
+                                        `delete_flag` tinyint(4) DEFAULT '0' COMMENT '删除标记',
+                                        PRIMARY KEY (`id`),
+                                        KEY `idx_header_id` (`header_id`,`delete_flag`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='盘点明细表';
+
+INSERT INTO `jsh_function` VALUES (263, '080113', '盘点管理', '0801', '/bill/stock_check', '/bill/StockCheckList', b'0', '0813', b'1', '电脑版', '1,2,3,7', 'profile', '0');

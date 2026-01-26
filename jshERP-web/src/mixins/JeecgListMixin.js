@@ -67,6 +67,8 @@ export const JeecgListMixin = {
       superQueryMatchType: 'and',
       /** 是否加载时就执行 */
       disableMixinCreated: false,
+      /** 是否加载时默认查询 */
+      disableDefaultQuery: false,
       /* 按钮权限 */
       btnEnableList: '',
     }
@@ -82,6 +84,11 @@ export const JeecgListMixin = {
       this.initDictConfig();
       //初始化按钮权限
       this.initActiveBtnStr();
+    } else if (!this.disableDefaultQuery) {
+      //初始化字典配置 在自己页面定义
+      this.initDictConfig()
+      //初始化按钮权限
+      this.initActiveBtnStr()
     }
   },
   mounted () {

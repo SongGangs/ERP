@@ -35,6 +35,7 @@ public interface MaterialMapperEx {
             @Param("position") String position,
             @Param("enabled") String enabled,
             @Param("remark") String remark,
+            @Param("categoryIds") List<Long> categoryIds,
             @Param("idList") List<Long> idList,
             @Param("mpList") String mpList);
 

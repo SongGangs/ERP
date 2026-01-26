@@ -46,7 +46,7 @@ public class DepotService {
     @Resource
     private MaterialCurrentStockMapperEx materialCurrentStockMapperEx;
 
-    public Depot getDepot(long id)throws Exception {
+    public Depot getDepot(long id) {
         Depot result=null;
         try{
             result=depotMapper.selectByPrimaryKey(id);

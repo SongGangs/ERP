@@ -105,7 +105,7 @@ export const JEditableTableMixin = {
           this.confirmLoading = false
           this.close()
         } else {
-          this.$message.warning(res.data.message);
+          this.$message.warning(res.data.message || res.data);
           this.confirmLoading = false
         }
       }).finally(() => {

@@ -51,7 +51,10 @@
             </a-form-item>
           </a-col>
           <a-col :lg="6" :md="12" :sm="24">
-            <a-form-item v-if="inOutManageFlag && !model.billType" :labelCol="labelCol" :wrapperCol="wrapperCol" label="关联单据">
+            <a-form-item v-if="pdNumber || (model.linkNumber && model.linkNumber.startsWith('PDFP'))" :labelCol="labelCol" :wrapperCol="wrapperCol" label="盘点单据">
+              <a-input v-decorator.trim="[ 'linkNumber' ]" :readOnly="true" disabled/>
+            </a-form-item>
+            <a-form-item v-else-if="inOutManageFlag && !model.billType" :labelCol="labelCol" :wrapperCol="wrapperCol" label="关联单据">
               <a-input-search placeholder="请选择待入库单据" v-decorator="[ 'linkNumber' ]" @search="onSearchLinkNumber" :readOnly="true"/>
             </a-form-item>
           </a-col>
@@ -246,6 +249,8 @@
         rowCanEdit: true,
         //出入库管理开关，适合独立仓管场景
         inOutManageFlag: false,
+        // 标识是否从盘点单过来的
+        pdNumber: null,
         model: {},
         labelCol: {
           xs: { span: 24 },
@@ -461,6 +466,15 @@
             })
           })
         }
+      },
+      //重写close方法，清空pdNumber
+      close() {
+        this.pdNumber = null
+        this.visible = false
+        this.eachAllTable((item) => {
+          item.initialize()
+        })
+        this.$emit('close')
       }
     }
   }

@@ -4,6 +4,7 @@ import com.jsh.erp.datasource.entities.*;
 import com.jsh.erp.datasource.mappers.TenantMapper;
 import com.jsh.erp.exception.BusinessParamCheckingException;
 import com.jsh.erp.utils.*;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -62,7 +63,7 @@ public class UserService {
     @Value("${tenant.tryDayLimit}")
     private Integer tryDayLimit;
 
-    public User getUser(long id)throws Exception {
+    public User getUser(long id) {
         User result=null;
         try{
             //先校验是否登录，然后才能查询用户数据
@@ -77,14 +78,21 @@ public class UserService {
         return result;
     }
 
-    public List<User> getUserListByIds(String ids)throws Exception {
+    public List<User> getUserListByIds(String ids) {
         List<Long> idList = StringUtil.strToLongList(ids);
+        return listUserByIds(idList);
+    }
+
+    public List<User> listUserByIds(List<Long> ids) {
         List<User> list = new ArrayList<>();
-        try{
+        if (CollectionUtils.isEmpty(ids)) {
+            return list;
+        }
+        try {
             UserExample example = new UserExample();
-            example.createCriteria().andIdIn(idList);
+            example.createCriteria().andIdIn(ids);
             list = userMapper.selectByExample(example);
-        }catch(Exception e){
+        } catch (Exception e) {
             JshException.readFail(logger, e);
         }
         return list;

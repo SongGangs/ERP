@@ -106,8 +106,14 @@
             <bind name="bindRemark" value="'%'+remark+'%'"/>
             and m.remark like #{bindRemark}
         </if>
-        <if test="idList.size()>0">
+        <if test="categoryIds != null and categoryIds.size()>0">
             and m.category_id in
+            <foreach collection="categoryIds" item="item" index="index" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="idList != null and idList.size()>0">
+            and m.id in
             <foreach collection="idList" item="item" index="index" separator="," open="(" close=")">
                 #{item}
             </foreach>

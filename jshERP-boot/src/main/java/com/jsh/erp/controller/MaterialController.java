@@ -17,6 +17,8 @@ import com.jsh.erp.service.UserService;
 import com.jsh.erp.utils.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.ListUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.jsh.erp.utils.ResponseJsonUtil.returnJson;
 import static com.jsh.erp.utils.ResponseJsonUtil.returnStr;
@@ -760,6 +763,44 @@ public class MaterialController extends BaseController {
             res.code = 200;
             res.data = map;
         } catch(Exception e){
+            logger.error(e.getMessage(), e);
+            res.code = 500;
+            res.data = "获取数据失败";
+        }
+        return res;
+    }
+
+    /**
+     * 商品库存查询
+     *
+     * @param depotId
+     * @param categoryId
+     * @param request
+     * @return
+     * @throws Exception
+     */
+    @GetMapping(value = "/listWithStock")
+    @ApiOperation(value = "商品库存查询")
+    public BaseResponseInfo listWithStock(@RequestParam(value = "depotId") Long depotId,
+                                          @RequestParam(value = "categoryId", required = false) Long categoryId,
+                                          HttpServletRequest request) {
+        BaseResponseInfo res = new BaseResponseInfo();
+        try {
+            List<Long> idList = new ArrayList<>();
+            if (categoryId != null) {
+                idList = materialService.getListByParentId(categoryId);
+            }
+            JSONArray arr = depotService.findDepotByCurrentUser();
+            List<Long> depotIds = arr.stream().map(t -> (JSONObject) t)
+                    .map(t -> t.getLong("id"))
+                    .filter(t -> t.equals(depotId))
+                    .collect(Collectors.toList());
+            AssertUtils.assertNotEmpty(depotIds, "无可选仓库");
+            String priceLimit = roleService.getCurrentPriceLimit(request);
+            List<MaterialVo4Unit> dataList = materialService.listWithStock(depotIds, idList, priceLimit);
+            res.code = 200;
+            res.data = dataList;
+        } catch (Exception e) {
             logger.error(e.getMessage(), e);
             res.code = 500;
             res.data = "获取数据失败";

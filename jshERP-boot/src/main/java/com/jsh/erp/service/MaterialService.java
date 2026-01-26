@@ -128,15 +128,15 @@ public class MaterialService {
         }
         List<MaterialVo4Unit> list = new ArrayList<>();
         try{
-            List<Long> idList = new ArrayList<>();
+            List<Long> categoryIds = new ArrayList<>();
             if(StringUtil.isNotEmpty(categoryId)){
-                idList = getListByParentId(Long.parseLong(categoryId));
+                categoryIds = getListByParentId(Long.parseLong(categoryId));
             }
             PageUtils.startPage();
-            list= materialMapperEx.selectByConditionMaterial(materialParam, standard, model, color, brand, mfrs,
+            list = materialMapperEx.selectByConditionMaterial(materialParam, standard, model, color, brand, mfrs,
                     otherField1, otherField2, otherField3, weight, expiryNum,
-                    enableSerialNumber, enableBatchNumber, position, enabled, remark, idList, mpList);
-            if (null != list && list.size()>0) {
+                    enableSerialNumber, enableBatchNumber, position, enabled, remark, categoryIds, null, mpList);
+            if (CollectionUtils.isNotEmpty(list)) {
                 Map<Long,BigDecimal> initialStockMap = getInitialStockMapByMaterialList(list);
                 Map<Long,BigDecimal> currentStockMap = getCurrentStockMapByMaterialList(list);
                 for (MaterialVo4Unit m : list) {
@@ -1398,6 +1398,39 @@ public class MaterialService {
                 item.setImgLarge("large");
             }
             item.setProductionDates(productionDatesMap.get(item.getId()));
+        }
+        return dataList;
+    }
+
+    public List<MaterialVo4Unit> listWithStock(List<Long> depotList, List<Long> idList, String priceLimit) throws Exception {
+        Map<Long, BigDecimal> initialStockMap = new HashMap<>();
+        boolean moveAvgPriceFlag = systemConfigService.getMoveAvgPriceFlag();
+
+        List<MaterialInitialStockWithMaterial> initialStockList = getInitialStockWithMaterial(depotList);
+        for (MaterialInitialStockWithMaterial mism : initialStockList) {
+            initialStockMap.put(mism.getMaterialId(), mism.getNumber());
+        }
+        List<MaterialVo4Unit> dataList = materialMapperEx.getListWithStock(depotList, idList, null, null, null, "createTime", null, null, null);
+        if (CollectionUtils.isEmpty(dataList)) {
+            return dataList;
+        }
+        for (MaterialVo4Unit item : dataList) {
+            item.setCurrentUnitPrice(roleService.parseMaterialPriceByLimit(item.getCurrentUnitPrice(), PriceLimitConstants.BUY, priceLimit));
+            item.setPurchaseDecimal(roleService.parseMaterialPriceByLimit(item.getPurchaseDecimal(), PriceLimitConstants.BUY, priceLimit));
+            item.setCurrentStockPrice(roleService.parseMaterialPriceByLimit(item.getCurrentStockPrice(), PriceLimitConstants.BUY, priceLimit));
+            item.setCurrentStockMovePrice(roleService.parseMaterialPriceByLimit(item.getCurrentStockMovePrice(), PriceLimitConstants.BUY, priceLimit));
+            if (moveAvgPriceFlag) {
+                item.setPurchaseDecimal(item.getCurrentUnitPrice());
+                item.setCurrentStockPrice(item.getCurrentStockMovePrice());
+            }
+            item.setUnitName(null != item.getUnitId() ? item.getUnitName() + "[多单位]" : item.getUnitName());
+            item.setInitialStock(null != initialStockMap.get(item.getId()) ? initialStockMap.get(item.getId()) : BigDecimal.ZERO);
+            item.setBigUnitStock(getBigUnitStock(item.getCurrentStock(), item.getUnitId()));
+            item.setMeId(item.getId());
+            if (fileUploadType == 2) {
+                item.setImgSmall("small");
+                item.setImgLarge("large");
+            }
         }
         return dataList;
     }
