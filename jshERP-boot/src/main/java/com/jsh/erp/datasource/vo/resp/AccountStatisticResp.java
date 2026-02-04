@@ -20,17 +20,17 @@ public class AccountStatisticResp {
 
     private List<AccountStatisticItemResp> income;
 
-    private List<AccountStatisticItemResp> out;
-
     private List<AccountStatisticItemResp> paidOut;
+
+    private List<AccountStatisticItemResp> unPaidOut;
 
     private List<AccountStatisticItemResp> purchase;
 
     private List<AccountStatisticItemResp> outStore;
 
-    private List<AccountStatisticItemResp> paidOtherInStore;
+    private List<AccountStatisticItemResp> paidPayment;
 
-    private List<AccountStatisticItemResp> unPaidOtherInStore;
+    private List<AccountStatisticItemResp> unPaidPayment;
 
     private List<AccountStatisticItemResp> companyOut;
 

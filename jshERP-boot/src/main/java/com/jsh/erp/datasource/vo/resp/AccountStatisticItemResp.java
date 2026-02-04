@@ -1,11 +1,10 @@
 package com.jsh.erp.datasource.vo.resp;
 
-import com.jsh.erp.datasource.vo.dto.AccountStatisticDto;
+import com.google.common.collect.Lists;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.beans.BeanUtils;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -41,5 +40,9 @@ public class AccountStatisticItemResp {
                         .itemName(itemMap.get(entry.getKey()))
                         .amount(entry.getValue()).build())
                 .collect(Collectors.toList());
+    }
+
+    public static List<AccountStatisticItemResp> from(String itemName, BigDecimal amount) {
+        return Lists.newArrayList(AccountStatisticItemResp.builder().itemName(itemName).amount(amount).build());
     }
 }

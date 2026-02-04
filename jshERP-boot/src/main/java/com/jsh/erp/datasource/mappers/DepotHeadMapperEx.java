@@ -2,6 +2,7 @@ package com.jsh.erp.datasource.mappers;
 
 import com.jsh.erp.datasource.entities.DepotHead;
 import com.jsh.erp.datasource.vo.*;
+import com.jsh.erp.datasource.vo.dto.AccountItemStatisticDto;
 import com.jsh.erp.datasource.vo.dto.DepotHeadStatisticDto;
 import org.apache.ibatis.annotations.Param;
 
@@ -309,4 +310,9 @@ public interface DepotHeadMapperEx {
     List<DepotHeadStatisticDto> getDepotHeadStatistic(@Param("accountId") Long accountId,
                                                       @Param("beginTime") String beginTime,
                                                       @Param("endTime") String endTime);
+
+
+    AccountItemStatisticDto statisticsPaymentByAccountId(@Param("accountId") Long accountId,
+                                                         @Param("beginTime") String beginTime,
+                                                         @Param("endTime") String endTime);
 }

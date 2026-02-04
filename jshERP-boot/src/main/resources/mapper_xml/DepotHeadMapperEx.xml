@@ -1447,4 +1447,36 @@
         </if>
         GROUP BY type, sub_type, biz_type, status
     </select>
+
+    <select id="statisticsPaymentByAccountId" resultType="com.jsh.erp.datasource.vo.dto.AccountItemStatisticDto">
+        SELECT
+            dh.account_id,
+            SUM(ifnull( dh.discount_last_money, 0 ) + ifnull( dh.other_money, 0 ) - ifnull( dh.deposit, 0 )- ifnull( abs( dh.change_amount ), 0 )) AS debt,
+            ifnull(SUM( ai.each_amount ), 0) AS finishDebt
+        FROM
+            jsh_depot_head dh
+                LEFT JOIN (SELECT ai.bill_id,
+                                  MIN( ah.account_id ) AS account_id,
+                                  ifnull( sum( abs( ai.each_amount )), 0 ) AS each_amount
+                           FROM
+                               jsh_account_item ai JOIN jsh_account_head ah ON ai.header_id = ah.id
+                           WHERE  ifnull( ai.delete_flag, '0' ) != '1'
+                    AND ai.bill_id IS NOT NULL
+                    AND ah.status = '1'
+                    AND ah.type = '付款'
+                           GROUP BY ai.bill_id ) ai ON dh.id = ai.bill_id
+        WHERE ( dh.type = '入库' OR dh.type = '出库' )
+          AND ( dh.sub_type = '其它' OR dh.sub_type = '销售' OR dh.sub_type = '采购退货' OR dh.sub_type = '销售退货' )
+          AND ifnull( dh.delete_flag, '0' ) != '1'
+        <if test="accountId != null">
+            and dh.account_id = #{accountId}
+        </if>
+        <if test="beginTime != null">
+            AND dh.oper_time >= #{beginTime}
+        </if>
+        <if test="endTime != null">
+            AND dh.oper_time &lt;= #{endTime}
+        </if>
+        GROUP BY dh.account_id
+    </select>
 </mapper>

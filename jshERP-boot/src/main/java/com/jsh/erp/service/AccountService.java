@@ -9,6 +9,7 @@ import com.jsh.erp.datasource.entities.*;
 import com.jsh.erp.datasource.mappers.*;
 import com.jsh.erp.datasource.vo.AccountVo4InOutList;
 import com.jsh.erp.datasource.vo.AccountVo4List;
+import com.jsh.erp.datasource.vo.dto.AccountItemStatisticDto;
 import com.jsh.erp.datasource.vo.dto.DepotHeadStatisticDto;
 import com.jsh.erp.datasource.vo.enums.HeadStatusEnum;
 import com.jsh.erp.datasource.vo.dto.AccountStatisticDto;
@@ -668,16 +669,17 @@ public class AccountService {
                 .collect(Collectors.toMap(AccountStatisticDto::getItemCode, AccountStatisticDto::getAmount, BigDecimal::add));
         List<AccountStatisticItemResp> income = AccountStatisticItemResp.from(inItemMap, itemMap);
 
-        Map<Long, BigDecimal> outItemMap = inOutStats.stream()
-                .filter(t -> "支出".equals(t.getTypeName()))
-                .collect(Collectors.toMap(AccountStatisticDto::getItemCode, AccountStatisticDto::getAmount, BigDecimal::add));
-        List<AccountStatisticItemResp> out = AccountStatisticItemResp.from(outItemMap, itemMap);
-
         Map<Long, BigDecimal> paidOutItemMap = inOutStats.stream()
                 .filter(t -> "支出".equals(t.getTypeName()))
                 .filter(t -> HeadStatusEnum.AUDITED.isType(t.getStatus()))
                 .collect(Collectors.toMap(AccountStatisticDto::getItemCode, AccountStatisticDto::getAmount, BigDecimal::add));
         List<AccountStatisticItemResp> paidOut = AccountStatisticItemResp.from(paidOutItemMap, itemMap);
+
+        Map<Long, BigDecimal> unPaidOutItemMap = inOutStats.stream()
+                .filter(t -> "支出".equals(t.getTypeName()))
+                .filter(t -> HeadStatusEnum.AUDITED.notType(t.getStatus()))
+                .collect(Collectors.toMap(AccountStatisticDto::getItemCode, AccountStatisticDto::getAmount, BigDecimal::add));
+        List<AccountStatisticItemResp> unPaidOut = AccountStatisticItemResp.from(unPaidOutItemMap, itemMap);
 
         Map<Long, BigDecimal> companyOutItemMap = inOutStats.stream()
                 .filter(t -> "支出".equals(t.getTypeName()))
@@ -699,23 +701,22 @@ public class AccountService {
                         .itemName(EnumUtils.getDesc(entry.getKey(), BizTypeEnum.class))
                         .amount(entry.getValue()).build())
                 .collect(Collectors.toList());
-        Map<String, BigDecimal> paidOtherInStoreItemMap = depotHeadStats.stream()
-                .filter(t -> DEPOTHEAD_TYPE_IN.equals(t.getTypeName()))
-                .filter(t -> SUB_TYPE_OTHER.equals(t.getSubTypeName()))
-                .filter(t -> HeadStatusEnum.AUDITED.isType(t.getStatus()))
-                .collect(Collectors.toMap(t -> "已付款单", DepotHeadStatisticDto::getAmount, BigDecimal::add));
-        Map<String, BigDecimal> unPaidOtherInStoreItemMap = depotHeadStats.stream()
-                .filter(t -> DEPOTHEAD_TYPE_IN.equals(t.getTypeName()))
-                .filter(t -> SUB_TYPE_OTHER.equals(t.getSubTypeName()))
-                .filter(t -> HeadStatusEnum.UNAUDITED.isType(t.getStatus()))
-                .collect(Collectors.toMap(t -> "未付款单", DepotHeadStatisticDto::getAmount, BigDecimal::add));
+
+        // 付款单 以其它入库和采购退款作为 付款单的全量数据
+        AccountItemStatisticDto paymentDepotHeadStat = depotHeadMapperEx.statisticsPaymentByAccountId(req.getAccountId(), beginTime, endTime);
+        List<AccountStatisticItemResp> paidPayment = Collections.emptyList();
+        List<AccountStatisticItemResp> unPaidPayment = Collections.emptyList();
+        if (Objects.nonNull(paymentDepotHeadStat)) {
+            paidPayment = AccountStatisticItemResp.from("付款单", paymentDepotHeadStat.getFinishDebt());
+            unPaidPayment = AccountStatisticItemResp.from("付款单", paymentDepotHeadStat.getDebt().subtract(paymentDepotHeadStat.getFinishDebt()));
+        }
 
         // 现金流水结余 = 收入单-支出单(已付款)-付款单-采购订单
         BigDecimal cashBalance = sumAmount(income).subtract(sumAmount(paidOut))
-                .subtract(sumAmount(paidOtherInStoreItemMap)).subtract(sumAmount(unPaidOtherInStoreItemMap))
+                .subtract(sumAmount(paidPayment)).subtract(sumAmount(unPaidPayment))
                 .subtract(sumAmount(purchaseItemMap));
         // 利润 = 收入单-支出单-出库
-        BigDecimal profit = sumAmount(income).subtract(sumAmount(out)).subtract(sumAmount(outStore));
+        BigDecimal profit = sumAmount(income).subtract(sumAmount(paidOut)).subtract(sumAmount(unPaidOut)).subtract(sumAmount(outStore));
         // 打款 = 收入单-维修费（公司）-清洁费（公司）-清洁费（公司）-管理费（公司）-水电等公摊（公司）
         BigDecimal paymentAmount = sumAmount(income).subtract(sumAmount(companyOut));
 
@@ -723,12 +724,12 @@ public class AccountService {
                 .accountId(account.getId())
                 .accountName(account.getName())
                 .income(income)
-                .out(out)
                 .paidOut(paidOut)
+                .unPaidOut(unPaidOut)
                 .purchase(AccountStatisticItemResp.from(purchaseItemMap))
                 .outStore(outStore)
-                .paidOtherInStore(AccountStatisticItemResp.from(paidOtherInStoreItemMap))
-                .unPaidOtherInStore(AccountStatisticItemResp.from(unPaidOtherInStoreItemMap))
+                .paidPayment(paidPayment)
+                .unPaidPayment(unPaidPayment)
                 .companyOut(companyOut)
                 .cashBalance(cashBalance)
                 .profit(profit)

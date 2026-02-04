@@ -110,21 +110,21 @@
                 </tr>
               </template>
 
-              <!-- 其它入库(已付款) -->
-              <template v-if="paidOtherInStoreData.length > 0">
+              <!-- 付款单(已支付) -->
+              <template v-if="paidPaymentData.length > 0">
                 <tr>
-                  <td :rowspan="paidOtherInStoreData.length" class="sub-category-cell">
-                    <a @click="jumpToOtherInList('paid')" class="link-text">其它入库(已付款)</a>
-                    <span class="percentage-text">{{ calculatePercentage(paidOtherInStoreTotalAmount) }}</span>
+                  <td :rowspan="paidPaymentData.length" class="sub-category-cell">
+                    <a @click="jumpToOtherInList(undefined)" class="link-text">付款单(已支付)</a>
+                    <span class="percentage-text">{{ calculatePercentage(paidPaymentTotalAmount) }}</span>
                   </td>
                   <td class="item-cell">
-                    {{ paidOtherInStoreData[0].itemName }}
-                    <span class="percentage-text">{{ calculatePercentage(paidOtherInStoreData[0].amount) }}</span>
+                    {{ paidPaymentData[0].itemName }}
+                    <span class="percentage-text">{{ calculatePercentage(paidPaymentData[0].amount) }}</span>
                   </td>
-                  <td class="amount-cell">{{ paidOtherInStoreData[0].amount }}</td>
-                  <td :rowspan="paidOtherInStoreData.length" class="total-amount-cell" style="background: #fff1f0; font-weight: bold;">{{ paidOtherInStoreTotalAmount }}</td>
+                  <td class="amount-cell">{{ paidPaymentData[0].amount }}</td>
+                  <td :rowspan="paidPaymentData.length" class="total-amount-cell" style="background: #fff1f0; font-weight: bold;">{{ paidPaymentTotalAmount }}</td>
                 </tr>
-                <tr v-for="(item, index) in paidOtherInStoreData.slice(1)" :key="'paidOtherInStore-' + index">
+                <tr v-for="(item, index) in paidPaymentData.slice(1)" :key="'paidPayment-' + index">
                   <td class="item-cell">
                     {{ item.itemName }}
                     <span class="percentage-text">{{ calculatePercentage(item.amount) }}</span>
@@ -133,21 +133,21 @@
                 </tr>
               </template>
 
-              <!-- 其它入库(未付款) -->
-              <template v-if="unPaidOtherInStoreData.length > 0">
+              <!-- 付款单(待支付) -->
+              <template v-if="unPaidPaymentData.length > 0">
                 <tr>
-                  <td :rowspan="unPaidOtherInStoreData.length" class="sub-category-cell">
-                    <a @click="jumpToOtherInList('unpaid')" class="link-text">其它入库(未付款)</a>
-                    <span class="percentage-text">{{ calculatePercentage(unPaidOtherInStoreTotalAmount) }}</span>
+                  <td :rowspan="unPaidPaymentData.length" class="sub-category-cell">
+                    <a @click="jumpToOtherInList(undefined)" class="link-text">付款单(待支付)</a>
+                    <span class="percentage-text">{{ calculatePercentage(unPaidPaymentTotalAmount) }}</span>
                   </td>
                   <td class="item-cell">
-                    {{ unPaidOtherInStoreData[0].itemName }}
-                    <span class="percentage-text">{{ calculatePercentage(unPaidOtherInStoreData[0].amount) }}</span>
+                    {{ unPaidPaymentData[0].itemName }}
+                    <span class="percentage-text">{{ calculatePercentage(unPaidPaymentData[0].amount) }}</span>
                   </td>
-                  <td class="amount-cell">{{ unPaidOtherInStoreData[0].amount }}</td>
-                  <td :rowspan="unPaidOtherInStoreData.length" class="total-amount-cell" style="background: #fff1f0; font-weight: bold;">{{ unPaidOtherInStoreTotalAmount }}</td>
+                  <td class="amount-cell">{{ unPaidPaymentData[0].amount }}</td>
+                  <td :rowspan="unPaidPaymentData.length" class="total-amount-cell" style="background: #fff1f0; font-weight: bold;">{{ unPaidPaymentTotalAmount }}</td>
                 </tr>
-                <tr v-for="(item, index) in unPaidOtherInStoreData.slice(1)" :key="'unPaidOtherInStore-' + index">
+                <tr v-for="(item, index) in unPaidPaymentData.slice(1)" :key="'unPaidPayment-' + index">
                   <td class="item-cell">
                     {{ item.itemName }}
                     <span class="percentage-text">{{ calculatePercentage(item.amount) }}</span>
@@ -221,25 +221,49 @@
           </a-col>
 
           <a-col :span="12">
+            <div class="expense-title">支出</div>
             <table class="statistic-table">
               <tbody>
-              <!-- 支出单(已付款和未付款) -->
-              <template v-if="outData.length > 0">
+              <!-- 支出单(已付款) -->
+              <template v-if="paidOutData.length > 0">
                 <tr>
-                  <td :rowspan="outData.length" class="sub-category-cell">
-                    <a @click="jumpToItemOutList(undefined, undefined)" class="link-text">支出单(已付款和未付款)</a>
-                    <span class="percentage-text">{{ calculatePercentage(outTotalAmount) }}</span>
+                  <td :rowspan="paidOutData.length" class="sub-category-cell">
+                    <a @click="jumpToItemOutList('1', undefined)" class="link-text">支出单(已付款)</a>
+                    <span class="percentage-text">{{ calculatePercentage(paidOutTotalAmount) }}</span>
                   </td>
                   <td class="item-cell">
-                    <a @click="jumpToItemOutList(undefined, outData[0].itemCode)" class="link-text">{{ outData[0].itemName }}</a>
-                    <span class="percentage-text">{{ calculatePercentage(outData[0].amount) }}</span>
+                    <a @click="jumpToItemOutList('1', paidOutData[0].itemCode)" class="link-text">{{ paidOutData[0].itemName }}</a>
+                    <span class="percentage-text">{{ calculatePercentage(paidOutData[0].amount) }}</span>
                   </td>
-                  <td class="amount-cell">{{ outData[0].amount }}</td>
-                  <td :rowspan="outData.length" class="total-amount-cell" style="background: #fff1f0; font-weight: bold;">{{ outTotalAmount }}</td>
+                  <td class="amount-cell">{{ paidOutData[0].amount }}</td>
+                  <td :rowspan="paidOutData.length" class="total-amount-cell" style="background: #fff1f0; font-weight: bold;">{{ paidOutTotalAmount }}</td>
                 </tr>
-                <tr v-for="(item, index) in outData.slice(1)" :key="'out-' + index">
+                <tr v-for="(item, index) in paidOutData.slice(1)" :key="'profit-paidOut-' + index">
                   <td class="item-cell">
-                    <a @click="jumpToItemOutList(undefined, item.itemCode)" class="link-text">{{ item.itemName }}</a>
+                    <a @click="jumpToItemOutList('1', item.itemCode)" class="link-text">{{ item.itemName }}</a>
+                    <span class="percentage-text">{{ calculatePercentage(item.amount) }}</span>
+                  </td>
+                  <td class="amount-cell">{{ item.amount }}</td>
+                </tr>
+              </template>
+
+              <!-- 支出单(待付款) -->
+              <template v-if="unPaidOutData.length > 0">
+                <tr>
+                  <td :rowspan="unPaidOutData.length" class="sub-category-cell">
+                    <a @click="jumpToItemOutList('0', undefined)" class="link-text">支出单(待付款)</a>
+                    <span class="percentage-text">{{ calculatePercentage(unPaidOutTotalAmount) }}</span>
+                  </td>
+                  <td class="item-cell">
+                    <a @click="jumpToItemOutList('0', unPaidOutData[0].itemCode)" class="link-text">{{ unPaidOutData[0].itemName }}</a>
+                    <span class="percentage-text">{{ calculatePercentage(unPaidOutData[0].amount) }}</span>
+                  </td>
+                  <td class="amount-cell">{{ unPaidOutData[0].amount }}</td>
+                  <td :rowspan="unPaidOutData.length" class="total-amount-cell" style="background: #fff1f0; font-weight: bold;">{{ unPaidOutTotalAmount }}</td>
+                </tr>
+                <tr v-for="(item, index) in unPaidOutData.slice(1)" :key="'profit-unPaidOut-' + index">
+                  <td class="item-cell">
+                    <a @click="jumpToItemOutList('0', item.itemCode)" class="link-text">{{ item.itemName }}</a>
                     <span class="percentage-text">{{ calculatePercentage(item.amount) }}</span>
                   </td>
                   <td class="amount-cell">{{ item.amount }}</td>
@@ -319,12 +343,12 @@ export default {
       statisticData: null,
       // 现金流水账数据
       incomeData: [],
-      outData: [],
       paidOutData: [],
+      unPaidOutData: [],
       purchaseData: [],
       outStoreData: [],
-      paidOtherInStoreData: [],
-      unPaidOtherInStoreData: [],
+      paidPaymentData: [],
+      unPaidPaymentData: [],
       companyOutData: [],
       // 现金结余
       cashBalance: 0,
@@ -337,10 +361,10 @@ export default {
       // 各类别总金额
       incomeTotalAmount: 0,
       paidOutTotalAmount: 0,
-      paidOtherInStoreTotalAmount: 0,
-      unPaidOtherInStoreTotalAmount: 0,
+      unPaidOutTotalAmount: 0,
+      paidPaymentTotalAmount: 0,
+      unPaidPaymentTotalAmount: 0,
       purchaseTotalAmount: 0,
-      outTotalAmount: 0,
       outStoreTotalAmount: 0,
       labelCol: {
         xs: { span: 1 },
@@ -450,8 +474,8 @@ export default {
       // 计算最大行数
       const cashFlowMaxRows = Math.max(
         this.incomeData.length,
-        this.paidOutData.length + this.paidOtherInStoreData.length +
-        this.unPaidOtherInStoreData.length + this.purchaseData.length
+        this.paidOutData.length + this.paidPaymentData.length +
+        this.unPaidPaymentData.length + this.purchaseData.length
       )
 
       // 构建现金流水账数据
@@ -484,24 +508,24 @@ export default {
           expenseCategory = expenseIndex === 0 ? '支出单(已付款)' : ''
           expenseIndex++
         }
-        // 其它入库(已付款)
-        else if (expenseIndex < this.paidOutData.length + this.paidOtherInStoreData.length) {
+        // 付款单(已支付)
+        else if (expenseIndex < this.paidOutData.length + this.paidPaymentData.length) {
           const idx = expenseIndex - this.paidOutData.length
-          expenseItem = this.paidOtherInStoreData[idx]
-          expenseCategory = idx === 0 ? '其它入库(已付款)' : ''
+          expenseItem = this.paidPaymentData[idx]
+          expenseCategory = idx === 0 ? '付款单(已支付)' : ''
           expenseIndex++
         }
-        // 其它入库(待付款)
-        else if (expenseIndex < this.paidOutData.length + this.paidOtherInStoreData.length + this.unPaidOtherInStoreData.length) {
-          const idx = expenseIndex - this.paidOutData.length - this.paidOtherInStoreData.length
-          expenseItem = this.unPaidOtherInStoreData[idx]
-          expenseCategory = idx === 0 ? '其它入库(待付款)' : ''
+        // 付款单(待支付)
+        else if (expenseIndex < this.paidOutData.length + this.paidPaymentData.length + this.unPaidPaymentData.length) {
+          const idx = expenseIndex - this.paidOutData.length - this.paidPaymentData.length
+          expenseItem = this.unPaidPaymentData[idx]
+          expenseCategory = idx === 0 ? '付款单(待支付)' : ''
           expenseIndex++
         }
         // 采购
-        else if (expenseIndex < this.paidOutData.length + this.paidOtherInStoreData.length +
-          this.unPaidOtherInStoreData.length + this.purchaseData.length) {
-          const idx = expenseIndex - this.paidOutData.length - this.paidOtherInStoreData.length - this.unPaidOtherInStoreData.length
+        else if (expenseIndex < this.paidOutData.length + this.paidPaymentData.length +
+          this.unPaidPaymentData.length + this.purchaseData.length) {
+          const idx = expenseIndex - this.paidOutData.length - this.paidPaymentData.length - this.unPaidPaymentData.length
           expenseItem = this.purchaseData[idx]
           expenseCategory = idx === 0 ? '采购' : ''
           expenseIndex++
@@ -538,7 +562,7 @@ export default {
       // 计算最大行数
       const profitMaxRows = Math.max(
         this.incomeData.length,
-        this.outData.length + this.outStoreData.length
+        this.paidOutData.length + this.unPaidOutData.length + this.outStoreData.length
       )
 
       // 构建利润账单数据
@@ -564,15 +588,22 @@ export default {
         let profitExpenseItem = null
         let profitExpenseCategory = ''
 
-        // 支出单(已付款和未付款)
-        if (profitExpenseIndex < this.outData.length) {
-          profitExpenseItem = this.outData[profitExpenseIndex]
-          profitExpenseCategory = profitExpenseIndex === 0 ? '支出单(已付款和未付款)' : ''
+        // 支出单(已付款)
+        if (profitExpenseIndex < this.paidOutData.length) {
+          profitExpenseItem = this.paidOutData[profitExpenseIndex]
+          profitExpenseCategory = profitExpenseIndex === 0 ? '支出单(已付款)' : ''
+          profitExpenseIndex++
+        }
+        // 支出单(待付款)
+        else if (profitExpenseIndex < this.paidOutData.length + this.unPaidOutData.length) {
+          const idx = profitExpenseIndex - this.paidOutData.length
+          profitExpenseItem = this.unPaidOutData[idx]
+          profitExpenseCategory = idx === 0 ? '支出单(待付款)' : ''
           profitExpenseIndex++
         }
         // 支出(出库)
-        else if (profitExpenseIndex < this.outData.length + this.outStoreData.length) {
-          const idx = profitExpenseIndex - this.outData.length
+        else if (profitExpenseIndex < this.paidOutData.length + this.unPaidOutData.length + this.outStoreData.length) {
+          const idx = profitExpenseIndex - this.paidOutData.length - this.unPaidOutData.length
           profitExpenseItem = this.outStoreData[idx]
           profitExpenseCategory = idx === 0 ? '支出(出库)' : ''
           profitExpenseIndex++
@@ -609,20 +640,20 @@ export default {
         }))
       }
 
-      // 处理现金流水账 - 其他人(已付款)
-      this.outData = []
-      if (this.statisticData.out && this.statisticData.out.length > 0) {
-        this.outData = this.statisticData.out.map(item => ({
+      // 处理现金流水账 - 支出单(已付款)
+      this.paidOutData = []
+      if (this.statisticData.paidOut && this.statisticData.paidOut.length > 0) {
+        this.paidOutData = this.statisticData.paidOut.map(item => ({
           itemName: item.itemName,
           itemCode: item.itemCode,
           amount: parseFloat(item.amount || 0).toFixed(2)
         }))
       }
 
-      // 处理现金流水账 - 支出单(已付款)
-      this.paidOutData = []
-      if (this.statisticData.paidOut && this.statisticData.paidOut.length > 0) {
-        this.paidOutData = this.statisticData.paidOut.map(item => ({
+      // 处理现金流水账 - 支出单(待付款)
+      this.unPaidOutData = []
+      if (this.statisticData.unPaidOut && this.statisticData.unPaidOut.length > 0) {
+        this.unPaidOutData = this.statisticData.unPaidOut.map(item => ({
           itemName: item.itemName,
           itemCode: item.itemCode,
           amount: parseFloat(item.amount || 0).toFixed(2)
@@ -648,18 +679,19 @@ export default {
         }))
       }
 
-      // 处理利润账单 - 支出单(已付款和未付款)
-      this.paidOtherInStoreData = []
-      if (this.statisticData.paidOtherInStore && this.statisticData.paidOtherInStore.length > 0) {
-        this.paidOtherInStoreData = this.statisticData.paidOtherInStore.map(item => ({
+      // 处理现金流水账 - 付款单(已支付)
+      this.paidPaymentData = []
+      if (this.statisticData.paidPayment && this.statisticData.paidPayment.length > 0) {
+        this.paidPaymentData = this.statisticData.paidPayment.map(item => ({
           itemName: item.itemName,
           amount: parseFloat(item.amount || 0).toFixed(2)
         }))
       }
 
-      this.unPaidOtherInStoreData = []
-      if (this.statisticData.unPaidOtherInStore && this.statisticData.unPaidOtherInStore.length > 0) {
-        this.unPaidOtherInStoreData = this.statisticData.unPaidOtherInStore.map(item => ({
+      // 处理现金流水账 - 付款单(待支付)
+      this.unPaidPaymentData = []
+      if (this.statisticData.unPaidPayment && this.statisticData.unPaidPayment.length > 0) {
+        this.unPaidPaymentData = this.statisticData.unPaidPayment.map(item => ({
           itemName: item.itemName,
           amount: parseFloat(item.amount || 0).toFixed(2)
         }))
@@ -668,10 +700,10 @@ export default {
       // 计算各类别总金额
       this.incomeTotalAmount = this.incomeData.reduce((sum, item) => sum + parseFloat(item.amount), 0).toFixed(2)
       this.paidOutTotalAmount = this.paidOutData.reduce((sum, item) => sum + parseFloat(item.amount), 0).toFixed(2)
-      this.paidOtherInStoreTotalAmount = this.paidOtherInStoreData.reduce((sum, item) => sum + parseFloat(item.amount), 0).toFixed(2)
-      this.unPaidOtherInStoreTotalAmount = this.unPaidOtherInStoreData.reduce((sum, item) => sum + parseFloat(item.amount), 0).toFixed(2)
+      this.unPaidOutTotalAmount = this.unPaidOutData.reduce((sum, item) => sum + parseFloat(item.amount), 0).toFixed(2)
+      this.paidPaymentTotalAmount = this.paidPaymentData.reduce((sum, item) => sum + parseFloat(item.amount), 0).toFixed(2)
+      this.unPaidPaymentTotalAmount = this.unPaidPaymentData.reduce((sum, item) => sum + parseFloat(item.amount), 0).toFixed(2)
       this.purchaseTotalAmount = this.purchaseData.reduce((sum, item) => sum + parseFloat(item.amount), 0).toFixed(2)
-      this.outTotalAmount = this.outData.reduce((sum, item) => sum + parseFloat(item.amount), 0).toFixed(2)
       this.outStoreTotalAmount = this.outStoreData.reduce((sum, item) => sum + parseFloat(item.amount), 0).toFixed(2)
 
       // 设置结余和利润
@@ -739,6 +771,20 @@ export default {
         },
         '支出单',
         'ItemOutList'
+      )
+    },
+    jumpToMoneyOutList(status) {
+      // 跳转到付款单列表
+      this.openInNewTab(
+        '/financial/money_out',
+        {
+          accountId: this.currentAccountId,
+          beginDate: this.queryParam.beginDate,
+          endDate: this.queryParam.endDate,
+          status: status
+        },
+        '付款单',
+        'MoneyOutList'
       )
     },
     jumpToOtherInList(paymentStatus) {
