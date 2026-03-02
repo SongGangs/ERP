@@ -654,7 +654,7 @@ export const BillListMixin = {
       })
     },
     async getCurrentPriceLimit(prefixNo) {
-      if (prefixNo === 'CGRK' || prefixNo === 'CGDD' || prefixNo === 'CGTH' || prefixNo === 'QTCK' || prefixNo === 'QTRK' || prefixNo === 'DBCK') {
+      if (prefixNo === 'CGRK' || prefixNo === 'CGDD' || prefixNo === 'CGTH' || prefixNo === 'QTCK' || prefixNo === 'QTRK' || prefixNo === 'DBCK' || prefixNo === 'PDFP') {
         await getAction('/user/getCurrentPriceLimit', {}).then(res => {
           if (res && res.code === 200) {
             this.priceLimit = res.data.priceLimit.includes(4)
@@ -671,7 +671,7 @@ export const BillListMixin = {
       } else {
         this.settingDataIndex = this.defDataIndex
       }
-      let needRemoveColumns = this.priceLimit ? ['totalPrice', 'totalTaxLastMoney', 'discount', 'discountMoney', 'discountLastMoney', 'otherMoney', 'needInMoney', 'changeAmount', 'deposit','debt', 'needBackMoney']
+      let needRemoveColumns = this.priceLimit ? ['totalPrice', 'totalTaxLastMoney', 'discount', 'discountMoney', 'discountLastMoney', 'otherMoney', 'needInMoney', 'changeAmount', 'deposit','debt', 'needBackMoney', 'originAmount', 'actualAmount', 'diffAmount', 'lossAmount', 'profitAmount']
         : []
       this.columns = this.defColumns.filter(item => {
         if(this.purchaseBySaleFlag) {

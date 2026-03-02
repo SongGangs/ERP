@@ -6,6 +6,7 @@ import com.jsh.erp.constants.BusinessConstants;
 import com.jsh.erp.constants.ExceptionConstants;
 import com.jsh.erp.datasource.entities.*;
 import com.jsh.erp.datasource.mappers.*;
+import com.jsh.erp.exception.BizException;
 import com.jsh.erp.exception.BusinessRunTimeException;
 import com.jsh.erp.exception.JshException;
 import com.jsh.erp.utils.PageUtils;
@@ -274,13 +275,19 @@ public class DepotService {
      * @return
      * @throws Exception
      */
-    public List<Long> parseDepotList(Long depotId) throws Exception {
+    public List<Long> parseDepotList(Long depotId){
         List<Long> depotList = new ArrayList<>();
         if(depotId !=null) {
             depotList.add(depotId);
         } else {
             //未选择仓库时默认为当前用户有权限的仓库
-            JSONArray depotArr = findDepotByCurrentUser();
+            JSONArray depotArr = null;
+            try {
+                depotArr = findDepotByCurrentUser();
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new BizException(ExceptionConstants.DATA_READ_FAIL_CODE, "获取用户仓库失败");
+            }
             for(Object obj: depotArr) {
                 JSONObject object = JSONObject.parseObject(obj.toString());
                 depotList.add(object.getLong("id"));

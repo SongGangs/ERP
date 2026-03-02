@@ -62,7 +62,7 @@
                 </a-col>
                 <a-col :md="6" :sm="24">
                   <a-form-item label="单据状态" :labelCol="labelCol" :wrapperCol="wrapperCol">
-                    <a-select placeholder="请选择单据状态" allow-clear v-model="queryParam.status">
+                    <a-select placeholder="请选择单据状态" mode="multiple" allow-clear v-model="queryParam.status">
                       <a-select-option value="0">未审核</a-select-option>
                       <a-select-option value="9" v-if="!checkFlag">审核中</a-select-option>
                       <a-select-option value="1">同意采购</a-select-option>
@@ -210,7 +210,7 @@
           type: "其它",
           subType: "请购单",
           creator: undefined,
-          status: undefined,
+          status: ["0","1","3"],
           remark: ""
         },
         prefixNo: 'QGD',
@@ -262,6 +262,17 @@
     computed: {
     },
     methods: {
+      getQueryParams() {
+        // 重写父类方法,处理 status 数组转字符串
+        let params = this.$options.mixins[0].methods.getQueryParams.call(this)
+        // 如果 status 是数组,转换为逗号分隔的字符串
+        if (this.queryParam.status && Array.isArray(this.queryParam.status)) {
+          let queryParam = JSON.parse(params.search)
+          queryParam.status = this.queryParam.status.join(',')
+          params.search = JSON.stringify(queryParam)
+        }
+        return params
+      }
     }
   }
 </script>

@@ -117,7 +117,7 @@
         <!-- 商品明细表格 - 只读展示 -->
         <a-table
           style="margin-top: 16px;"
-          :columns="columns"
+          :columns="displayColumns"
           :dataSource="displayDataSource"
           :loading="loading"
           :pagination="false"
@@ -129,13 +129,13 @@
               <span style="margin-right: 24px; color: #52c41a;">
                 🟢 盘盈数量: <strong>{{ surplusNumber }}</strong>
               </span>
-              <span style="margin-right: 24px; color: #52c41a;">
+              <span v-if="!priceLimit" style="margin-right: 24px; color: #52c41a;">
                 盘盈金额: <strong>{{ surplusAmount }}</strong>
               </span>
               <span style="margin-right: 24px; color: #ff4d4f;">
                 🔴 盘亏数量: <strong>{{ lossNumber }}</strong>
               </span>
-              <span style="color: #ff4d4f;">
+              <span v-if="!priceLimit" style="color: #ff4d4f;">
                 盘亏金额: <strong>{{ lossAmount }}</strong>
               </span>
             </div>
@@ -183,6 +183,7 @@ export default {
       model: {},
       fileList: [],
       prefixNo: 'PDFP',
+      priceLimit: false,
       DepotCheckStatus, // 状态枚举
       labelCol: {
         xs: { span: 24 },
@@ -221,6 +222,14 @@ export default {
     }
   },
   computed: {
+    // 根据 priceLimit 过滤显示的列
+    displayColumns() {
+      if (this.priceLimit) {
+        // 如果启用价格限制，过滤掉价格相关列
+        return this.columns.filter(col => !['unitPrice', 'allPrice'].includes(col.dataIndex))
+      }
+      return this.columns
+    },
     totalDiffNumber() {
       return this.allDataSource.reduce((sum, item) => sum + (item.diffNumber - 0), 0).toFixed(2)
     },

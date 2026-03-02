@@ -78,9 +78,10 @@ public class DepotCheckService {
      * 分页查询盘点单列表
      */
     public List<DepotCheckHeadListResp> selectList(DepotCheckQueryReq req) {
+        List<Long> depotListIds = depotService.parseDepotList(req.getDepotId());
         LambdaQueryWrapper<DepotCheckHead> wrapper = new LambdaQueryWrapper<>();
         wrapper.like(StringUtil.isNotEmpty(req.getCheckNumber()), DepotCheckHead::getCheckNumber, req.getCheckNumber())
-                .eq(req.getDepotId() != null, DepotCheckHead::getDepotId, req.getDepotId())
+                .in(CollectionUtils.isNotEmpty(depotListIds), DepotCheckHead::getDepotId, depotListIds)
                 .eq(req.getStatus() != null, DepotCheckHead::getStatus, req.getStatus())
                 .eq(Objects.nonNull(req.getOperatorId()), DepotCheckHead::getUpdater, req.getOperatorId())
                 .ge(req.getBeginTime() != null, DepotCheckHead::getCheckDate, req.getBeginTime())

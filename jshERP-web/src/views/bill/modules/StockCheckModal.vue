@@ -186,6 +186,7 @@
         visible: false,
         operTimeStr: '',
         prefixNo: 'PDFP',
+        priceLimit: false,
         fileList:[],
         rowCanEdit: true,
         model: {},
@@ -204,6 +205,7 @@
         },
         refKeys: ['materialDataTable', ],
         activeKey: 'materialDataTable',
+        allMaterialColumns: [], // 保存完整的列定义（包括价格列）
         materialTable: {
           loading: false,
           dataSource: [],
@@ -220,8 +222,8 @@
             { title: '盘点数量', key: 'operNumber', width: '7%', type: FormTypes.inputNumber, statistics: true,
               validateRules: [
                 {
-                  pattern: /^(0|[1-9]\d*)(\.\d+)?$/,
-                  message: '${title}必须大于等于0'
+                  pattern: /^(0|[1-9]\d*)$/,
+                  message: '${title}只能填写0或正整数'
                 }]
             },
             { title: '盈亏数量', key: 'diffNumber', width: '7%', type: FormTypes.normal, statistics: true },
@@ -268,9 +270,16 @@
           this.updateCheckStatistics()
         },
         deep: true
+      },
+      priceLimit: {
+        handler(newVal) {
+          this.updateColumnsBasedOnPriceLimit()
+        }
       }
     },
     created () {
+      // 保存原始的列定义
+      this.allMaterialColumns = [...this.materialTable.columns]
     },
     methods: {
       //重写addInit和copyAddInit方法，使用年月日格式
@@ -353,6 +362,20 @@
         })
 
         this.checkStatistics = statistics
+      },
+      // 根据 priceLimit 更新表格列
+      updateColumnsBasedOnPriceLimit() {
+        // 如果 allMaterialColumns 为空，先保存原始列
+        if (!this.allMaterialColumns || this.allMaterialColumns.length === 0) {
+          this.allMaterialColumns = [...this.materialTable.columns]
+        }
+
+        // 如果启用价格限制，过滤掉价格相关列
+        if (this.priceLimit) {
+          this.materialTable.columns = this.allMaterialColumns.filter(col => !['unitPrice', 'allPrice'].includes(col.key))
+        } else {
+          this.materialTable.columns = [...this.allMaterialColumns]
+        }
       },
       //调用完edit()方法之后会自动调用此方法
       editAfter() {

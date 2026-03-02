@@ -81,7 +81,7 @@
               <a-checkbox-group @change="onColChange" v-model="settingDataIndex" :defaultValue="settingDataIndex">
                 <a-row style="width: 500px">
                   <template v-for="(item,index) in defColumns">
-                    <template>
+                    <template v-if="!priceLimit || !['originAmount','actualAmount','diffAmount','lossAmount','profitAmount'].includes(item.dataIndex)">
                       <a-col :span="8">
                         <a-checkbox :value="item.dataIndex">
                           <j-ellipsis :value="item.title" :length="10"></j-ellipsis>
@@ -358,6 +358,7 @@
       },
       // 查看盘点单
       myHandleView(record) {
+        this.$refs.modalView.priceLimit = this.priceLimit
         this.$refs.modalView.show(record)
       },
       // 盘点或编辑盘点单（合并重复逻辑）
